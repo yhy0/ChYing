@@ -1,0 +1,8 @@
+# Druid
+/druid/websession.html    {status=200}      {type="html"}     {tag="Druid未授权"}   {root_only}
+/system/druid/websession.html    {status=200}      {type="html"}     {tag="Druid未授权"}   {root_only}
+/webpage/system/druid/websession.html(jeecg)    {status=200}      {type="html"}     {tag="Druid未授权"}   {root_only}
+
+/druid/login.html       {status=200}      {type="html"}     {tag="Druid登录"}   {root_only}
+/system/druid/login.html        {status=200}      {type="html"}     {tag="Druid登录"}   {root_only}
+/webpage/system/druid/login.html        {status=200}      {type="html"}     {tag="Druid登录"}   {root_only}

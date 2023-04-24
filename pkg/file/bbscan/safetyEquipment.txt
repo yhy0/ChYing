@@ -1,0 +1,2 @@
+# 安全设备
+/fort/pages/login.jsp          {status=200}     {root_only}

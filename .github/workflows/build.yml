@@ -1,0 +1,92 @@
+name: ChYing build
+
+on:
+  create:
+    tags:
+      - v*
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Prepare release environment
+    runs-on: ubuntu-latest
+    steps:
+      - run: env
+  build-gui:
+    name: Build gui
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows/amd64
+            output: ChYing.exe
+          - os: macos-latest
+            platform: darwin/universal
+            # wails bug, mac 的 output file 不生效, 先用这个保证能用
+            output: ChYing
+          - os: ubuntu-latest
+            platform: linux/amd64
+            output: ChYing-linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: npm install && npm run build
+        working-directory: frontend
+      - uses: dAppServer/wails-build-action@v2
+        with:
+          build-name: ${{ matrix.output }}
+          build-platform: ${{ matrix.platform }}
+          go-version: 1.19
+          package: false
+      - if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          rm -rf ./build/bin/${{ matrix.output }}.app.zip
+          ditto -c -k --keepParent ./build/bin/${{matrix.output}}.app ./build/bin/${{matrix.output}}.app.zip
+          rm -rf ./build/bin/${{ matrix.output }}.app
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: target
+          path: build/bin/*
+
+  collect-release:
+    name: Collect and release
+    needs: [ build-gui ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: target
+          path: target
+      - run: ls -al target && ls -R target/
+      - working-directory: target
+        run: |
+          rm -rf ChYing-amd64-installer.exe
+          rm -rf ChYing.pkg
+          mv ChYing.app.zip ChYing-darwin.app.zip
+      - run: ls -al target && ls -R target/ && file target/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: target-release
+          path: target/*
+
+      # release assets
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: target/*

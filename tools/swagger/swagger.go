@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/buger/jsonparser"
 	"github.com/thoas/go-funk"
+	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/Jie/conf"
@@ -43,6 +44,9 @@ func init() {
 }
 
 func Scan(target string) {
+	// 每次扫描前都重新读取一遍配置字典
+	file.ReadFiles()
+
 	u, err := url.Parse(target)
 	if err != nil {
 		logging.Logger.Errorf("Scan url.Parse(%s) err: %v", target, err)

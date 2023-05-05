@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/log"
+	"github.com/yhy0/ChYing/tools/burpSuite"
+	"github.com/yhy0/ChYing/tools/burpSuite/data"
 	"github.com/yhy0/ChYing/tools/fuzz"
 	"github.com/yhy0/ChYing/tools/swagger"
 	"github.com/yhy0/ChYing/tools/twj"
@@ -29,6 +32,9 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	// 启动中间人代理
+	go burpSuite.Run()
+
 	// 通知前端各种数据更改
 	go func() {
 		for {
@@ -39,8 +45,13 @@ func (a *App) startup(ctx context.Context) {
 				runtime.EventsEmit(ctx, "FuzzPercentage", percentage)
 			case _fuzz := <-fuzz.FuzzChan: // fuzz 表格数据
 				runtime.EventsEmit(ctx, "Fuzz", _fuzz)
-			case swagger := <-swagger.SwaggerChan:
-				runtime.EventsEmit(ctx, "swagger", swagger)
+			case _swagger := <-swagger.SwaggerChan:
+				runtime.EventsEmit(ctx, "swagger", _swagger)
+			// burp 相关
+			case history := <-data.HttpHistory:
+				runtime.EventsEmit(ctx, "HttpHistory", history)
+			case id := <-data.HTTPId:
+				runtime.EventsEmit(ctx, "HTTPBody", data.HTTPBodyMap.ReadMap(id))
 			}
 		}
 	}()
@@ -142,4 +153,48 @@ func (a *App) FuzzStop() {
 	fuzz.Stop = true
 	time.Sleep(2 * time.Second)
 	fuzz.Stop = false
+}
+
+// burp 相关
+
+func (a *App) GetHistoryDump(id int) *data.HTTPBody {
+	return data.HTTPBodyMap.ReadMap(id)
+}
+
+func (a *App) SendToRepeater(id int) {
+	runtime.EventsEmit(a.ctx, "RepeaterBody", data.HTTPBodyMap.ReadMap(id))
+	return
+}
+
+// Raw Repeater 请求
+func (a *App) Raw(request string, target string, id string) (httpBody *data.HTTPBody) {
+	// 说明第一次
+	if id == "" {
+		id = uuid.NewV4().String()
+	}
+
+	resp, err := httpx.Raw(request, target)
+	if err != nil {
+		return
+	}
+
+	httpBody = &data.HTTPBody{
+		TargetUrl: target,
+		Request:   resp.RequestDump,
+		Response:  resp.ResponseDump,
+		UUID:      id,
+	}
+	value, ok := data.RepeaterBodyMap[id]
+	if ok {
+		_id := len(value)
+		value[_id] = httpBody
+		return
+	}
+
+	// 初始化
+	data.RepeaterBodyMap[id] = make(map[int]*data.HTTPBody)
+
+	data.RepeaterBodyMap[id][0] = httpBody
+
+	return
 }

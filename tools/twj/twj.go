@@ -79,6 +79,8 @@ func Verify(jwtString string, secret string) (*Claims, error) {
 }
 
 func GenerateSignature() string {
+	// 每次扫描前都重新读取一遍配置字典
+	file.ReadFiles()
 	if Twj == nil {
 		return ""
 	}

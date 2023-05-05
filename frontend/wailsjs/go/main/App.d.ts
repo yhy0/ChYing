@@ -8,11 +8,17 @@ export function Fuzz(arg1:string,arg2:Array<string>,arg3:string):Promise<string>
 
 export function FuzzStop():Promise<void>;
 
+export function GetHistoryDump(arg1:number):Promise<any>;
+
 export function Greet(arg1:string):Promise<string>;
 
 export function Parser(arg1:string):Promise<any>;
 
 export function Proxy(arg1:string):Promise<main.Message>;
+
+export function Raw(arg1:string,arg2:string,arg3:string):Promise<any>;
+
+export function SendToRepeater(arg1:number):Promise<void>;
 
 export function Swagger(arg1:string):Promise<void>;
 

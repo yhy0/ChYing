@@ -27,6 +27,9 @@ func init() {
 }
 
 func Fuzz(target string, actions []string, filePath string) error {
+	// 每次扫描前都重新读取一遍配置字典
+	file.ReadFiles()
+
 	res, err := httpx.Request(target, "GET", "", false, nil)
 	if err != nil {
 		return err

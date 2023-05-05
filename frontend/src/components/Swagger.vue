@@ -50,7 +50,7 @@
             <n-gi>
                 <n-tabs type="line" animated >
                     <n-tab-pane name="request" style="width: 100%; overflow-x: auto;">
-                        <n-code language="html" :code="request" show-line-numbers style="white-space: pre-wrap; text-align: left;" />
+                        <n-code language="http" :code="request" show-line-numbers style="white-space: pre-wrap; text-align: left;" />
                     </n-tab-pane>
                 </n-tabs>
             </n-gi>
@@ -58,7 +58,7 @@
             <n-gi>
                 <n-tabs type="line" animated>
                     <n-tab-pane name="response" style="width: 100%; overflow-x: auto;">
-                        <n-code language="html" :code="response" show-line-numbers style="white-space: pre-wrap; text-align: left; " />
+                        <n-code language="http" :code="response" show-line-numbers style="white-space: pre-wrap; text-align: left; " />
                     </n-tab-pane>
                 </n-tabs>
             </n-gi>

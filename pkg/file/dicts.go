@@ -16,3 +16,8 @@ var fileDicc embed.FS
 
 //go:embed twj.txt
 var jwtSecrets embed.FS
+
+// https://github.com/devploit/dontgo403/tree/main/payloads
+//
+//go:embed 403bypass
+var bypass403 embed.FS

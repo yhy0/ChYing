@@ -89,6 +89,7 @@ func DirSearch(target string, actions []string) {
 
 			FuzzChan <- tools.Result{
 				Url:           target + "/" + path,
+				Method:        "GET",
 				StatusCode:    resp.StatusCode,
 				ContentLength: resp.ContentLength,
 				Request:       resp.RequestDump,

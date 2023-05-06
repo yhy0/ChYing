@@ -227,6 +227,10 @@ const columns = [
         title: "Url",
         key: "url",
     },
+    {
+        title: "Method",
+        key: "method",
+    },
     statusColumn,
     lengthColumn,
 ];
@@ -234,6 +238,7 @@ const columns = [
 EventsOn("Fuzz", e => {
     data.value.push({
         url: e.url,
+        method: e.method,
         statusCode: e.status,
         length: e.length,
         request: e.request,

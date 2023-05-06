@@ -1,0 +1,11 @@
+Referer /admin
+X-HTTP-Method-Override POST
+X-HTTP-Method-Override PUT
+X-Original-URL /admin
+X-Override-URL /admin
+X-Rewrite-URL /admin
+X-Forwarded-Port 80
+X-Forwarded-Port 443
+X-Forwarded-Port 4443
+X-Forwarded-Port 8080
+X-Forwarded-Port 8443

@@ -15,11 +15,12 @@ require (
 	github.com/projectdiscovery/stringsutil v0.0.2
 	github.com/projectdiscovery/utils v0.0.19
 	github.com/samber/lo v1.38.1
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/thoas/go-funk v0.9.3
 	github.com/tidwall/match v1.1.1
 	github.com/wailsapp/wails/v2 v2.4.1
-	github.com/yhy0/Jie v0.0.0-20230414123101-e1e9bfe36638
+	github.com/yhy0/Jie v0.0.0-20230505144319-0fca552aa9b6
 	github.com/yhy0/logging v0.0.0-20230316052906-9f857773c4b6
 	go.uber.org/ratelimit v0.2.0
 )
@@ -33,6 +34,7 @@ require (
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
+	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect

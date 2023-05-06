@@ -20,11 +20,10 @@ import (
 **/
 
 var (
-	DiccData []string
-
+	DiccData    []string
 	BBscanRules map[string]*Rule
-
-	JwtSecrets []string
+	JwtSecrets  []string
+	Bypass403   map[string][]string
 )
 
 var chyingDir string
@@ -102,6 +101,20 @@ func New() {
 		}
 	}
 
+	Bypass403 = make(map[string][]string)
+	// 返回[]fs.DirEntry
+	entries, err = bypass403.ReadDir("403bypass")
+	if err != nil {
+		panic(err)
+	}
+	for _, entry := range entries {
+		content, err := bypass403.ReadFile("403bypass/" + entry.Name())
+		if err != nil {
+			continue
+		}
+		Bypass403[entry.Name()] = util.CvtLines(string(content))
+	}
+
 	// 将文件释放
 	UserFile()
 }
@@ -168,13 +181,40 @@ func WriteToConfig() {
 		}
 	}
 
-	// 3. 释放 dirsearch 扫描规则文件
+	// 3. 释放 jwt 密钥文件
 	jwt, err := jwtSecrets.ReadFile("twj.txt")
 	if err != nil {
 		panic(err)
 	}
 	if err = os.WriteFile(filepath.Join(chyingDir, "twj.txt"), jwt, 0644); err != nil {
 		panic(err)
+	}
+
+	// 4. 释放 403 bypass 规则文件
+	bypass := filepath.Join(chyingDir, "403bypass")
+	if err = os.MkdirAll(bypass, 0755); err != nil {
+		panic(err)
+	}
+	// 遍历嵌入文件夹中的文件
+	files, err = fs.ReadDir(bypass403, "403bypass")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range files {
+		// 拼接目标文件路径
+		ruleFile := filepath.Join(bypass, f.Name())
+
+		rulesContent, err := bypass403.ReadFile("403bypass/" + f.Name())
+		if err != nil {
+			logging.Logger.Errorln(err)
+			continue
+		}
+
+		if err = os.WriteFile(ruleFile, rulesContent, 0644); err != nil {
+			logging.Logger.Errorln(err)
+			continue
+		}
 	}
 
 }
@@ -207,7 +247,6 @@ func ReadFiles() {
 	regContentType, _ := regexp.Compile(`{type="(.*?)"}`)
 	regContentTypeNo, _ := regexp.Compile(`{type_no="(.*?)"}`)
 
-	// 返回[]fs.DirEntry
 	bbscan := filepath.Join(chyingDir, "bbscan")
 	entries, err := os.ReadDir(bbscan)
 	if err != nil {
@@ -253,6 +292,21 @@ func ReadFiles() {
 		}
 	}
 
+	Bypass403 = make(map[string][]string)
+	// 返回[]fs.DirEntry
+	bypass := filepath.Join(chyingDir, "403bypass")
+	entries, err = os.ReadDir(bypass)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, entry := range entries {
+		content, err := os.ReadFile(bypass + "/" + entry.Name())
+		if err != nil {
+			continue
+		}
+		Bypass403[entry.Name()] = util.CvtLines(string(content))
+	}
 }
 
 func Trim(s string) string {

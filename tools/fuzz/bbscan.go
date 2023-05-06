@@ -266,6 +266,7 @@ func BBscan(u string, indexContentLength int, indexbody string) {
 
 						FuzzChan <- tools.Result{
 							Url:           u + path,
+							Method:        "GET",
 							StatusCode:    res.StatusCode,
 							ContentLength: res.ContentLength,
 							Request:       res.RequestDump,

@@ -76,6 +76,7 @@ func Scan(target string) {
 
 	SwaggerChan <- tools.Result{
 		Url:           target,
+		Method:        "GET",
 		StatusCode:    req.StatusCode,
 		ContentLength: req.ContentLength,
 		Request:       req.RequestDump,
@@ -99,6 +100,7 @@ func Scan(target string) {
 
 		SwaggerChan <- tools.Result{
 			Url:           t,
+			Method:        "GET",
 			StatusCode:    req.StatusCode,
 			ContentLength: req.ContentLength,
 			Request:       req.RequestDump,
@@ -151,6 +153,7 @@ func Scan(target string) {
 
 			SwaggerChan <- tools.Result{
 				Url:           host + basePath + api,
+				Method:        "GET",
 				StatusCode:    req.StatusCode,
 				ContentLength: req.ContentLength,
 				Request:       req.RequestDump,
@@ -173,6 +176,7 @@ func Scan(target string) {
 
 		SwaggerChan <- tools.Result{
 			Url:           target,
+			Method:        "GET",
 			StatusCode:    req.StatusCode,
 			ContentLength: req.ContentLength,
 			Request:       req.RequestDump,
@@ -528,6 +532,7 @@ func scan(method, target, bodyParams string, header map[string]string) {
 
 		SwaggerChan <- tools.Result{
 			Url:           target,
+			Method:        "GET",
 			StatusCode:    req.StatusCode,
 			ContentLength: req.ContentLength,
 			Request:       req.RequestDump,
@@ -610,6 +615,7 @@ func scan(method, target, bodyParams string, header map[string]string) {
 
 		SwaggerChan <- tools.Result{
 			Url:           target,
+			Method:        method,
 			StatusCode:    req.StatusCode,
 			ContentLength: req.ContentLength,
 			Request:       req.RequestDump,

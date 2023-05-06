@@ -44,8 +44,21 @@ func (a *App) startup(ctx context.Context) {
 			case percentage := <-fuzz.FuzzPercentage: // fuzz 的进度条
 				runtime.EventsEmit(ctx, "FuzzPercentage", percentage)
 			case _fuzz := <-fuzz.FuzzChan: // fuzz 表格数据
+				// todo 先在这里对 403 页面进行 bypass 测试，后续再看看有没有必要在前端显示做一个按钮开关控制
+				if _fuzz.StatusCode == 403 {
+					bypass := fuzz.Bypass403(_fuzz.Url, "")
+					if bypass != nil {
+						fuzz.FuzzChan <- *bypass
+					}
+				}
 				runtime.EventsEmit(ctx, "Fuzz", _fuzz)
 			case _swagger := <-swagger.SwaggerChan:
+				if _swagger.StatusCode == 403 {
+					bypass := fuzz.Bypass403(_swagger.Url, _swagger.Method)
+					if bypass != nil {
+						fuzz.FuzzChan <- *bypass
+					}
+				}
 				runtime.EventsEmit(ctx, "swagger", _swagger)
 			// burp 相关
 			case history := <-data.HttpHistory:

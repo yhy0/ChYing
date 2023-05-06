@@ -24,9 +24,18 @@ https://wails.io/zh-Hans/docs/gettingstarted/installation/
 
 对 `swagger api` 进行未授权、ssrf、注入等测试
 
+### 403 bypass
+
+上述两个功能会自动进行 403 bypass
+
+https://github.com/devploit/dontgo403
+
+https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
+
 ### JWT
 
-JWT token 解析，[jwt.io](https://jwt.io/) 样式显示；JWT 秘钥爆破
+- JWT token 解析，[jwt.io](https://jwt.io/) 样式显示
+- JWT 秘钥爆破
 
 ### BurpSuite
 

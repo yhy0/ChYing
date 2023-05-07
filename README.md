@@ -2,7 +2,9 @@
 
 将旦昧爽之交，日夕昏明之际，北面而察之，淡淡焉若有物存，莫识其状。其所触也，窃窃然有声，经物而物不疾也。
 
-<video src="./images/ChYing.mp4"></video>
+<video controls="controls" loop="loop" autoplay="autoplay"> 
+    <source src="images/ChYing.mp4" type="video/mp4">
+</video>
 
 ## 构建项目
 

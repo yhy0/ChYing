@@ -123,6 +123,7 @@ func Request(target string, method string, postdata string, isredirect bool, hea
 	req.Header.Set("User-Agent", uarand.GetRandom())
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Connection", "close")
+	req.Header.Set("Accept-Encoding", "identity")
 	flag := true
 	for k, v := range headers {
 		if k == "Content-Type" {
@@ -150,13 +151,16 @@ func Request(target string, method string, postdata string, isredirect bool, hea
 		return &Response{"999", 999, "", "", "", nil, 0, "", "", 0}, err
 	}
 
-	responseDump, _ := httputil.DumpResponse(resp, true)
+	dump, _ := httputil.DumpResponse(resp, false)
+
 	var location string
 	var respbody string
 	defer resp.Body.Close()
 	if body, err := ioutil.ReadAll(resp.Body); err == nil {
 		respbody = string(body)
 	}
+
+	responseDump := string(dump) + respbody
 	if resplocation, err := resp.Location(); err == nil {
 		location = resplocation.String()
 	}
@@ -223,4 +227,59 @@ func UploadRequest(target string, params map[string]string, name, path string) (
 	}
 
 	return &Response{resp.Status, resp.StatusCode, respbody, string(requestDump), string(responseDump), resp.Header, int(resp.ContentLength), resp.Request.URL.String(), location, 0}, nil
+}
+
+func RequestRaw(target string, method string, postdata string, isredirect bool, headers map[string]string) (*Response, error) {
+	if isredirect {
+		jar, _ := cookiejar.New(nil)
+		session.Client.Jar = jar
+	}
+
+	req, err := http.NewRequest(strings.ToUpper(method), target, strings.NewReader(postdata))
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range headers {
+		req.Header[k] = []string{v}
+	}
+	req.Header.Set("Accept-Encoding", "identity")
+
+	var start = time.Now()
+	trace := &httptrace.ClientTrace{
+		GotFirstResponseByte: func() {},
+	}
+
+	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
+
+	requestDump, _ := httputil.DumpRequestOut(req, true)
+	session.RateLimiter.Take()
+	resp, err := session.Client.Do(req)
+	if err != nil {
+		//防止空指针
+		return &Response{"999", 999, "", "", "", nil, 0, "", "", 0}, err
+	}
+
+	dump, _ := httputil.DumpResponse(resp, false)
+
+	var location string
+	var respbody string
+	defer resp.Body.Close()
+	if body, err := ioutil.ReadAll(resp.Body); err == nil {
+		respbody = string(body)
+	}
+
+	responseDump := string(dump) + respbody
+
+	if resplocation, err := resp.Location(); err == nil {
+		location = resplocation.String()
+	}
+
+	contentLength := int(resp.ContentLength)
+
+	if contentLength == -1 {
+		contentLength = len(respbody)
+	}
+
+	return &Response{resp.Status, resp.StatusCode, respbody, string(requestDump), responseDump, resp.Header, contentLength, resp.Request.URL.String(), location, float64(time.Since(start).Milliseconds())}, nil
 }

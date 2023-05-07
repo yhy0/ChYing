@@ -41,9 +41,19 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 使用 [go-mitmproxy](https://github.com/lqqyt2423/go-mitmproxy) 项目实现 BurpSuite 的 功能
 
+[证书安装](https://github.com/lqqyt2423/go-mitmproxy#usage):
+
+启动后HTTP代理地址默认设置为9080端口
+
+第一次启动后需要安装证书来解析HTTPS流量。 证书会在第一次启动命令后自动生成，保存在~/.mitmproxy/mitmproxy-ca-cert.pem. 安装步骤可以在 Python mitmproxy 文档中找到：[关于证书](https://docs.mitmproxy.org/stable/concepts-certificates/)。
+
 -   [ ] Proxy 模块 						HTTP history 部分实现，其它未实现
 -   [x] Repeater 模块               
--   [ ] Intruder 模块                
+-   [x] Intruder 模块                部分功能已实现
+    -   [x] Sniper 模式 Fuzz
+    -   [x] Cluster bomb 模式 Fuzz
+    -   [x] 对 payload 进行 md5 加密
+
 
 ### 字典可配置
 

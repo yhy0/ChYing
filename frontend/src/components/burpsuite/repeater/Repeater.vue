@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import {computed, ref} from "vue";
 import {NCard, useMessage} from "naive-ui";
 import {EventsOn} from "../../../../wailsjs/runtime/runtime.js";
 import {Raw} from "../../../../wailsjs/go/main/App.js";
@@ -38,8 +38,7 @@ function handleClose(name) {
         return;
     }
     panels.value.splice(index, 1);
-    const newKey = panels.value[Math.min(index, panels.value.length - 1)].key;
-    value.value = newKey;
+    value.value = panels.value[Math.min(index, panels.value.length - 1)].key;
 }
 
 EventsOn("RepeaterBody", result => {
@@ -58,20 +57,21 @@ EventsOn("RepeaterBody", result => {
 
 const request = ref('');
 // 通过 id 监听 更改，应该有更优雅的实现方式，但是我不会。。。
-function updateReqValue() {
+function updateReqValue(panel) {
     request.value = document.getElementById("myCode").textContent;
 }
 
 function send(panel) {
-    console.log(panel.url);
+    if (request.value === "") {
+        request.value = panel.req;
+    }
+
     Raw(request.value, panel.url, panel.id).then(result=>{
         panel.req = result.request;
         panel.res = result.response;
         panel.id = result.uuid;
     })
 }
-
-
 
 </script>
 
@@ -81,7 +81,6 @@ function send(panel) {
         type="card"
         :addable="addable"
         :closable="closable"
-        tab-style="min-width: 80px;"
         @close="handleClose"
         @add="handleAdd"
     >
@@ -96,16 +95,16 @@ function send(panel) {
                 <n-grid :x-gap="12" :cols="2">
                     <n-gi>
                         <n-tabs type="line" animated >
-                            <n-tab-pane name="request" style="width: 100%; overflow-x: auto;">
+                            <n-tab-pane name="Request" style="width: 100%; overflow-x: auto;">
                                 <!-- contenteditable 设置为可修改, 这样通过 id 获取值 不能再使用 show-line-numbers 显示行号，不然会将行号带到请求中 -->
-                                <n-code id="myCode" contenteditable language="http" :code="panel.req" @input="updateReqValue" style="white-space: pre-wrap; text-align: left;" />
+                                <n-code id="myCode" contenteditable language="http" :code="panel.req" @input="updateReqValue(panel)" style="white-space: pre-wrap; text-align: left;" />
                             </n-tab-pane>
                         </n-tabs>
                     </n-gi>
 
                     <n-gi>
                         <n-tabs type="line" animated>
-                            <n-tab-pane name="response" style="width: 100%; overflow-x: auto;">
+                            <n-tab-pane name="Response" style="width: 100%; overflow-x: auto;">
                                 <n-code language="http" word-wrap :code="panel.res" show-line-numbers style="white-space: pre-wrap; text-align: left; " />
                             </n-tab-pane>
                         </n-tabs>

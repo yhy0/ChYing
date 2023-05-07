@@ -1,4 +1,4 @@
-export namespace data {
+export namespace burpSuite {
 	
 	export class HTTPBody {
 	    targetUrl: string;

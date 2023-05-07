@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "highlight.js": "^11.7.0",
+    "uuid": "^9.0.0",
     "vue": "^3.2.37"
   },
   "devDependencies": {

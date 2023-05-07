@@ -10,7 +10,6 @@ import (
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/log"
 	"github.com/yhy0/ChYing/tools/burpSuite"
-	"github.com/yhy0/ChYing/tools/burpSuite/data"
 	"github.com/yhy0/ChYing/tools/fuzz"
 	"github.com/yhy0/ChYing/tools/swagger"
 	"github.com/yhy0/ChYing/tools/twj"
@@ -61,10 +60,8 @@ func (a *App) startup(ctx context.Context) {
 				}
 				runtime.EventsEmit(ctx, "swagger", _swagger)
 			// burp 相关
-			case history := <-data.HttpHistory:
+			case history := <-burpSuite.HttpHistory:
 				runtime.EventsEmit(ctx, "HttpHistory", history)
-			case id := <-data.HTTPId:
-				runtime.EventsEmit(ctx, "HTTPBody", data.HTTPBodyMap.ReadMap(id))
 			}
 		}
 	}()
@@ -170,17 +167,19 @@ func (a *App) FuzzStop() {
 
 // burp 相关
 
-func (a *App) GetHistoryDump(id int) *data.HTTPBody {
-	return data.HTTPBodyMap.ReadMap(id)
+// GetHistoryDump 代理记录
+func (a *App) GetHistoryDump(id int) *burpSuite.HTTPBody {
+	return burpSuite.HTTPBodyMap.ReadMap(id)
 }
 
+// SendToRepeater 发给 Repeater 界面处理
 func (a *App) SendToRepeater(id int) {
-	runtime.EventsEmit(a.ctx, "RepeaterBody", data.HTTPBodyMap.ReadMap(id))
+	runtime.EventsEmit(a.ctx, "RepeaterBody", burpSuite.HTTPBodyMap.ReadMap(id))
 	return
 }
 
 // Raw Repeater 请求
-func (a *App) Raw(request string, target string, id string) (httpBody *data.HTTPBody) {
+func (a *App) Raw(request string, target string, id string) (httpBody *burpSuite.HTTPBody) {
 	// 说明第一次
 	if id == "" {
 		id = uuid.NewV4().String()
@@ -191,13 +190,13 @@ func (a *App) Raw(request string, target string, id string) (httpBody *data.HTTP
 		return
 	}
 
-	httpBody = &data.HTTPBody{
+	httpBody = &burpSuite.HTTPBody{
 		TargetUrl: target,
 		Request:   resp.RequestDump,
 		Response:  resp.ResponseDump,
 		UUID:      id,
 	}
-	value, ok := data.RepeaterBodyMap[id]
+	value, ok := burpSuite.RepeaterBodyMap[id]
 	if ok {
 		_id := len(value)
 		value[_id] = httpBody
@@ -205,9 +204,25 @@ func (a *App) Raw(request string, target string, id string) (httpBody *data.HTTP
 	}
 
 	// 初始化
-	data.RepeaterBodyMap[id] = make(map[int]*data.HTTPBody)
+	burpSuite.RepeaterBodyMap[id] = make(map[int]*burpSuite.HTTPBody)
 
-	data.RepeaterBodyMap[id][0] = httpBody
+	burpSuite.RepeaterBodyMap[id][0] = httpBody
 
 	return
+}
+
+// SendToIntruder 发给 Intruder 界面处理
+func (a *App) SendToIntruder(id int) {
+	runtime.EventsEmit(a.ctx, "IntruderBody", burpSuite.HTTPBodyMap.ReadMap(id))
+	return
+}
+
+// Intruder 处理 Intruder 传来的参数
+func (a *App) Intruder(target string, req string, payloads []string, rules []string, attackType string, uuid string) {
+	burpSuite.Intruder(target, req, payloads, rules, attackType, uuid, a.ctx)
+}
+
+// GetAttackDump Intruder attack 记录
+func (a *App) GetAttackDump(uuid string, id int) *burpSuite.HTTPBody {
+	return burpSuite.IntruderMap[uuid].ReadMap(id)
 }

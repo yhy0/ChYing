@@ -1,10 +1,8 @@
-package data
-
-import "sync"
+package burpSuite
 
 /**
   @author: yhy
-  @since: 2023/4/24
+  @since: 2023/5/7
   @desc: //TODO
 **/
 
@@ -27,32 +25,6 @@ type HTTPHistory struct {
 	Time      string `json:"time"`
 }
 
-type SMap struct {
-	sync.RWMutex
-	Map map[int]*HTTPBody
-}
-
-func (l *SMap) WriteMap(key int, value *HTTPBody) {
-	l.Lock()
-	l.Map[key] = value
-	l.Unlock()
-}
-
-func (l *SMap) ReadMap(key int) *HTTPBody {
-	l.RLock()
-	value, _ := l.Map[key]
-	l.RUnlock()
-	return value
-}
-
-var HttpHistory chan HTTPHistory
-
-var HTTPId chan int
-var HTTPBodyMap *SMap
-
-// RepeaterBodyMap Repeater 中回退、前进使用
-var RepeaterBodyMap map[string]map[int]*HTTPBody
-
 type HTTPBody struct {
 	TargetUrl string `json:"targetUrl"`
 	Request   string `json:"request"`
@@ -60,14 +32,9 @@ type HTTPBody struct {
 	UUID      string `json:"uuid"`
 }
 
-func init() {
-	HttpHistory = make(chan HTTPHistory, 1)
-
-	HTTPId = make(chan int, 1)
-
-	HTTPBodyMap = &SMap{
-		Map: make(map[int]*HTTPBody),
-	}
-
-	RepeaterBodyMap = make(map[string]map[int]*HTTPBody)
+type IntruderRes struct {
+	Id      int    `json:"id"`
+	Payload string `json:"payload"`
+	Status  string `json:"status"`
+	Length  string `json:"length"`
 }

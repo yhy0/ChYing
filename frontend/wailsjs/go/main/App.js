@@ -14,12 +14,20 @@ export function FuzzStop() {
   return window['go']['main']['App']['FuzzStop']();
 }
 
+export function GetAttackDump(arg1, arg2) {
+  return window['go']['main']['App']['GetAttackDump'](arg1, arg2);
+}
+
 export function GetHistoryDump(arg1) {
   return window['go']['main']['App']['GetHistoryDump'](arg1);
 }
 
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
+}
+
+export function Intruder(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['main']['App']['Intruder'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 export function Parser(arg1) {
@@ -32,6 +40,10 @@ export function Proxy(arg1) {
 
 export function Raw(arg1, arg2, arg3) {
   return window['go']['main']['App']['Raw'](arg1, arg2, arg3);
+}
+
+export function SendToIntruder(arg1) {
+  return window['go']['main']['App']['SendToIntruder'](arg1);
 }
 
 export function SendToRepeater(arg1) {

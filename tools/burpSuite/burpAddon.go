@@ -1,9 +1,8 @@
-package burp
+package burpSuite
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/yhy0/ChYing/tools/burpSuite/data"
 	"github.com/yhy0/ChYing/tools/burpSuite/mitmproxy/proxy"
 	"github.com/yhy0/logging"
 	"net/http"
@@ -58,7 +57,7 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			remoteAddr = ""
 		}
 
-		data.HttpHistory <- data.HTTPHistory{
+		HttpHistory <- HTTPHistory{
 			Id:        f.Id,
 			Host:      f.Request.URL.Host,
 			Method:    f.Request.Method,
@@ -120,7 +119,7 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 		}
 		responseDump := buf.String()
 
-		data.HTTPBodyMap.WriteMap(f.Id, &data.HTTPBody{
+		HTTPBodyMap.WriteMap(f.Id, &HTTPBody{
 			TargetUrl: f.Request.URL.String(),
 			Request:   requestDump,
 			Response:  responseDump,

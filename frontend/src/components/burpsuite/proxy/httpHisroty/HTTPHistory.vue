@@ -50,7 +50,7 @@
 import {NCard, NDataTable, useMessage} from "naive-ui";
 import {ref, h, nextTick } from "vue";
 import {EventsOn} from "../../../../../wailsjs/runtime/runtime.js";
-import {GetHistoryDump, SendToRepeater} from "../../../../../wailsjs/go/main/App.js";
+import {GetHistoryDump, SendToRepeater, SendToIntruder} from "../../../../../wailsjs/go/main/App.js";
 
 
 const message = useMessage();
@@ -65,7 +65,11 @@ const showDropdown = ref(false);
 const options = [
     {
         label: () => h("span", { style: { color: "green" } }, "Repeater"),
-        key: "sr",
+        key: "repeater",
+    },
+    {
+        label: () => h("span", { style: { color: "green" } }, "Intruder"),
+        key: "intruder",
     },
     {
         label: () => h("span", { style: { color: "red" } }, "删除"),
@@ -77,10 +81,12 @@ const rid = ref(0);
 
 const handleSelect = (option) => {
     showDropdown.value = false;
-    if (option === "sr") {
+    if (option === "repeater") {
         SendToRepeater(rid.value);
-        message.info("success");
-
+        message.info("Send To Repeater Success");
+    } else if (option === "intruder") {
+        SendToIntruder(rid.value);
+        message.info("Send To Intruder Success");
     } else if (option === "edit") {
         // 打开编辑对话框
         // ...

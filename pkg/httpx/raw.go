@@ -46,7 +46,7 @@ func Raw(request string, target string) (*Response, error) {
 		return nil, err
 	}
 
-	return Request(rawRequestData.FullURL, rawRequestData.Method, rawRequestData.Data, false, rawRequestData.Headers)
+	return RequestRaw(rawRequestData.FullURL, rawRequestData.Method, rawRequestData.Data, false, rawRequestData.Headers)
 }
 
 // Parse parses the raw request as supplied by the user

@@ -29,8 +29,70 @@ func Intruder(target string, req string, payloads []string, rules []string, atta
 	}
 }
 
-// sniper 模式设置的所有 payload 位置使用同一份 fuzz 文本
+// sniper 模式 设置每个 payload 位置都使用相同的 fuzz 文本 跑一遍
 func sniper(target string, req string, payloads []string, rules []string, uuid string, ctx context.Context) {
+	positions := getPositions(req)
+	ch := make(chan struct{}, 20)
+
+	// 定义分隔符的回调函数
+	splitFunc := func(r rune) bool {
+		return r == '\r' || r == '\n'
+	}
+
+	// 使用 FieldsFunc() 函数分割字符串
+	payloads = strings.FieldsFunc(payloads[0], splitFunc)
+
+	var id = 0
+
+	for i, position := range positions {
+		request := req // req 不能改变
+		for _, payload := range payloads {
+			// 这里是根据payload位置来进行对应的处理
+			payload = processing(payload, rules[i])
+			request = strings.Replace(request, position, payload, 1)
+			ch <- struct{}{}
+			id += 1
+			go func(request, payload string, id int) {
+				intruderRes := IntruderRes{
+					Id:      id,
+					Payload: []string{payload},
+				}
+				resp, err := httpx.Raw(request, target)
+
+				<-ch
+				if err != nil {
+					runtime.EventsEmit(ctx, uuid, intruderRes)
+					return
+				}
+
+				intruderRes.Status = strconv.Itoa(resp.StatusCode)
+				intruderRes.Length = strconv.Itoa(resp.ContentLength)
+
+				runtime.EventsEmit(ctx, uuid, intruderRes)
+
+				smap, ok := IntruderMap[uuid]
+				if !ok {
+					// 如果不存在，则创建一个新的 SMap 实例并添加到 IntruderMap 中
+					smap = &SMap{
+						Map: make(map[int]*HTTPBody),
+					}
+					IntruderMap[uuid] = smap
+				}
+
+				IntruderMap[uuid].WriteMap(i, &HTTPBody{
+					TargetUrl: target,
+					Request:   resp.RequestDump,
+					Response:  resp.ResponseDump,
+				})
+
+			}(request, payload, id)
+		}
+	}
+	close(ch)
+}
+
+// batteringRam 模式设置的所有 payload 位置使用同一份 fuzz 文本
+func batteringRam(target string, req string, payloads []string, rules []string, uuid string, ctx context.Context) {
 	positions := getPositions(req)
 	ch := make(chan struct{}, 20)
 
@@ -58,6 +120,8 @@ func sniper(target string, req string, payloads []string, rules []string, uuid s
 				Payload: []string{payload},
 			}
 			resp, err := httpx.Raw(request, target)
+
+			<-ch
 			if err != nil {
 				runtime.EventsEmit(ctx, uuid, intruderRes)
 				return
@@ -88,12 +152,78 @@ func sniper(target string, req string, payloads []string, rules []string, uuid s
 	close(ch)
 }
 
-func batteringRam(target string, req string, payloads []string, rules []string, uuid string, ctx context.Context) {
-
-}
-
+// pitchfork 模式 ，payload 一一对应
 func pitchfork(target string, req string, payloads []string, rules []string, uuid string, ctx context.Context) {
+	positions := getPositions(req)
+	ch := make(chan struct{}, 20)
 
+	// 定义分隔符的回调函数
+	splitFunc := func(r rune) bool {
+		return r == '\r' || r == '\n'
+	}
+
+	words := make([][]string, 0, len(payloads))
+	for i, w := range payloads {
+		// 使用 FieldsFunc() 函数分割字符串
+		words[i] = strings.FieldsFunc(w, splitFunc)
+	}
+
+	payloadss := make([][]string, len(words[0]))
+
+	for k := range words[0] {
+		payloadss[k] = []string{words[0][k]}
+		for i := range words {
+			if i > 0 {
+				payloadss[k] = append(payloadss[k], words[i][k])
+			}
+		}
+
+	}
+
+	for i, payload := range payloadss {
+		request := req // req 不能改变
+		// 这里是根据payload位置来进行对应的处理
+		for j, position := range positions {
+			_payload := processing(payload[j], rules[j])
+			request = strings.Replace(request, position, _payload, 1)
+		}
+		ch <- struct{}{}
+		go func(request string, payload []string, i int) {
+			intruderRes := IntruderRes{
+				Id:      i,
+				Payload: payload,
+			}
+			resp, err := httpx.Raw(request, target)
+			<-ch
+			if err != nil {
+				runtime.EventsEmit(ctx, uuid, intruderRes)
+				return
+			}
+
+			intruderRes.Status = strconv.Itoa(resp.StatusCode)
+			intruderRes.Length = strconv.Itoa(resp.ContentLength)
+
+			runtime.EventsEmit(ctx, uuid, intruderRes)
+
+			smap, ok := IntruderMap[uuid]
+			if !ok {
+				// 如果不存在，则创建一个新的 SMap 实例并添加到 IntruderMap 中
+				smap = &SMap{
+					Map: make(map[int]*HTTPBody),
+				}
+				IntruderMap[uuid] = smap
+			}
+
+			IntruderMap[uuid].WriteMap(i, &HTTPBody{
+				TargetUrl: target,
+				Request:   resp.RequestDump,
+				Response:  resp.ResponseDump,
+			})
+
+		}(request, payload, i)
+	}
+
+	close(ch)
 }
 
 // clusterBomb 每个 payload 位置使用不同的 fuzz 文本
@@ -119,6 +249,7 @@ func clusterBomb(target string, req string, payloads []string, rules []string, u
 				Payload: payload,
 			}
 			resp, err := httpx.Raw(request, target)
+			<-ch
 			if err != nil {
 				runtime.EventsEmit(ctx, uuid, intruderRes)
 				return

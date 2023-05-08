@@ -7,35 +7,15 @@ import (
 	"testing"
 )
 
-/**
-  @author: yhy
-  @since: 2023/5/7
-  @desc: //TODO
-**/
+/*
+*
 
-func backtrack(cur []string, index int, keys []string, values [][]string, orderedKeys []string) [][]string {
-	var results [][]string // 保存结果集合
-	if index == len(keys) {
-		return [][]string{append([]string{}, cur...)} // 返回当前排列组合
-	}
-	for _, s := range values[index] {
-		cur = append(cur, s)
-		subResults := backtrack(cur, index+1, keys, values, orderedKeys)
-		results = append(results, subResults...)
-		cur = cur[:len(cur)-1]
-	}
-	return results // 返回所有排列组合
-}
+	@author: yhy
+	@since: 2023/5/7
+	@desc: //TODO
 
-func contains(s []string, e string) bool {
-	for _, v := range s {
-		if v == e {
-			return true
-		}
-	}
-	return false
-}
-
+*
+*/
 func Test(t *testing.T) {
 	input := "这是§一个§测试§字符串§ asdasdas "
 	re := regexp.MustCompile(`§(.*?)§`)            // 定义正则表达式
@@ -58,31 +38,24 @@ func Test(t *testing.T) {
 	// 输出结果字符串切片
 	fmt.Println(result)
 
-	m := map[string][]string{
-		"A": {"7", "2"},
-		"B": {"3", "4", "1"},
+	arr := [][]string{
+		{"a", "b"},
+		{"x", "y", "z"},
+		{"alpha", "beta"},
 	}
 
-	keys := make([]string, 0, len(m))
-	values := make([][]string, 0, len(m))
-	orderedKeys := make([]string, 0, len(m))
-	for k, v := range m {
-		keys = append(keys, k)
-		values = append(values, v)
-		orderedKeys = append(orderedKeys, k)
-	}
-	results := backtrack(make([]string, 0, len(keys)), 0, keys, values, orderedKeys)
-	for i, result := range results {
-		reorderedResult := make([]string, len(result))
-		for j, k := range orderedKeys {
-			for _, s := range result {
-				if m[k] != nil && contains(m[k], s) {
-					reorderedResult[j] = s
-					break
-				}
+	res := make([][]string, len(arr[0]))
+
+	for k := range arr[0] {
+		res[k] = []string{arr[0][k]}
+
+		for i := range arr {
+			if i > 0 {
+				res[k] = append(res[k], arr[i][k])
 			}
 		}
-		results[i] = reorderedResult
+
 	}
-	fmt.Printf("%v\n", results) // 返回结果集合
+	fmt.Println(res)
+
 }

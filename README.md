@@ -62,9 +62,9 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 用到的各种字典文件, 第一次运行会将内置字典释放到用户目录的`.config/ChYing`目录下，后续每次运行都会先读取一遍
 
 ## 问题
+前端不会，全靠 ChatGPT 
 
 - 现在各个 tabs 页面，不点进去不会激活，导致 BurpSuite 用之前必须点击一遍每个页面
-
 ## License
 
 This code is distributed under the [MIT license](https://github.com/yhy0/ChYing/blob/main/LICENSE). See [LICENSE](https://github.com/yhy0/ChYing/blob/main/LICENSE) in this directory.

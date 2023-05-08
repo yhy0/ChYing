@@ -219,6 +219,12 @@ func (a *App) SendToIntruder(id int) {
 
 // Intruder 处理 Intruder 传来的参数
 func (a *App) Intruder(target string, req string, payloads []string, rules []string, attackType string, uuid string) {
+	for i, rule := range rules {
+		if rule == "" {
+			rules[i] = "None"
+		}
+	}
+
 	burpSuite.Intruder(target, req, payloads, rules, attackType, uuid, a.ctx)
 }
 

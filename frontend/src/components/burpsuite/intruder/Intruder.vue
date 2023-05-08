@@ -70,7 +70,14 @@ function updateReqValue(panel) {
     request.value = document.getElementById("myCode").textContent;
     if (request.value === "") {
         request.value = panel.req;
+    } else {
+        panel.req = request.value;
     }
+
+    const count = (request.value.match(/§/g) || []).length; // 计算 § 符号的数量
+    payloadCount.value = count / 2;
+    panel.len = payloadCount.value;
+
 }
 
 const options = [
@@ -96,13 +103,10 @@ const payloadCount = ref(0);
 // 鼠标选中 ,点击按钮，增加 §§
 function Add(panel) {
     const selection = window.getSelection().toString();
-    if (request.value === "") {
-        request.value = panel.req;
-    }
+    request.value = panel.req;
     if(selection) {
         request.value = request.value.replace(selection, `§${selection}§`)
         const count = (request.value.match(/§/g) || []).length; // 计算 § 符号的数量
-
         payloadCount.value = count / 2;
         panel.len = payloadCount.value;
         panel.req = request.value;
@@ -164,12 +168,17 @@ const selectedSubOption = ref(Array(payloadCount.value).fill(subOptions[optionsM
 const payload = ref([]);
 const payloadSingle = ref('');
 
+// 通过改变 keyValue 的值来销毁该 Attack 界面
+// const keyValue = ref(0);
+
 function attack(panel) {
+    // keyValue.value += 1
     const payloads = [];
     const rules = [];
     if(payload.value.length >0) {
         payload.value.forEach((item, index) => {
             payloads.push(item);
+            // payloads.push("\r\n§-§\r\n");   // 多个字典以 § 为分隔符
             rules.push(selectedSubOption.value[index])
         });
     } else {
@@ -188,6 +197,7 @@ function attack(panel) {
 
     Intruder(panel.url, request.value, payloads, rules, attackTypes.value[panel.key], panel.uuid)
 }
+
 </script>
 
 <template>
@@ -200,9 +210,9 @@ function attack(panel) {
             @add="handleAdd"
     >
 
-        <n-tab-pane v-for="panel in panels" :key="panel.key" :name="panel.key">
+        <n-tab-pane v-for="panel in panels" :key="panel.key" :name="panel.key" display-directive="show:lazy">
             <n-card style="margin-bottom: 16px; margin-top: 10px">
-                <n-tabs type="line" animated>
+                <n-tabs type="line" animated display-directive="show:lazy">
                     <n-tab-pane name="Positions">
                         <n-card title="Choose an attack type" size="small">
                             <div style="display: flex; align-items: center;">
@@ -222,7 +232,7 @@ function attack(panel) {
 
                         </n-card>
                     </n-tab-pane>
-                    <n-tab-pane name="Payloads">
+                    <n-tab-pane name="Payloads" display-directive="show:lazy">
                         <n-card title="Payload settings" size="large" >
                             <n-layout has-sider sider-placement="right">
                                 <div>
@@ -245,9 +255,9 @@ function attack(panel) {
                         </n-card>
                     </n-tab-pane>
 
-                    <n-tab-pane name="Attack">
+                    <n-tab-pane name="Attack" display-directive="show:lazy">
                         <n-button color="#ff6633" @click="attack(panel)" style="margin-bottom: 10px;">Start attack</n-button>
-                        <Attack :uuid="panel.uuid" :len="panel.len"/>
+                        <Attack :uuid="panel.uuid" :len="panel.len" :key="keyValue"/>
                     </n-tab-pane>
                 </n-tabs>
             </n-card>

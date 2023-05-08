@@ -70,8 +70,6 @@ const rowProps = (row) => {
     };
 };
 
-const Payload = [""];
-
 const columns = [
     {
         title: "Request",
@@ -86,7 +84,6 @@ const columns = [
         key: `Payload${index}`,
         resizable: true,
         width: 100,
-        ellipsis: true,
     })),
     {
         title: "Status",
@@ -108,16 +105,20 @@ const rowClassName = (row) => {
 }
 
 EventsOn(props.uuid, IntruderRes => {
-    console.log(props.len);
-    console.log(IntruderRes["payload"].length)
-    data.value.push({
+    const newRow = {
         Id: IntruderRes["id"],
-        ...Array.from({ length: IntruderRes["payload"].length }, (_, index) => ({
-            [`Payload${index}`]: IntruderRes["payload"][index],
-        })),
         Status: IntruderRes["status"],
         Length: IntruderRes["length"],
-    });
+    }
+    console.log(IntruderRes["payload"])
+
+    let i = 0;
+    while (i < props.len) {
+        newRow[`Payload${i}`] = IntruderRes["payload"][i]
+        i++;
+    }
+
+    data.value.push(newRow);
 });
 
 </script>

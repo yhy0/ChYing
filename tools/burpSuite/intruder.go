@@ -2,7 +2,6 @@ package burpSuite
 
 import (
 	"context"
-	"fmt"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/util"
@@ -18,7 +17,6 @@ import (
 **/
 
 func Intruder(target string, req string, payloads []string, rules []string, attackType string, uuid string, ctx context.Context) {
-	fmt.Println(attackType)
 	switch attackType {
 	case "Sniper":
 		sniper(target, req, payloads, rules, uuid, ctx)
@@ -103,19 +101,8 @@ func clusterBomb(target string, req string, payloads []string, rules []string, u
 	positions := getPositions(req)
 	ch := make(chan struct{}, 20)
 
-	// 定义分隔符的回调函数
-	splitFunc := func(r rune) bool {
-		return r == '\r' || r == '\n'
-	}
-
-	var payloadsMap = make(map[string][]string)
-	for i, payload := range payloads {
-		// 使用 FieldsFunc() 函数分割字符串
-		payloadsMap[rules[i]] = strings.FieldsFunc(payload, splitFunc)
-	}
-
 	//  获取全部组合的可能性 payloads
-	result := combinations(payloadsMap, rules)
+	result := combinations(payloads, rules)
 
 	for i, payload := range result {
 		request := req // req 不能改变
@@ -162,48 +149,56 @@ func clusterBomb(target string, req string, payloads []string, rules []string, u
 	close(ch)
 }
 
-// combinations 获取所有 clusterBomb 模式payload组合结果的可能性
-func combinations(data map[string][]string, pattern []string) [][]string {
-	var results [][]string
-	var stack []int
-	var output []string
-
-	for i := 0; i < len(pattern); i++ {
-		key := pattern[i]
-		values := data[key]
-
-		if len(values) == 0 {
-			return nil
-		}
-
-		stack = append(stack, len(values))
-		output = append(output, values[0])
+// combinations 获取所有 clusterBomb 模式payload组合结果的可能性,并且保证顺序不乱
+func combinations(words []string, rules []string) [][]string {
+	// 定义分隔符的回调函数
+	splitFunc := func(r rune) bool {
+		return r == '\r' || r == '\n'
 	}
 
-	for len(stack) > 0 {
-		result := make([]string, len(pattern))
-		copy(result, output)
-		results = append(results, result)
-
-		i := len(stack) - 1
-		output[i] = data[pattern[i]][stack[i]-1]
-		stack[i]--
-
-		for ; i > 0 && stack[i] == 0; i-- {
-			stack[i-1]--
-			stack[i] = len(data[pattern[i]])
-			output[i] = data[pattern[i]][0]
-		}
-
-		if stack[0] == 0 {
-			break
-		}
-
-		output[0] = data[pattern[0]][stack[0]-1]
-		stack[0]--
+	payloads := make([][]string, 0, len(words))
+	for _, w := range words {
+		// 使用 FieldsFunc() 函数分割字符串
+		payloads = append(payloads, strings.FieldsFunc(w, splitFunc))
 	}
 
+	results := backtrack(make([]string, 0, len(rules)), 0, rules, payloads, rules)
+	for i, result := range results {
+		reorderedResult := make([]string, len(result))
+		for j := range rules {
+			for _, s := range result {
+				if contains(payloads[j], s) {
+					reorderedResult[j] = s
+					break
+				}
+			}
+		}
+		results[i] = reorderedResult
+	}
 	return results
+}
+
+func backtrack(cur []string, index int, keys []string, values [][]string, orderedKeys []string) [][]string {
+	var results [][]string // 保存结果集合
+	if index == len(keys) {
+		return [][]string{append([]string{}, cur...)} // 返回当前排列组合
+	}
+	for _, s := range values[index] {
+		cur = append(cur, s)
+		subResults := backtrack(cur, index+1, keys, values, orderedKeys)
+		results = append(results, subResults...)
+		cur = cur[:len(cur)-1]
+	}
+	return results // 返回所有排列组合
+}
+
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if v == e {
+			return true
+		}
+	}
+	return false
 }
 
 // getPositions 获取 payload 设置位置字符

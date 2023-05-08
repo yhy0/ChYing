@@ -48,6 +48,10 @@ const props = defineProps({
     uuid: {
         type: String,
         required: true
+    },
+    len: {
+        type: Number,
+        required: true
     }
 })
 
@@ -66,6 +70,8 @@ const rowProps = (row) => {
     };
 };
 
+const Payload = [""];
+
 const columns = [
     {
         title: "Request",
@@ -74,13 +80,14 @@ const columns = [
         width: 100,
         sorter: (row1, row2) => row1.Id - row2.Id
     },
-    {
-        title: "Payload",
-        key: "Payload",
+    // 动态生成列定义对象
+    ...Array.from({ length: props.len }, (_, index) => ({
+        title: `Payload ${index + 1}`,
+        key: `Payload${index}`,
         resizable: true,
-        width: 200,
-        ellipsis: true
-    },
+        width: 100,
+        ellipsis: true,
+    })),
     {
         title: "Status",
         key: "Status",
@@ -101,10 +108,13 @@ const rowClassName = (row) => {
 }
 
 EventsOn(props.uuid, IntruderRes => {
-    console.log(IntruderRes);
+    console.log(props.len);
+    console.log(IntruderRes["payload"].length)
     data.value.push({
         Id: IntruderRes["id"],
-        Payload: IntruderRes["payload"],
+        ...Array.from({ length: IntruderRes["payload"].length }, (_, index) => ({
+            [`Payload${index}`]: IntruderRes["payload"][index],
+        })),
         Status: IntruderRes["status"],
         Length: IntruderRes["length"],
     });

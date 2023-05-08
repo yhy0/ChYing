@@ -224,5 +224,6 @@ func (a *App) Intruder(target string, req string, payloads []string, rules []str
 
 // GetAttackDump Intruder attack 记录
 func (a *App) GetAttackDump(uuid string, id int) *burpSuite.HTTPBody {
+	fmt.Println(uuid, id)
 	return burpSuite.IntruderMap[uuid].ReadMap(id)
 }

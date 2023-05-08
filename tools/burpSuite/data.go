@@ -33,8 +33,8 @@ type HTTPBody struct {
 }
 
 type IntruderRes struct {
-	Id      int    `json:"id"`
-	Payload string `json:"payload"`
-	Status  string `json:"status"`
-	Length  string `json:"length"`
+	Id      int      `json:"id"`
+	Payload []string `json:"payload"`
+	Status  string   `json:"status"`
+	Length  string   `json:"length"`
 }

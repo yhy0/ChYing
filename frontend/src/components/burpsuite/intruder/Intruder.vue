@@ -21,6 +21,8 @@ const closable = computed(() => {
     return panels.value.length > 1;
 });
 
+const attackTypes = ref([""]); // 用于保存每个标签页对应的攻击类型选项
+
 function handleAdd() {
     const newKey = String(+panels.value[panels.value.length - 1].key + 1);
     panels.value.push({
@@ -31,8 +33,10 @@ function handleAdd() {
         id: ``,
         uuid:  uuidv4(),   // 生成随机 UUID
         key: newKey,
+        len: 0,
     });
     value.value = newKey;
+    attackTypes.value.push('Sniper');
 }
 
 function handleClose(name) {
@@ -53,16 +57,17 @@ EventsOn("IntruderBody", result => {
         key: newKey,
         uuid: uuidv4(),   // 生成随机 UUID
         id: "",
+        len: 0,
     };
     panels.value.push(newPanel);
     value.value = newKey;
+    attackTypes.value.push('Sniper');
 });
 
 const request = ref('');
 // 通过 id 监听 更改，应该有更优雅的实现方式，但是我不会。。。
 function updateReqValue(panel) {
     request.value = document.getElementById("myCode").textContent;
-
     if (request.value === "") {
         request.value = panel.req;
     }
@@ -86,27 +91,31 @@ const options = [
         value: "Cluster bomb",
     },
 ]
-
-const attackType = ref("Sniper");
 const payloadCount = ref(0);
 
 // 鼠标选中 ,点击按钮，增加 §§
 function Add(panel) {
     const selection = window.getSelection().toString();
-    if(selection) {
-        panel.req = panel.req.replace(selection, `§${selection}§`)
-        payloadCount.value = payloadCount.value+1;
+    if (request.value === "") {
         request.value = panel.req;
+    }
+    if(selection) {
+        request.value = request.value.replace(selection, `§${selection}§`)
+        const count = (request.value.match(/§/g) || []).length; // 计算 § 符号的数量
+
+        payloadCount.value = count / 2;
+        panel.len = payloadCount.value;
+        panel.req = request.value;
     }
 }
 
 function Clear(panel) {
-    panel.req = panel.req.replaceAll("§", "");
-    request.value = panel.req;
+    request.value = request.value.replaceAll("§", "");
+    panel.req = request.value;
 }
 
 const shouldRenderInputs = computed(() => {
-    return ["Pitchfork", "Cluster bomb"].includes(attackType.value)
+    return ["Pitchfork", "Cluster bomb"].includes(attackTypes.value[Number(value.value)])
 })
 
 const optionsMapped = [
@@ -128,7 +137,6 @@ const optionsMapped = [
     },
 ]
 
-
 const subOptions = {
     None :[{label:"", value:"None"}],
     Encode: [
@@ -143,8 +151,6 @@ const subOptions = {
     ]
 }
 
-
-
 const selectedOptionSingle = ref(optionsMapped[0].value)
 const selectedSubOptionSingle = ref(subOptions[selectedOptionSingle.value][0].value)
 
@@ -152,12 +158,8 @@ watch(selectedOptionSingle, (newValue,) => {
     selectedSubOptionSingle.value = subOptions[newValue][0].value
 })
 
-// const selectedOption = ref(optionsMapped[0].value)
-// const selectedSubOption = ref(subOptions[selectedOption.value][0].value)
-
 const selectedOption = ref(Array(payloadCount.value).fill(optionsMapped[0].value))
 const selectedSubOption = ref(Array(payloadCount.value).fill(subOptions[optionsMapped[0].value][0].value))
-
 
 const payload = ref([]);
 const payloadSingle = ref('');
@@ -184,10 +186,8 @@ function attack(panel) {
         return
     }
 
-    Intruder(panel.url, request.value, payloads, rules, attackType.value, panel.uuid)
+    Intruder(panel.url, request.value, payloads, rules, attackTypes.value[panel.key], panel.uuid)
 }
-
-
 </script>
 
 <template>
@@ -202,20 +202,19 @@ function attack(panel) {
 
         <n-tab-pane v-for="panel in panels" :key="panel.key" :name="panel.key">
             <n-card style="margin-bottom: 16px; margin-top: 10px">
-                <n-button color="#ff6633" @click="attack(panel)">Start attack</n-button>
                 <n-tabs type="line" animated>
                     <n-tab-pane name="Positions">
                         <n-card title="Choose an attack type" size="small">
                             <div style="display: flex; align-items: center;">
-                                Attack type: <n-select v-model:value="attackType" :options="options" style="width: 80%"/>
+                                Attack type: <n-select v-model:value="attackTypes[panel.key]" :options="options" style="width: 80%"/>
                             </div>
                         </n-card>
-                        <n-card title="Payload positions" size="large" >
+                        <n-card title="Payload positions" size="large" style="margin-bottom: 16px; margin-top: 10px">
                             <n-layout has-sider sider-placement="right">
                                 <n-layout-content content-style="padding: 5px; overflow-x: auto;">
                                     <n-code id="myCode" contenteditable language="http" :code="panel.req" @input="updateReqValue(panel)" style="white-space: pre-wrap; text-align: left;" />
                                 </n-layout-content>
-                                <n-layout-sider :width="90" content-style="padding: 10px;">
+                                <n-layout-sider :width="90" content-style="padding: 5px;">
                                     <n-button @click="Add(panel)">Add§</n-button>
                                     <n-button @click="Clear(panel)" style="margin-top: 10px">Clear§</n-button>
                                 </n-layout-sider>
@@ -247,7 +246,8 @@ function attack(panel) {
                     </n-tab-pane>
 
                     <n-tab-pane name="Attack">
-                        <Attack :uuid="panel.uuid"/>
+                        <n-button color="#ff6633" @click="attack(panel)" style="margin-bottom: 10px;">Start attack</n-button>
+                        <Attack :uuid="panel.uuid" :len="panel.len"/>
                     </n-tab-pane>
                 </n-tabs>
             </n-card>

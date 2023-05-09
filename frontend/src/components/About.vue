@@ -30,7 +30,7 @@ function openURL(url) {
                 <n-card style="text-align: left;">
                     <n-h3> JWT 测试 </n-h3>
                     <n-p> JWT token 解析，<n-button @click="openURL('https://jwt.io/')" quaternary type="primary">jwt.io</n-button> 样式显示</n-p>
-                    <n-p> JWT 秘钥爆破 样式显示</n-p>
+                    <n-p> JWT 秘钥爆破 </n-p>
                 </n-card>
 
                 <n-card style="text-align: left;">

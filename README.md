@@ -49,9 +49,9 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 第一次启动后需要安装证书来解析HTTPS流量。 证书会在第一次启动命令后自动生成，保存在~/.mitmproxy/mitmproxy-ca-cert.pem. 安装步骤可以在 Python mitmproxy 文档中找到：[关于证书](https://docs.mitmproxy.org/stable/concepts-certificates/)。
 
--   [ ] Proxy 模块 						HTTP history 部分实现，其它未实现
+-   [ ] Proxy 模块        HTTP history 部分实现，其它未实现
 -   [x] Repeater 模块               
--   [x] Intruder 模块                四种Fuzz模式已实现， payload部分各种处理函数未实现，现在只有MD5加密
+-   [x] Intruder 模块     四种Fuzz模式已实现， payload部分各种处理函数未实现，现在只有MD5加密
 
 
 ### 字典可配置

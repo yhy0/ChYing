@@ -51,10 +51,7 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 -   [ ] Proxy 模块 						HTTP history 部分实现，其它未实现
 -   [x] Repeater 模块               
--   [x] Intruder 模块                部分功能已实现
-    -   [x] Sniper 模式 Fuzz
-    -   [x] Cluster bomb 模式 Fuzz
-    -   [x] 对 payload 进行 md5 加密
+-   [x] Intruder 模块                四种Fuzz模式已实现， payload部分各种处理函数未实现，现在只有MD5加密
 
 
 ### 字典可配置
@@ -65,6 +62,9 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 前端不会，全靠 ChatGPT 
 
 - 现在各个 tabs 页面，不点进去不会激活，导致 BurpSuite 用之前必须点击一遍每个页面
+- Intruder 模块 手动修改request包内容时，每写一个字符，要重新点击鼠标，将光标重新定位到要修改的位置
+  
+  - Attack 显示不能切换别的 Intruder tab页，不然结果就不显示了，前端数据绑定问题，太菜了，还没想好怎么写
 ## License
 
 This code is distributed under the [MIT license](https://github.com/yhy0/ChYing/blob/main/LICENSE). See [LICENSE](https://github.com/yhy0/ChYing/blob/main/LICENSE) in this directory.

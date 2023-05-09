@@ -25,6 +25,7 @@ const attackTypes = ref([""]); // 用于保存每个标签页对应的攻击类�
 
 function handleAdd() {
     const newKey = String(+panels.value[panels.value.length - 1].key + 1);
+    attackTypes.value.push('Sniper');
     panels.value.push({
         title: `Tab ${newKey}`,
         req: ``,
@@ -36,7 +37,6 @@ function handleAdd() {
         len: 0,
     });
     value.value = newKey;
-    attackTypes.value.push('Sniper');
 }
 
 function handleClose(name) {
@@ -59,9 +59,9 @@ EventsOn("IntruderBody", result => {
         id: "",
         len: 0,
     };
+    attackTypes.value.push('Sniper');
     panels.value.push(newPanel);
     value.value = newKey;
-    attackTypes.value.push('Sniper');
 });
 
 const request = ref('');
@@ -76,8 +76,11 @@ function updateReqValue(panel) {
 
     const count = (request.value.match(/§/g) || []).length; // 计算 § 符号的数量
     payloadCount.value = count / 2;
-    panel.len = payloadCount.value;
-
+    if(["Sniper", "Battering ram"].includes(attackTypes.value[Number(value.value)])){
+        panel.len = 1;
+    } else {
+        panel.len = payloadCount.value;
+    }
 }
 
 const options = [
@@ -108,7 +111,11 @@ function Add(panel) {
         request.value = request.value.replace(selection, `§${selection}§`)
         const count = (request.value.match(/§/g) || []).length; // 计算 § 符号的数量
         payloadCount.value = count / 2;
-        panel.len = payloadCount.value;
+        if(["Sniper", "Battering ram"].includes(attackTypes.value[Number(value.value)])){
+            panel.len = 1;
+        } else {
+            panel.len = payloadCount.value;
+        }
         panel.req = request.value;
     }
 }

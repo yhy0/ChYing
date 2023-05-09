@@ -1,12 +1,12 @@
 <script setup>
+import {ref} from "vue";
 import Twj from "./Twj.vue"
 import Swagger from "./Swagger.vue"
 import Fuzz from "./fuzz/Fuzz.vue"
 import BurpSuite from "./burpsuite/BurpSuite.vue";
-import {ref} from "vue";
+import About from "./About.vue";
 
-const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'BurpSuite'])
-
+const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'BurpSuite','About'])
 
 </script>
 
@@ -35,6 +35,12 @@ const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'BurpSuite'])
             <n-tab-pane name="BurpSuite" display-directive="show:lazy" tab="BurpSuite">
                 <n-message-provider>
                     <BurpSuite/>
+                </n-message-provider>
+            </n-tab-pane>
+
+            <n-tab-pane name="About" display-directive="show:lazy" tab="About">
+                <n-message-provider>
+                    <About/>
                 </n-message-provider>
             </n-tab-pane>
         </n-tabs>

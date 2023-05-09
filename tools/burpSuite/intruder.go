@@ -44,12 +44,14 @@ func sniper(target string, req string, payloads []string, rules []string, uuid s
 
 	var id = 0
 
-	for i, position := range positions {
-		request := req // req 不能改变
+	for _, position := range positions {
 		for _, payload := range payloads {
+			request := req // req 不能改变
 			// 这里是根据payload位置来进行对应的处理
-			payload = processing(payload, rules[i])
+			payload = processing(payload, rules[0])
 			request = strings.Replace(request, position, payload, 1)
+			// 去除其他位置的 §
+			request = strings.ReplaceAll(request, "§", "")
 			ch <- struct{}{}
 			id += 1
 			go func(request, payload string, id int) {
@@ -79,7 +81,7 @@ func sniper(target string, req string, payloads []string, rules []string, uuid s
 					IntruderMap[uuid] = smap
 				}
 
-				IntruderMap[uuid].WriteMap(i, &HTTPBody{
+				IntruderMap[uuid].WriteMap(id, &HTTPBody{
 					TargetUrl: target,
 					Request:   resp.RequestDump,
 					Response:  resp.ResponseDump,
@@ -107,8 +109,8 @@ func batteringRam(target string, req string, payloads []string, rules []string, 
 	for i, payload := range payloads {
 		request := req // req 不能改变
 		// 这里是根据payload位置来进行对应的处理
-		for j, position := range positions {
-			payload = processing(payload, rules[j])
+		for _, position := range positions {
+			payload = processing(payload, rules[0])
 			request = strings.Replace(request, position, payload, 1)
 		}
 
@@ -341,7 +343,6 @@ func getPositions(req string) []string {
 	for _, match := range matches {
 		result = append(result, "§"+match[1]+"§")
 	}
-
 	return result
 }
 

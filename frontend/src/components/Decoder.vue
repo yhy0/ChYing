@@ -111,6 +111,8 @@ function handleEncodeUnicode(index) {
     })
     values.value.splice(index + 2)
     clearOtherChecks("EncodeUnicode",index)
+    console.log(DecodeURL.value[index])
+    console.log(DecodeURL)
 }
 
 function handleDecodeURL(index) {
@@ -120,6 +122,7 @@ function handleDecodeURL(index) {
     })
     values.value.splice(index + 2)
     clearOtherChecks("DecodeURL",index)
+    console.log(EncodeUnicode.value[index])
 }
 
 function handleEncodeURL(index) {

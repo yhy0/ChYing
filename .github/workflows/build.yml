@@ -40,7 +40,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
       - run: npm install && npm run build
         working-directory: frontend
       - uses: dAppServer/wails-build-action@v2
@@ -86,7 +86,35 @@ jobs:
           path: target/*
 
       # release assets
-      - uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+      # 获取最近发布版本的 tag
+      - name: Get latest release tag
+        id: get_latest_release
+        uses: mheap/github-tag-action@v1.13.0
         with:
-          files: target/*
+          ref: 'latest'
+
+      # 获取当前提交的 tag
+      - name: Get current tag
+        id: get_current_tag
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
+        shell: bash
+
+      # 获取从上次发布版本到本次提交的所有 commit 记录
+      - name: Get commit messages
+        id: get_commit_messages
+        run: |
+          git log --pretty=format:"- %s" ${{ steps.get_latest_release.outputs.tag }}..HEAD > commit_messages.txt
+          echo ::set-output name=messages::$(cat commit_messages.txt | awk '{printf "%s<br/>",$0;}')
+        shell: bash
+
+      # 如果当前提交是一个新的 tag，则创建 release 并显示所有 commit 记录
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        if: ${{ steps.get_latest_release.outputs.tag != steps.get_current_tag.outputs.tag }}
+        with:
+          files: |
+            target/*
+          body: ${{ steps.get_commit_messages.outputs.messages }}
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}

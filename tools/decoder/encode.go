@@ -2,8 +2,10 @@ package decoder
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 /**
@@ -23,10 +25,19 @@ func EncodeUnicode(str string) string {
 
 // EncodeURL URL 编码
 func EncodeURL(str string) string {
-	return url.QueryEscape(str)
+	encoded := url.QueryEscape(str)                   // 这个函数会将空格，替换为+
+	encoded = strings.ReplaceAll(encoded, "+", "%20") // 这里再将+ 替换为 %2B
+	return encoded
 }
 
 // EncodeBase64 Base64 编码
 func EncodeBase64(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
+}
+
+// EncodeHex hex 编码
+func EncodeHex(str string) string {
+	buf := make([]byte, hex.EncodedLen(len(str)))
+	hex.Encode(buf, []byte(str))
+	return string(buf)
 }

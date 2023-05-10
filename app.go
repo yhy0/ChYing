@@ -249,6 +249,10 @@ func (a *App) Decoder(str string, mode string) string {
 		return decoder.DecodeBase64(str)
 	case "EncodeBase64":
 		return decoder.EncodeBase64(str)
+	case "DecodeHex":
+		return decoder.DecodeHex(str)
+	case "EncodeHex":
+		return decoder.EncodeHex(str)
 	case "MD5":
 		return decoder.Md5(str)
 	default:

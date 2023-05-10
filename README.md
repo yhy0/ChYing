@@ -65,6 +65,7 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 - Intruder 模块 手动修改request包内容时，每写一个字符，要重新点击鼠标，将光标重新定位到要修改的位置
   
   - Attack 显示不能切换别的 Intruder tab页，不然结果就不显示了，前端数据绑定问题，太菜了，还没想好怎么写
+
 ## License
 
 This code is distributed under the [MIT license](https://github.com/yhy0/ChYing/blob/main/LICENSE). See [LICENSE](https://github.com/yhy0/ChYing/blob/main/LICENSE) in this directory.

@@ -2,6 +2,7 @@ package decoder
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"net/url"
 	"strconv"
 	"strings"
@@ -47,4 +48,18 @@ func DecodeBase64(str string) string {
 		return str
 	}
 	return string(decoded)
+}
+
+// DecodeHex hex 解码
+func DecodeHex(str string) string {
+	buf := make([]byte, hex.DecodedLen(len(str)))
+	n, err := hex.Decode(buf, []byte(str))
+
+	if err != nil {
+		return str
+	}
+	if n > 0 {
+		return string(buf)
+	}
+	return str
 }

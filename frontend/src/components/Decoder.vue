@@ -96,23 +96,21 @@ function addInput(index) {
 }
 
 function handleDecodeUnicode(index, event) {
+    clearOtherChecks("DecodeUnicode",index)
     DecodeUnicode.value[index] = true
     Decoder(values.value[index],"DecodeUnicode").then(result => {
         values.value[index+1] = result
     })
     values.value.splice(index + 2)
-    clearOtherChecks("DecodeUnicode",index)
 }
 
 function handleEncodeUnicode(index) {
+    clearOtherChecks("EncodeUnicode",index)
     EncodeUnicode.value[index] = true
     Decoder(values.value[index],"EncodeUnicode").then(result => {
         values.value[index+1] = result
     })
     values.value.splice(index + 2)
-    clearOtherChecks("EncodeUnicode",index)
-    console.log(DecodeURL.value[index])
-    console.log(DecodeURL)
 }
 
 function handleDecodeURL(index) {
@@ -122,7 +120,6 @@ function handleDecodeURL(index) {
     })
     values.value.splice(index + 2)
     clearOtherChecks("DecodeURL",index)
-    console.log(EncodeUnicode.value[index])
 }
 
 function handleEncodeURL(index) {
@@ -172,7 +169,7 @@ function handleEncodeHex(index) {
 
 function handleMD5(index) {
     DecodeMD5.value[index] = true
-    clearOtherChecks("DecodeMD5",index)
+    clearOtherChecks("DecodeMD5", index)
     Decoder(values.value[index],"MD5").then(result => {
         values.value[index+1] = result
     })
@@ -195,8 +192,46 @@ function clearOtherChecks(exclude, index) {
 
     for (const check of checks) {
         if (check !== exclude) {
-            eval(check + '.value[index] = false')
-            eval(check + '.value.splice(index + 2)')
+            switch (check) {
+                case 'DecodeUnicode':
+                    DecodeUnicode.value[index] = false
+                    DecodeUnicode.value.splice(index+2)
+                    break;
+                case 'DecodeURL':
+                    DecodeURL.value[index] = false
+                    DecodeURL.value.splice(index+2)
+                    break;
+                case 'DecodeBase64':
+                    DecodeBase64.value[index] = false
+                    DecodeBase64.value.splice(index+2)
+                    break
+                case 'DecodeHex':
+                    DecodeHex.value[index] = false
+                    DecodeHex.value.splice(index+2)
+                    break
+                case 'EncodeUnicode':
+                    EncodeUnicode.value[index] = false
+                    EncodeUnicode.value.splice(index+2)
+                    break
+                case 'EncodeURL':
+                    EncodeURL.value[index] = false
+                    EncodeURL.value.splice(index+2)
+                    break
+                case 'EncodeBase64':
+                    EncodeBase64.value[index] = false
+                    EncodeBase64.value.splice(index+2)
+                    break
+                case 'EncodeHex':
+                    EncodeHex.value[index] = false
+                    EncodeHex.value.splice(index+2)
+                    break
+                case 'DecodeMD5':
+                    DecodeMD5.value[index] = false
+                    DecodeMD5.value.splice(index+2)
+                    break
+                default:
+                    break
+            }
         }
     }
 }

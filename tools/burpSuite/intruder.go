@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/pkg/httpx"
-	"github.com/yhy0/ChYing/pkg/util"
+	"github.com/yhy0/ChYing/tools/decoder"
 	"regexp"
 	"strconv"
 	"strings"
@@ -350,7 +350,7 @@ func getPositions(req string) []string {
 func processing(payload, rule string) string {
 	switch rule {
 	case "MD5": // MD5 加密处理
-		return util.Md5(payload)
+		return decoder.Md5(payload)
 	}
 	return payload
 }

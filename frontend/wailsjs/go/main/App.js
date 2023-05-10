@@ -6,6 +6,10 @@ export function Brute() {
   return window['go']['main']['App']['Brute']();
 }
 
+export function Decoder(arg1, arg2) {
+  return window['go']['main']['App']['Decoder'](arg1, arg2);
+}
+
 export function Fuzz(arg1, arg2, arg3) {
   return window['go']['main']['App']['Fuzz'](arg1, arg2, arg3);
 }

@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function Brute():Promise<string>;
 
+export function Decoder(arg1:string,arg2:string):Promise<string>;
+
 export function Fuzz(arg1:string,arg2:Array<string>,arg3:string):Promise<string>;
 
 export function FuzzStop():Promise<void>;

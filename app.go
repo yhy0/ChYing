@@ -10,6 +10,7 @@ import (
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/log"
 	"github.com/yhy0/ChYing/tools/burpSuite"
+	"github.com/yhy0/ChYing/tools/decoder"
 	"github.com/yhy0/ChYing/tools/fuzz"
 	"github.com/yhy0/ChYing/tools/swagger"
 	"github.com/yhy0/ChYing/tools/twj"
@@ -232,4 +233,25 @@ func (a *App) Intruder(target string, req string, payloads []string, rules []str
 func (a *App) GetAttackDump(uuid string, id int) *burpSuite.HTTPBody {
 	fmt.Println(uuid, id)
 	return burpSuite.IntruderMap[uuid].ReadMap(id)
+}
+
+func (a *App) Decoder(str string, mode string) string {
+	switch mode {
+	case "DecodeUnicode":
+		return decoder.DecodeUnicode(str)
+	case "EncodeUnicode":
+		return decoder.EncodeUnicode(str)
+	case "DecodeURL":
+		return decoder.DecodeURL(str)
+	case "EncodeURL":
+		return decoder.EncodeURL(str)
+	case "DecodeBase64":
+		return decoder.DecodeBase64(str)
+	case "EncodeBase64":
+		return decoder.EncodeBase64(str)
+	case "MD5":
+		return decoder.Md5(str)
+	default:
+		return str
+	}
 }

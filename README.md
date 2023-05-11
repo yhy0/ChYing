@@ -78,7 +78,13 @@ This code is distributed under the [MIT license](https://github.com/yhy0/ChYing/
 
 https://github.com/lijiejie/bbscan
 
+https://github.com/maurosoria/dirsearch
+
+https://github.com/devploit/dontgo403
+
 https://github.com/lqqyt2423/go-mitmproxy
+
+https://wails.io/
 
 ## Star History
 

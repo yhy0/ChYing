@@ -14,7 +14,7 @@ export function GetAttackDump(arg1:string,arg2:number):Promise<any>;
 
 export function GetHistoryDump(arg1:number):Promise<any>;
 
-export function Greet(arg1:string):Promise<string>;
+export function GetProxyPort():Promise<string>;
 
 export function Intruder(arg1:string,arg2:string,arg3:Array<string>,arg4:Array<string>,arg5:string,arg6:string):Promise<void>;
 
@@ -27,6 +27,8 @@ export function Raw(arg1:string,arg2:string,arg3:string):Promise<any>;
 export function SendToIntruder(arg1:number):Promise<void>;
 
 export function SendToRepeater(arg1:number):Promise<void>;
+
+export function Settings(arg1:string):Promise<string>;
 
 export function Swagger(arg1:string):Promise<void>;
 

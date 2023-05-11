@@ -9,6 +9,7 @@ import (
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/log"
+	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/ChYing/tools/burpSuite"
 	"github.com/yhy0/ChYing/tools/decoder"
 	"github.com/yhy0/ChYing/tools/fuzz"
@@ -33,8 +34,9 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	// 启动中间人代理
-	go burpSuite.Run()
+	go burpSuite.Run(conf.ProxyPort)
 
+	runtime.EventsEmit(ctx, "ProxyPort", conf.ProxyPort)
 	// 通知前端各种数据更改
 	go func() {
 		for {
@@ -73,11 +75,6 @@ func (a *App) startup(ctx context.Context) {
 	logging.Logger.AddHook(log.GuiLog)
 
 	httpx.NewSession()
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
 type Message struct {
@@ -167,6 +164,33 @@ func (a *App) FuzzStop() {
 }
 
 // burp 相关
+
+// Settings 配置
+func (a *App) Settings(port string) string {
+	logging.Logger.Infoln(conf.ProxyPort, port)
+	if conf.ProxyPort == port {
+		return ""
+	}
+
+	if utils.IsPortOccupied(port) {
+		return "端口被占用"
+	} else {
+		err := burpSuite.Restart(port)
+		logging.Logger.Errorln(err)
+		if err != "" {
+			return err
+		}
+		conf.ProxyPort = port
+		logging.Logger.Infoln(conf.ProxyPort, port)
+		runtime.EventsEmit(a.ctx, "ProxyPort", conf.ProxyPort)
+		return ""
+	}
+}
+
+// GetProxyPort 配置
+func (a *App) GetProxyPort() string {
+	return conf.ProxyPort
+}
 
 // GetHistoryDump 代理记录
 func (a *App) GetHistoryDump(id int) *burpSuite.HTTPBody {

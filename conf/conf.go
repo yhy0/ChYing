@@ -7,3 +7,5 @@ package conf
 **/
 
 var Proxy string
+
+var ProxyPort = "9080"

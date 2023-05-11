@@ -20,15 +20,21 @@
                     <Intruder/>
                 </n-message-provider>
             </n-tab-pane>
+            <n-tab-pane name="Settings" tab="Settings">
+                <n-message-provider>
+                    <Settings/>
+                </n-message-provider>
+            </n-tab-pane>
         </n-tabs>
     </n-card>
 </template>
 
 <script setup>
+import {ref} from "vue";
 import Proxy from "./proxy/Proxy.vue";
 import Repeater from "./repeater/Repeater.vue";
 import Intruder from "./intruder/Intruder.vue";
-import {ref} from "vue";
+import Settings from "./Settings.vue";
 
 const activeTabs = ref(['Proxy', 'Repeater', 'Intruder'])
 

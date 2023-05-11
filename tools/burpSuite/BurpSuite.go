@@ -1,6 +1,8 @@
 package burpSuite
 
 import (
+	"context"
+	"fmt"
 	"github.com/yhy0/ChYing/tools/burpSuite/mitmproxy/proxy"
 	"github.com/yhy0/logging"
 	"sync"
@@ -41,6 +43,8 @@ var RepeaterBodyMap map[string]map[int]*HTTPBody
 
 var IntruderMap map[string]*SMap
 
+var Proxy *proxy.Proxy
+
 func init() {
 	HttpHistory = make(chan HTTPHistory, 1)
 
@@ -53,25 +57,38 @@ func init() {
 	RepeaterBodyMap = make(map[string]map[int]*HTTPBody)
 }
 
-func Run() {
+func Run(port string) {
 	opts := &proxy.Options{
 		Debug:             2,
-		Addr:              ":19080",
+		Addr:              fmt.Sprintf(":%s", port),
 		StreamLargeBodies: 1024 * 1024 * 5,
 		SslInsecure:       false,
 		CaRootPath:        "",
 	}
 
-	p, err := proxy.NewProxy(opts)
+	var err error
+	Proxy, err = proxy.NewProxy(opts)
 	if err != nil {
 		logging.Logger.Fatal(err)
 	}
 
 	// 这种不错，通过添加插件的形式，这样只要实现了接口,p.AddAddon(xxxx), 然后就会自动执行相应的操作
 	// 添加一个日志记录插件
-	p.AddAddon(&proxy.LogAddon{})
+	Proxy.AddAddon(&proxy.LogAddon{})
 
-	p.AddAddon(&Burp{})
+	Proxy.AddAddon(&Burp{})
 
-	logging.Logger.Fatal(p.Start())
+	logging.Logger.Errorln(Proxy.Start())
+}
+
+// Restart 更换监听端口
+func Restart(port string) string {
+	// 先关闭然后再启动
+	err := Proxy.Shutdown(context.TODO())
+	if err != nil {
+		logging.Logger.Errorln(err)
+		return err.Error()
+	}
+	go Run(port)
+	return ""
 }

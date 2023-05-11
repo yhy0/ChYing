@@ -26,8 +26,8 @@ export function GetHistoryDump(arg1) {
   return window['go']['main']['App']['GetHistoryDump'](arg1);
 }
 
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
+export function GetProxyPort() {
+  return window['go']['main']['App']['GetProxyPort']();
 }
 
 export function Intruder(arg1, arg2, arg3, arg4, arg5, arg6) {
@@ -52,6 +52,10 @@ export function SendToIntruder(arg1) {
 
 export function SendToRepeater(arg1) {
   return window['go']['main']['App']['SendToRepeater'](arg1);
+}
+
+export function Settings(arg1) {
+  return window['go']['main']['App']['Settings'](arg1);
 }
 
 export function Swagger(arg1) {

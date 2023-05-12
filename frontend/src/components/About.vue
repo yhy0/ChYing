@@ -39,6 +39,15 @@ function openURL(url) {
                     <n-p> Repeater 模块</n-p>
                     <n-p> Intruder 模块 四种Fuzz模式已实现， payload部分各种处理函数未实现，现在只有MD5加密</n-p>
                 </n-card>
+
+                <n-card style="text-align: left;">
+                    <n-h3> 编码、解码 </n-h3>
+                </n-card>
+
+                <n-card style="text-align: left;">
+                    <n-h3> 杀软识别 </n-h3>
+                    <n-p> <n-button @click="openURL('https://github.com/gh0stkey/avList')" quaternary type="primary">avList</n-button></n-p>
+                </n-card>
             </div>
         </n-collapse-item>
         <n-collapse-item title="字典可配置" name="2">

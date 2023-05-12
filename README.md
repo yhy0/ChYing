@@ -58,6 +58,12 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 用到的各种字典文件, 第一次运行会将内置字典释放到用户目录的`.config/ChYing`目录下，后续每次运行都会先读取一遍
 
+### 编码、解码
+
+### 杀软识别
+
+https://github.com/gh0stkey/avList/blob/master/avlist.js
+
 ## 问题
 前端不会，全靠 ChatGPT 
 
@@ -83,6 +89,8 @@ https://github.com/maurosoria/dirsearch
 https://github.com/devploit/dontgo403
 
 https://github.com/lqqyt2423/go-mitmproxy
+
+https://github.com/gh0stkey/avList/
 
 https://wails.io/
 

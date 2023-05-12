@@ -6,6 +6,7 @@ import Fuzz from "./fuzz/Fuzz.vue";
 import Decoder from "./Decoder.vue";
 import BurpSuite from "./burpsuite/BurpSuite.vue";
 import About from "./About.vue";
+import Tools from "./tools/Tools.vue";
 
 const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'Decoder', 'BurpSuite', 'About'])
 
@@ -42,6 +43,12 @@ const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'Decoder', 'BurpSuite', 'About
             <n-tab-pane name="Decoder" display-directive="show:lazy" tab="Decoder">
                 <n-message-provider>
                     <Decoder/>
+                </n-message-provider>
+            </n-tab-pane>
+
+            <n-tab-pane name="Tools" display-directive="show:lazy" tab="Tools">
+                <n-message-provider>
+                    <Tools/>
                 </n-message-provider>
             </n-tab-pane>
 

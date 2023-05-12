@@ -21,3 +21,8 @@ var jwtSecrets embed.FS
 //
 //go:embed 403bypass
 var bypass403 embed.FS
+
+// AvFile https://github.com/r00tSe7en/get_AV/blob/master/av.json
+//
+//go:embed av.json
+var AvFile embed.FS

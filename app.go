@@ -10,6 +10,7 @@ import (
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/log"
 	"github.com/yhy0/ChYing/pkg/utils"
+	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/ChYing/tools/burpSuite"
 	"github.com/yhy0/ChYing/tools/decoder"
 	"github.com/yhy0/ChYing/tools/fuzz"
@@ -282,4 +283,8 @@ func (a *App) Decoder(str string, mode string) string {
 	default:
 		return str
 	}
+}
+
+func (a *App) TaskList(out string) map[string]string {
+	return tools.Tasklist(out)
 }

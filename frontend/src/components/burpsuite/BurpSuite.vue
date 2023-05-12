@@ -1,4 +1,3 @@
-
 <template>
     <n-card>
         <n-tabs type="line" animated v-model="activeTabs">

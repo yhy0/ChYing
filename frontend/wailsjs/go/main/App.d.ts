@@ -32,4 +32,6 @@ export function Settings(arg1:string):Promise<string>;
 
 export function Swagger(arg1:string):Promise<void>;
 
+export function TaskList(arg1:string):Promise<{[key: string]: string}>;
+
 export function Verify(arg1:string,arg2:string):Promise<main.Message>;

@@ -1,6 +1,7 @@
 package file
 
 import (
+	"encoding/json"
 	folderutil "github.com/projectdiscovery/utils/folder"
 	"github.com/yhy0/Jie/pkg/util"
 	"github.com/yhy0/logging"
@@ -24,6 +25,7 @@ var (
 	BBscanRules map[string]*Rule
 	JwtSecrets  []string
 	Bypass403   map[string][]string
+	Av          map[string]string
 )
 
 var chyingDir string
@@ -113,6 +115,18 @@ func New() {
 			continue
 		}
 		Bypass403[entry.Name()] = util.CvtLines(string(content))
+	}
+
+	// 读取 av.json 文件内容
+	data, err := AvFile.ReadFile("av.json")
+	if err != nil {
+		panic(err)
+	}
+	// 解析 JSON 数据到一个 map 对象中
+	Av = make(map[string]string)
+	err = json.Unmarshal(data, &Av)
+	if err != nil {
+		panic(err)
 	}
 
 	// 将文件释放
@@ -217,6 +231,14 @@ func WriteToConfig() {
 		}
 	}
 
+	// 5. 释放杀软对照文件
+	av, err := AvFile.ReadFile("av.json")
+	if err != nil {
+		panic(err)
+	}
+	if err = os.WriteFile(filepath.Join(chyingDir, "av.json"), av, 0644); err != nil {
+		panic(err)
+	}
 }
 
 // ReadFiles 文件存在，读取文件内容
@@ -306,6 +328,34 @@ func ReadFiles() {
 			continue
 		}
 		Bypass403[entry.Name()] = util.CvtLines(string(content))
+	}
+
+	avfile := filepath.Join(chyingDir, "av.json")
+	_, err = os.Stat(avfile)
+	if os.IsNotExist(err) {
+		av, err := AvFile.ReadFile("av.json")
+		if err != nil {
+			panic(err)
+		}
+		if err = os.WriteFile(avfile, av, 0644); err != nil {
+			panic(err)
+		}
+	} else {
+		// 读取 av.json 文件内容
+		data, err := os.ReadFile(filepath.Join(chyingDir, "av.json"))
+		if err != nil {
+			logging.Logger.Errorln("ReadFiles(twj.txt)", err)
+			data, err = AvFile.ReadFile("av.json")
+			if err != nil {
+				panic(err)
+			}
+		}
+		// 解析 JSON 数据到一个 map 对象中
+		Av = make(map[string]string)
+		err = json.Unmarshal(data, &Av)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 

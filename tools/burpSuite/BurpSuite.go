@@ -45,6 +45,8 @@ var IntruderMap map[string]*SMap
 
 var Proxy *proxy.Proxy
 
+var Intercept bool
+
 func init() {
 	HttpHistory = make(chan HTTPHistory, 1)
 

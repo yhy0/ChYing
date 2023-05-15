@@ -5,6 +5,7 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"errors"
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -36,8 +37,8 @@ func (r *Response) IsTextContentType() bool {
 }
 
 func (r *Response) DecodedBody() ([]byte, error) {
-	if r.decodedBody != nil {
-		return r.decodedBody, nil
+	if r.DecodedBodyStr != nil {
+		return r.DecodedBodyStr, nil
 	}
 
 	if r.decodedErr != nil {
@@ -49,35 +50,39 @@ func (r *Response) DecodedBody() ([]byte, error) {
 	}
 
 	if len(r.Body) == 0 {
-		r.decodedBody = r.Body
-		return r.decodedBody, nil
+		r.DecodedBodyStr = r.Body
+		return r.DecodedBodyStr, nil
 	}
 
 	enc := r.Header.Get("Content-Encoding")
 	if enc == "" || enc == "identity" {
-		r.decodedBody = r.Body
-		return r.decodedBody, nil
+		r.DecodedBodyStr = r.Body
+		return r.DecodedBodyStr, nil
 	}
 
-	decodedBody, decodedErr := decode(enc, r.Body)
+	DecodedBodyStr, decodedErr := decode(enc, r.Body)
 	if decodedErr != nil {
 		r.decodedErr = decodedErr
 		log.Error(r.decodedErr)
 		return nil, decodedErr
 	}
 
-	r.decodedBody = decodedBody
+	r.DecodedBodyStr = DecodedBodyStr
 	r.decoded = true
-	return r.decodedBody, nil
+	return r.DecodedBodyStr, nil
 }
 
 func (r *Response) ReplaceToDecodedBody() {
+	fmt.Println("999999\r\n", string(r.Body))
+	fmt.Println("0000\r\n", string(r.DecodedBodyStr))
 	body, err := r.DecodedBody()
 	if err != nil || body == nil {
 		return
 	}
 
 	r.Body = body
+
+	fmt.Println("8888888\r\n", string(r.Body))
 	r.Header.Del("Content-Encoding")
 	r.Header.Set("Content-Length", strconv.Itoa(len(body)))
 	r.Header.Del("Transfer-Encoding")

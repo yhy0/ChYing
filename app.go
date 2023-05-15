@@ -34,6 +34,7 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	burpSuite.Ctx = ctx
 	// 启动中间人代理
 	go burpSuite.Run(conf.ProxyPort)
 
@@ -191,6 +192,24 @@ func (a *App) Settings(port string) string {
 // GetProxyPort 配置
 func (a *App) GetProxyPort() string {
 	return conf.ProxyPort
+}
+
+// Intercept 拦截包
+func (a *App) Intercept(intercept, wait bool, request string) int {
+	if intercept {
+		burpSuite.Intercept = true
+	} else {
+		burpSuite.Intercept = false
+	}
+
+	if wait && burpSuite.Sum != 0 {
+		burpSuite.InterceptBody = request
+		fmt.Println("===============================", wait)
+		burpSuite.Sum -= 1
+		<-burpSuite.Done
+	}
+
+	return burpSuite.Sum
 }
 
 // GetHistoryDump 代理记录

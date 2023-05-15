@@ -18,22 +18,22 @@ type Request struct {
 	Header http.Header
 	Body   []byte
 
-	raw    *http.Request
-	RawStr string
+	HttpRaw *http.Request
+	RawStr  string
 }
 
 func newRequest(req *http.Request) *Request {
 	return &Request{
-		Method: req.Method,
-		URL:    req.URL,
-		Proto:  req.Proto,
-		Header: req.Header,
-		raw:    req,
+		Method:  req.Method,
+		URL:     req.URL,
+		Proto:   req.Proto,
+		Header:  req.Header,
+		HttpRaw: req,
 	}
 }
 
 func (r *Request) Raw() *http.Request {
-	return r.raw
+	return r.HttpRaw
 }
 
 func (req *Request) MarshalJSON() ([]byte, error) {
@@ -100,11 +100,11 @@ type Response struct {
 	Body       []byte      `json:"-"`
 	BodyReader io.Reader
 	Raw        *http.Response
-	close      bool // connection close
+	Close      bool // connection close
 
-	decodedBody []byte
-	decoded     bool // decoded reports whether the response was sent compressed but was decoded to decodedBody.
-	decodedErr  error
+	DecodedBodyStr []byte
+	decoded        bool // decoded reports whether the response was sent compressed but was decoded to decodedBody.
+	decodedErr     error
 }
 
 // flow

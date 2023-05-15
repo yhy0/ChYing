@@ -6,6 +6,7 @@
                     v-model:value="values[index]"
                     type="textarea"
                     @input="addInput(index)"
+                    style="text-align: left; "
                 />
             </n-col>
             <n-row span="20">

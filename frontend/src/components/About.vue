@@ -35,8 +35,8 @@ function openURL(url) {
 
                 <n-card style="text-align: left;">
                     <n-h3> BurpSuite </n-h3>
-                    <n-p> Proxy 模块 HTTP history 部分实现，其它未实现 </n-p>
-                    <n-p> Repeater 模块</n-p>
+                    <n-p> Proxy 模块 </n-p>
+                    <n-p> Repeater 模块 </n-p>
                     <n-p> Intruder 模块 四种Fuzz模式已实现， payload部分各种处理函数未实现，现在只有MD5加密</n-p>
                 </n-card>
 
@@ -59,9 +59,6 @@ function openURL(url) {
             <n-card style="text-align: left;">
                 <n-gradient-text type="error">
                     现在各个 tabs 页面，不点进去不会激活，导致 BurpSuite 用之前必须点击一遍每个页面
-                </n-gradient-text>
-                <n-gradient-text type="error">
-                    Intruder 模块 手动修改request包内容时，每写一个字符，要重新点击鼠标，将光标重新定位到要修改的位置
                 </n-gradient-text>
                 <n-gradient-text type="error">
                     Attack 显示不能切换别的 Intruder tab页，不然结果就不显示了，前端数据绑定问题，太菜了，还没想好怎么写

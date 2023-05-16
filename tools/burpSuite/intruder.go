@@ -351,6 +351,22 @@ func processing(payload, rule string) string {
 	switch rule {
 	case "MD5": // MD5 加密处理
 		return decoder.Md5(payload)
+	case "Base64-encode": // MD5 加密处理
+		return decoder.EncodeBase64(payload)
+	case "Base64-decode": // MD5 加密处理
+		return decoder.DecodeBase64(payload)
+	case "Unicode-encode": // MD5 加密处理
+		return decoder.EncodeUnicode(payload)
+	case "Unicode-decode": // MD5 加密处理
+		return decoder.DecodeUnicode(payload)
+	case "URL-encode": // MD5 加密处理
+		return decoder.EncodeURL(payload)
+	case "URL-decode": // MD5 加密处理
+		return decoder.DecodeURL(payload)
+	case "Hex-encode": // MD5 加密处理
+		return decoder.EncodeHex(payload)
+	case "Hex-decode": // MD5 加密处理
+		return decoder.DecodeHex(payload)
 	}
 	return payload
 }

@@ -68,8 +68,7 @@ https://github.com/gh0stkey/avList/blob/master/avlist.js
 前端不会，全靠 ChatGPT 
 
 - 现在各个 tabs 页面，不点进去不会激活，导致 BurpSuite 用之前必须点击一遍每个页面
-- Intruder 模块 手动修改request包内容时，每写一个字符，要重新点击鼠标，将光标重新定位到要修改的位置
-  
+- Intruder 模块
   - Attack 显示不能切换别的 Intruder tab页，不然结果就不显示了，前端数据绑定问题，太菜了，还没想好怎么写
 
 ## License

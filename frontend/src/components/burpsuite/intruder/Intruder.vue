@@ -137,10 +137,15 @@ const subOptions = {
     None :[{label:"", value:"None"}],
     Encode: [
         {label: "Base64-encode", value: "Base64-encode"},
+        {label: "Unicode-encode", value: "Unicode-encode"},
+        {label: "URL-encode", value: "URL-encode"},
+        {label: "Hex-encode", value: "Hex-encode"},
     ],
     Decode: [
+        {label: "Base64-decode", value: "Base64-decode"},
+        {label: "Unicode-decode", value: "Unicode-decode"},
         {label: "URL-decode", value: "URL-decode"},
-        {label: "Base64-encode", value: "Base64-encode"},
+        {label: "Hex-decode", value: "Hex-decode"},
     ],
     Hash: [
         {label: "MD5", value: "MD5"},

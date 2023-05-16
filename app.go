@@ -29,8 +29,7 @@ func NewApp() *App {
 	return &App{}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
+// startup is called when the app starts. The context is saved ,so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	burpSuite.Ctx = ctx
@@ -213,6 +212,12 @@ func (a *App) Intercept(intercept, wait bool, request string) int {
 // GetHistoryDump 代理记录
 func (a *App) GetHistoryDump(id int) *burpSuite.HTTPBody {
 	return burpSuite.HTTPBodyMap.ReadMap(id)
+}
+
+// InterceptSend 从 Intercept 发给 Repeater\Intruder 界面处理
+func (a *App) InterceptSend(name string) {
+	runtime.EventsEmit(a.ctx, name, burpSuite.HttpBodyInter)
+	return
 }
 
 // SendToRepeater 发给 Repeater 界面处理

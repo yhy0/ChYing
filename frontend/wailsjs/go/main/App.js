@@ -34,6 +34,10 @@ export function Intercept(arg1, arg2, arg3) {
   return window['go']['main']['App']['Intercept'](arg1, arg2, arg3);
 }
 
+export function InterceptSend(arg1) {
+  return window['go']['main']['App']['InterceptSend'](arg1);
+}
+
 export function Intruder(arg1, arg2, arg3, arg4, arg5, arg6) {
   return window['go']['main']['App']['Intruder'](arg1, arg2, arg3, arg4, arg5, arg6);
 }

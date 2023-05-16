@@ -170,6 +170,12 @@ func (b *Burp) Request(f *proxy.Flow) {
 
 		requestDump := buf.String()
 
+		HttpBodyInter = &HTTPBody{
+			TargetUrl: f.Request.URL.String(),
+			Request:   requestDump,
+			Response:  "",
+		}
+
 		runtime.EventsEmit(Ctx, "InterceptBody", requestDump)
 		Sum += 1
 		Done <- true

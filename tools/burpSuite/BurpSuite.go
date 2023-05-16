@@ -47,6 +47,8 @@ var Proxy *proxy.Proxy
 
 var Intercept bool
 
+var HttpBodyInter *HTTPBody
+
 func init() {
 	HttpHistory = make(chan HTTPHistory, 1)
 

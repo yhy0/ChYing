@@ -10,6 +10,10 @@
             <n-button :type="type" style="margin-right: 16px;" id="start" @click="changeButtonType()">
                 {{value}}
             </n-button>
+
+            <n-dropdown trigger="hover" :show-arrow="true" :options="options" @select="handleSelect">
+                <n-button>Action</n-button>
+            </n-dropdown>
         </div>
 
         <n-card>
@@ -20,9 +24,40 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
-import {Intercept} from "../../../../../wailsjs/go/main/App.js";
+import {ref, h} from "vue";
+import {NCard, useMessage} from "naive-ui";
+import {Intercept, InterceptSend} from "../../../../../wailsjs/go/main/App.js";
 import {EventsOn} from "../../../../../wailsjs/runtime/runtime.js";
+
+const message = useMessage();
+
+const options = [
+    {
+        label: () => h("span", { style: { color: "green" } }, "Repeater"),
+        key: "repeater",
+    },
+    {
+        label: () => h("span", { style: { color: "green" } }, "Intruder"),
+        key: "intruder",
+    },
+];
+const handleSelect = (option) => {
+    if (option === "repeater") {
+
+        if(body.value !== "") {
+            message.info("Send To Repeater Success");
+            InterceptSend("RepeaterBody")
+        }
+
+    } else if (option === "intruder") {
+        if(body.value !== "") {
+            message.info("Send To Intruder Success");
+            InterceptSend("IntruderBody")
+        }
+
+    }
+};
+
 
 const body = ref('')
 

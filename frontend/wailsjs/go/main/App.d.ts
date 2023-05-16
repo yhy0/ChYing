@@ -18,6 +18,8 @@ export function GetProxyPort():Promise<number>;
 
 export function Intercept(arg1:boolean,arg2:boolean,arg3:string):Promise<number>;
 
+export function InterceptSend(arg1:string):Promise<void>;
+
 export function Intruder(arg1:string,arg2:string,arg3:Array<string>,arg4:Array<string>,arg5:string,arg6:string):Promise<void>;
 
 export function Parser(arg1:string):Promise<any>;

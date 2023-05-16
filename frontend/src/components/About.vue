@@ -25,7 +25,7 @@ function openURL(url) {
                     <n-h3> 403 bypass </n-h3>
                     <n-p> 上述两个功能会自动进行 403 bypass</n-p>
                     <n-p><n-button @click="openURL('https://github.com/devploit/dontgo403')" quaternary type="primary">dontgo403</n-button> </n-p>
-                    <n-p><n-button @click="openURL('https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33')" quaternary type="primary">403-bypass-lyncdiscover-microsoft-com-db2778458c33</n-button> </n-p>
+                    <n-p><n-button @click="openURL('https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33')" quaternary type="error">未实现403-bypass-lyncdiscover-microsoft-com-db2778458c33</n-button> </n-p>
                 </n-card>
                 <n-card style="text-align: left;">
                     <n-h3> JWT 测试 </n-h3>
@@ -37,11 +37,13 @@ function openURL(url) {
                     <n-h3> BurpSuite </n-h3>
                     <n-p> Proxy 模块 </n-p>
                     <n-p> Repeater 模块 </n-p>
-                    <n-p> Intruder 模块 四种Fuzz模式已实现， payload部分各种处理函数未实现，现在只有MD5加密</n-p>
+                    <n-p> Intruder 模块</n-p>
                 </n-card>
 
                 <n-card style="text-align: left;">
                     <n-h3> 编码、解码 </n-h3>
+                    <n-p> Unicode 、URL、Hex、Base64 编/解码</n-p>
+                    <n-p> MD5 加密 </n-p>
                 </n-card>
 
                 <n-card style="text-align: left;">

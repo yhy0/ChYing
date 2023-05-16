@@ -56,12 +56,9 @@ EventsOn("RepeaterBody", result => {
 });
 
 const request = ref('');
-// 通过 id 监听 更改，应该有更优雅的实现方式，但是我不会。。。
-function updateReqValue(panel) {
-    request.value = document.getElementById("myCode").textContent;
-}
 
 function send(panel) {
+    request.value = document.getElementById("myCodeR").textContent;
     if (request.value === "") {
         request.value = panel.req;
     }
@@ -97,7 +94,7 @@ function send(panel) {
                         <n-tabs type="line" animated >
                             <n-tab-pane name="Request" style="width: 100%; overflow-x: auto;">
                                 <!-- contenteditable 设置为可修改, 这样通过 id 获取值 不能再使用 show-line-numbers 显示行号，不然会将行号带到请求中 -->
-                                <n-code id="myCode" contenteditable language="http" :code="panel.req" @input="updateReqValue(panel)" style="white-space: pre-wrap; text-align: left;" />
+                                <n-code id="myCodeR" contenteditable language="http" :code="panel.req" style="white-space: pre-wrap; text-align: left;" />
                             </n-tab-pane>
                         </n-tabs>
                     </n-gi>

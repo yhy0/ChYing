@@ -67,8 +67,6 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			}
 		}
 
-		fmt.Println("asdas--==-= \r\n", string(f.Response.Body))
-
 		if f.ConnContext.ServerConn.Conn != nil {
 			remoteAddr = f.ConnContext.ServerConn.Conn.RemoteAddr().String()
 		} else {
@@ -146,9 +144,7 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 
 // Request 这里可以拦截请求
 func (b *Burp) Request(f *proxy.Flow) {
-	fmt.Println("Request ", Intercept)
 	if Intercept {
-		fmt.Println(f.Request.Raw())
 		buf := bytes.NewBuffer(make([]byte, 0))
 		fmt.Fprintf(buf, "%s %s %s\r\n", f.Request.Method, f.Request.URL.RequestURI(), f.Request.Proto)
 		fmt.Fprintf(buf, "Host: %s\r\n", f.Request.URL.Host)
@@ -177,11 +173,8 @@ func (b *Burp) Request(f *proxy.Flow) {
 		runtime.EventsEmit(Ctx, "InterceptBody", requestDump)
 		Sum += 1
 		Done <- true
-		fmt.Println("=============+++++++++++++++++++++++++++++++++++++++++++++++++")
-		fmt.Println(InterceptBody)
 
 		// 先备份一份 request
-
 		temp := f.Request
 		// 点击 forward 后，根据输入框的值组装数据
 		target, err := urlutil.ParseURL(f.Request.URL.String(), true)
@@ -272,9 +265,6 @@ func (b *Burp) Response(f *proxy.Flow) {
 		f.Response.Raw = resp.Raw
 		f.Response.Close = resp.Close
 
-		fmt.Println("77777\r\n ", string(resp.Body))
-		fmt.Println("66666\r\n ", string(f.Response.Body))
-
 		f.Response.ReplaceToDecodedBody()
 
 	}
@@ -310,6 +300,5 @@ func formatResponseDump(dump string, req *http.Request) *proxy.Response {
 	r.Raw = resp
 	r.Close = resp.Close
 
-	fmt.Println("he  ", r.Header)
 	return &r
 }

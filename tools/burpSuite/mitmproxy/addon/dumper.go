@@ -85,7 +85,6 @@ func (d *Dumper) dump(f *proxy.Flow) {
 
 	buf.WriteString("\r\n\r\n")
 
-	fmt.Println("=-=--=23123 ", buf.String())
 	//_, err = d.out.Write(buf.Bytes())
 	//if err != nil {
 	//	log.Error(err)

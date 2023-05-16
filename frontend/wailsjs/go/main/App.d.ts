@@ -14,7 +14,7 @@ export function GetAttackDump(arg1:string,arg2:number):Promise<any>;
 
 export function GetHistoryDump(arg1:number):Promise<any>;
 
-export function GetProxyPort():Promise<string>;
+export function GetProxyPort():Promise<number>;
 
 export function Intercept(arg1:boolean,arg2:boolean,arg3:string):Promise<number>;
 
@@ -30,7 +30,7 @@ export function SendToIntruder(arg1:number):Promise<void>;
 
 export function SendToRepeater(arg1:number):Promise<void>;
 
-export function Settings(arg1:string):Promise<string>;
+export function Settings(arg1:number):Promise<string>;
 
 export function Swagger(arg1:string):Promise<void>;
 

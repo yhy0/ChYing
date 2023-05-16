@@ -59,10 +59,10 @@ func init() {
 	RepeaterBodyMap = make(map[string]map[int]*HTTPBody)
 }
 
-func Run(port string) {
+func Run(port int) {
 	opts := &proxy.Options{
 		Debug:             2,
-		Addr:              fmt.Sprintf(":%s", port),
+		Addr:              fmt.Sprintf(":%d", port),
 		StreamLargeBodies: 1024 * 1024 * 5,
 		SslInsecure:       false,
 		CaRootPath:        "",
@@ -84,7 +84,7 @@ func Run(port string) {
 }
 
 // Restart 更换监听端口
-func Restart(port string) string {
+func Restart(port int) string {
 	// 先关闭然后再启动
 	err := Proxy.Shutdown(context.TODO())
 	if err != nil {

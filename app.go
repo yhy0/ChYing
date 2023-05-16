@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/conf"
@@ -104,7 +103,7 @@ func (a *App) Verify(jwt string, secret string) (msg Message) {
 	parseJWT, err := twj.Verify(jwt, secret)
 
 	if err != nil {
-		fmt.Println(err)
+		logging.Logger.Errorln(err)
 		msg.Msg = ""
 		msg.Error = err.Error()
 		return
@@ -168,7 +167,7 @@ func (a *App) FuzzStop() {
 // burp 相关
 
 // Settings 配置
-func (a *App) Settings(port string) string {
+func (a *App) Settings(port int) string {
 	logging.Logger.Infoln(conf.ProxyPort, port)
 	if conf.ProxyPort == port {
 		return ""
@@ -190,7 +189,7 @@ func (a *App) Settings(port string) string {
 }
 
 // GetProxyPort 配置
-func (a *App) GetProxyPort() string {
+func (a *App) GetProxyPort() int {
 	return conf.ProxyPort
 }
 
@@ -204,7 +203,6 @@ func (a *App) Intercept(intercept, wait bool, request string) int {
 
 	if wait && burpSuite.Sum != 0 {
 		burpSuite.InterceptBody = request
-		fmt.Println("===============================", wait)
 		burpSuite.Sum -= 1
 		<-burpSuite.Done
 	}
@@ -275,7 +273,6 @@ func (a *App) Intruder(target string, req string, payloads []string, rules []str
 
 // GetAttackDump Intruder attack 记录
 func (a *App) GetAttackDump(uuid string, id int) *burpSuite.HTTPBody {
-	fmt.Println(uuid, id)
 	return burpSuite.IntruderMap[uuid].ReadMap(id)
 }
 

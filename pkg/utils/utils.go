@@ -11,8 +11,8 @@ import (
   @desc: //TODO
 **/
 
-func IsPortOccupied(port string) bool {
-	address := fmt.Sprintf(":%s", port)
+func IsPortOccupied(port int) bool {
+	address := fmt.Sprintf(":%d", port)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		return true // 端口已被占用

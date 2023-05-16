@@ -68,7 +68,7 @@ const submitForm = () => {
     formRef.value?.validate((valid) => {
         if (!valid) {
             // 表单验证通过
-            Settings(formValue.value.port.toString()).then((result) => {
+            Settings(formValue.value.port).then((result) => {
                 if(result === "") {
                     message.success('设置成功');
                 } else {

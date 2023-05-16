@@ -5,7 +5,6 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"errors"
-	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -73,8 +72,6 @@ func (r *Response) DecodedBody() ([]byte, error) {
 }
 
 func (r *Response) ReplaceToDecodedBody() {
-	fmt.Println("999999\r\n", string(r.Body))
-	fmt.Println("0000\r\n", string(r.DecodedBodyStr))
 	body, err := r.DecodedBody()
 	if err != nil || body == nil {
 		return
@@ -82,7 +79,6 @@ func (r *Response) ReplaceToDecodedBody() {
 
 	r.Body = body
 
-	fmt.Println("8888888\r\n", string(r.Body))
 	r.Header.Del("Content-Encoding")
 	r.Header.Set("Content-Length", strconv.Itoa(len(body)))
 	r.Header.Del("Transfer-Encoding")

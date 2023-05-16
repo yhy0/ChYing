@@ -45,6 +45,7 @@ const response = ref('');
 const rowId = ref('');
 
 const props = defineProps({
+    name: 'Attack',
     uuid: {
         type: String,
         required: true
@@ -54,8 +55,6 @@ const props = defineProps({
         required: true
     }
 })
-
-console.log(props.uuid);
 
 const rowProps = (row) => {
     return {

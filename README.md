@@ -1,6 +1,34 @@
 ## 承影
 
+<p align="center">
 将旦昧爽之交，日夕昏明之际，北面而察之，淡淡焉若有物存，莫识其状。其所触也，窃窃然有声，经物而物不疾也。
+  <br/>
+  <br/>
+  <a href="https://github.com/yhy0/ChYing/blob/main/LICENSE">
+    <img alt="Release" src="https://img.shields.io/github/license/yhy0/ChYing"/>
+  </a>
+  <a href="https://github.com/yhy0/ChYing">
+    <img alt="Release" src="https://img.shields.io/badge/release-v0.8.2-brightgreen"/>
+  </a>
+  <a href="https://github.com/yhy0/ChYing">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/yhy0/ChYing?color=9cf"/>
+  </a>
+  <a href="https://github.com/yhy0/ChYing">
+    <img alt="GitHub forks" src="https://img.shields.io/github/forks/yhy0/ChYing"/>
+  </a>
+  <a href="https://github.com/yhy0/ChYing">
+    <img alt="GitHub all release" src="https://img.shields.io/github/downloads/yhy0/ChYing/total?color=blueviolet"/>
+  </a>
+</p>
+<div align="center">
+<strong>
+<samp>
+
+[简体中文](./README.md) · [English](./README-en.md)
+
+</samp>
+</strong>
+</div>
 
 <video controls="controls" loop="loop" autoplay="autoplay"> 
     <source src="images/ChYing.mp4" type="video/mp4">
@@ -94,6 +122,8 @@ https://github.com/lqqyt2423/go-mitmproxy
 https://github.com/gh0stkey/avList/
 
 https://wails.io/
+
+https://www.naiveui.com/
 
 ## Star History
 

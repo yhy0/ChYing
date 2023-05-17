@@ -79,7 +79,7 @@ jobs:
           current_tag=$(git describe --tags --abbrev=0)
           
           # Get previous tag (latest one before the current one)
-          previous_tag=$(git describe --abbrev=0 --tags ${current_tag}^)
+          previous_tag=$(git describe --abbrev=0 --tags ${current_tag})
           
           # List commits between the previous and current tag
           commit_messages=$(git log --pretty=format:"- %s (%h)" ${previous_tag}..${current_tag})

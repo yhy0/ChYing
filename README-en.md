@@ -60,7 +60,7 @@ Unauthenticated, SSRF, and injection testing on `swagger api`.
 
 ### 403 Bypass
 
-Automatic 403 bypass for the aforementioned features.
+Automatic 403 bypass for the Swagger features.
 
 https://github.com/devploit/dontgo403
 

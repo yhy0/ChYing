@@ -56,7 +56,7 @@ https://wails.io/zh-Hans/docs/gettingstarted/installation/
 
 ### 403 bypass
 
-上述两个功能会自动进行 403 bypass
+Swagger 会自动进行 403 bypass
 
 https://github.com/devploit/dontgo403
 

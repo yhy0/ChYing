@@ -84,10 +84,10 @@ function handleCheckedChange(checked) {
         const inputValue = inputRef.value.$el.querySelector("input").value;
         Proxy(inputValue).then(result => {
             if (result.Error !== "") {
-                message.error(result.Msg + "; " + result.Error)
+                message.error(result.msg + "; " + result.error)
                 return
             }
-            message.success(result.Msg)
+            message.success(result.msg)
         })
     } else {
         Proxy("").then(result => {

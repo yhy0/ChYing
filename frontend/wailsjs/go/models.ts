@@ -21,6 +21,25 @@ export namespace burpSuite {
 
 }
 
+export namespace main {
+	
+	export class Message {
+	    msg: string;
+	    error: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Message(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.msg = source["msg"];
+	        this.error = source["error"];
+	    }
+	}
+
+}
+
 export namespace twj {
 	
 	export class Jwt {

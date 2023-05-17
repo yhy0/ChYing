@@ -23,7 +23,7 @@ function openURL(url) {
 
                 <n-card style="text-align: left;">
                     <n-h3> 403 bypass </n-h3>
-                    <n-p> 上述两个功能会自动进行 403 bypass</n-p>
+                    <n-p> Swagger 会自动进行 403 bypass</n-p>
                     <n-p><n-button @click="openURL('https://github.com/devploit/dontgo403')" quaternary type="primary">dontgo403</n-button> </n-p>
                     <n-p><n-button @click="openURL('https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33')" quaternary type="error">未实现403-bypass-lyncdiscover-microsoft-com-db2778458c33</n-button> </n-p>
                 </n-card>

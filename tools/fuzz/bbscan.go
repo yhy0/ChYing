@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -45,16 +46,16 @@ func getTitle(body string) string {
 func ReqPage(u string) (*Page, *httpx.Response, error) {
 	page := &Page{}
 	var backUpSuffixList = []string{".tar", ".tar.gz", ".zip", ".rar", ".7z", ".bz2", ".gz", ".war"}
-	var method = "GET"
+	var m = "GET"
 
 	for _, ext := range backUpSuffixList {
 		if strings.HasSuffix(u, ext) {
 			page.isBackUpPath = true
-			method = "HEAD"
+			m = "HEAD"
 		}
 	}
 
-	if res, err := httpx.Request(u, method, "", false, conf.DefaultHeader); err == nil {
+	if res, err := httpx.Request(u, m, "", false, conf.DefaultHeader); err == nil {
 		if util.IntInSlice(res.StatusCode, []int{301, 302, 307, 308}) {
 			page.is302 = true
 		}
@@ -77,7 +78,7 @@ func ReqPage(u string) (*Page, *httpx.Response, error) {
 }
 
 // BBscan todo 还应该传进来爬虫找到的 api 目录
-func BBscan(u string, indexContentLength int, indexbody string) {
+func BBscan(u string, indexContentLength int, indexbody string, _403 bool) {
 	if strings.HasSuffix(u, "/") {
 		u = u[:len(u)-1]
 	}
@@ -109,6 +110,7 @@ func BBscan(u string, indexContentLength int, indexbody string) {
 			other200Contentlen = append(other200Contentlen, url404res.ContentLength)
 		}
 	}
+	wg := sync.WaitGroup{}
 	ch := make(chan struct{}, 20)
 
 	for path, rule := range file.BBscanRules {
@@ -123,8 +125,9 @@ func BBscan(u string, indexContentLength int, indexbody string) {
 		}
 
 		ch <- struct{}{}
-
+		wg.Add(1)
 		go func(path string, rule *file.Rule) {
+			defer wg.Done()
 			if target, res, err := ReqPage(u + path); err == nil && res != nil {
 				if util.In(res.Body, conf.WafContent) {
 					<-ch
@@ -245,25 +248,11 @@ func BBscan(u string, indexContentLength int, indexbody string) {
 						similar = strsim.Compare(strings.ReplaceAll(url404res.Body, "/file_not_support", ""), strings.ReplaceAll(res.Body, path, "")) <= 0.9 // 不相似才会往下执行
 					}
 
-					// 与之前成功的对比，相似代表有误报或者是认证拦着了，只需要记下一个就行
-					//for k, v := range resAll {
-					//	u, err := url.Parse(k)
-					//	if err != nil {
-					//		continue
-					//	}
-					//
-					//	if u.Path == path { // 只对比 path 不一样的
-					//		continue
-					//	}
-					//	similar = int(strsim.Compare(strings.ReplaceAll(v, u.Path, ""), strings.ReplaceAll(res.Body, path, ""))*100) >= 80
-					//	if similar { // 相似去除
-					//		<-ch
-					//		return
-					//	}
-					//}
+					if _403 && res.StatusCode == 403 {
+						go Bypass403(u+path, "GET")
+					}
 
 					if similar && res.StatusCode != 404 && res.StatusCode != 403 && res.StatusCode != 301 && res.StatusCode != 302 && res.StatusCode != 304 && !target.is403 {
-
 						FuzzChan <- tools.Result{
 							Url:           u + path,
 							Method:        "GET",
@@ -282,5 +271,6 @@ func BBscan(u string, indexContentLength int, indexbody string) {
 		}(path, rule)
 	}
 
+	wg.Wait()
 	close(ch)
 }

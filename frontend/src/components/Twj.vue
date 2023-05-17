@@ -1,9 +1,8 @@
 <script setup>
-import {reactive, watch} from 'vue'
+import {reactive} from 'vue'
 import { useMessage} from 'naive-ui'
 import {Parser, Verify, Brute} from '../../wailsjs/go/main/App'
 import {EventsOn} from "../../wailsjs/runtime";
-
 
 const message = useMessage()    // 使用这个组件外面一层必须使用包裹   <n-message-provider> </n-message-provider>
 
@@ -17,7 +16,6 @@ const twj = reactive({
   percentage: 0,
 })
 
-
 function parser() {
   Parser(twj.jwt).then(result => {
     if(result.header === "") {
@@ -25,24 +23,23 @@ function parser() {
       return
     }
     message.success("JWT Parser Success")
-    twj.header = result.header
-    twj.payload = result.payload
+    twj.header = JSON.stringify(JSON.parse(result.header),null, 2);
+    twj.payload = JSON.stringify(JSON.parse(result.payload),null, 2);
     twj.message = result.message
-    twj.signature = result.signatureStr
+    twj.signature = result.signature
   })
 }
 
 function verify() {
   Verify(twj.jwt, twj.secret).then(result => {
-    if(result.Error !== "") {
-      message.error(result.Error)
+    if(result.error !== "") {
+      message.error(result.error)
       return
     }
     message.success("Signature Verified")
-    twj.signature = result.Msg
+    twj.signature = result.msg
   })
 }
-
 
 function brute() {
     Brute().then(result => {
@@ -56,7 +53,6 @@ function brute() {
 EventsOn("Percentage", Percentage => {
     twj.percentage = Percentage
 });
-
 
 </script>
 
@@ -82,17 +78,16 @@ EventsOn("Percentage", Percentage => {
       </n-space>
     </n-gi>
     <n-gi>
-
-      <n-card :bordered="false" title="Header" size="small">
-        <n-input v-model:value="twj.header" type="textarea" :autosize="{minRows: 1}"/>
+      <n-card title="Header" size="small" style="margin-bottom: 16px; margin-top: 10px">
+          <n-code id="header" language="json" :code="twj.header" word-wrap style="white-space: pre-wrap; text-align: left;"/>
       </n-card>
 
-      <n-card :bordered="false" title="Payload" size="small">
-          <n-input v-model:value="twj.payload" type="textarea" :autosize="{minRows: 3}"/>
+      <n-card title="Payload" size="small" style="margin-bottom: 16px; margin-top: 10px">
+          <n-code id="payload" language="json" :code="twj.payload" word-wrap style="white-space: pre-wrap; text-align: left;"/>
       </n-card>
 
-      <n-card :bordered="false" title="Verify" size="small">
-        <n-input v-model:value="twj.signature" type="textarea" :autosize="{minRows: 3}"/>
+      <n-card title="Verify" size="small" style="margin-bottom: 16px; margin-top: 10px">
+          <n-code id="signature" language="json" :code="twj.signature" word-wrap style="white-space: pre-wrap; text-align: left;"/>
       </n-card>
 
     </n-gi>

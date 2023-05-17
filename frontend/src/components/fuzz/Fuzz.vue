@@ -7,13 +7,14 @@
                         <n-input v-model:value="formValue.targetUrl" placeholder="https://example.com/" />
                     </n-form-item>
                     <n-form-item :span="12">
-                        <n-checkbox-group v-model:value="formValue.checkboxGroupValue">
+                        <n-checkbox-group v-model:value="formValue.checkboxGroupValue" @change="checkboxGroupChanged">
                             <n-space>
                                 <n-checkbox value="jsp">jsp</n-checkbox>
                                 <n-checkbox value="php">php</n-checkbox>
                                 <n-checkbox value="asp">asp</n-checkbox>
                                 <n-checkbox value="aspx">aspx</n-checkbox>
                                 <n-checkbox value="bbscan">bbscan</n-checkbox>
+                                <n-checkbox value="403">bypass 403</n-checkbox>
                             </n-space>
                         </n-checkbox-group>
 <!--                        <n-input v-model:value="formValue.path" placeholder="file path" />-->
@@ -88,7 +89,6 @@
         </n-grid>
     </n-card>
 
-
     <n-modal v-model:show="showAdvanced"
              preset="dialog"
              title="高级配置"
@@ -110,7 +110,6 @@ const inputRef = ref(null);
 const showAdvanced = ref(false);
 
 const message = useMessage();
-
 const data = ref([]);
 
 const formValue = ref({
@@ -164,12 +163,10 @@ function handleCheckedChange(checked) {
     }
 }
 
-
 const alertType = ref('warning')
 const alertContent = ref("没有任务")
 
 // table
-
 const request = ref('');
 const response = ref('');
 
@@ -276,5 +273,14 @@ EventsOn("FuzzPercentage", Percentage => {
     percentage.value = Percentage
 });
 
-
+function checkboxGroupChanged(newValue) {
+    // 如果选择了bbscan则将除 403 以外的选项都设为未选中
+    if (newValue.includes('bbscan')) {
+        if (newValue.includes('403')) {
+            formValue.value.checkboxGroupValue = ['bbscan', '403'];
+        } else {
+            formValue.value.checkboxGroupValue = ['bbscan'];
+        }
+    }
+}
 </script>

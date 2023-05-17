@@ -35,19 +35,28 @@ func Fuzz(target string, actions []string, filePath string) error {
 		return err
 	}
 
+	var _403 = false
+	if funk.Contains(actions, "403") {
+		_403 = true
+	}
+
 	if funk.Contains(actions, "bbscan") {
-		BBscan(target, res.ContentLength, res.Body)
+		BBscan(target, res.ContentLength, res.Body, _403)
 	}
 
 	if len(actions) > 0 && !funk.Contains(actions, "bbscan") {
-		DirSearch(target, actions)
+		DirSearch(target, actions, _403)
+	}
+
+	if len(actions) == 1 && _403 {
+		Bypass403(target, "GET")
 	}
 
 	return nil
 }
 
 // DirSearch 规则 进行目录遍历
-func DirSearch(target string, actions []string) {
+func DirSearch(target string, actions []string, _403 bool) {
 	target = strings.TrimRight(target, "/")
 	var paths []string
 
@@ -60,6 +69,9 @@ func DirSearch(target string, actions []string) {
 		// 替换后缀
 		if strings.Contains(p, "%EXT%") {
 			for _, ext := range actions {
+				if ext == "bbscan" || ext == "403" {
+					continue
+				}
 				p = strings.ReplaceAll(p, "%EXT%", ext)
 				paths = append(paths, p)
 			}
@@ -85,6 +97,10 @@ func DirSearch(target string, actions []string) {
 			<-ch
 			if filter(path, resp) {
 				return
+			}
+
+			if _403 && resp.StatusCode == 403 {
+				go Bypass403(target+"/"+path, "GET")
 			}
 
 			FuzzChan <- tools.Result{

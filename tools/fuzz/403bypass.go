@@ -15,7 +15,7 @@ import (
 	@desc: bypass 403 	https://github.com/devploit/dontgo403
 **/
 
-func Bypass403(uri, m string) *tools.Result {
+func Bypass403(uri, m string) {
 	if !strings.HasSuffix(uri, "/") {
 		uri += "/"
 	}
@@ -28,30 +28,70 @@ func Bypass403(uri, m string) *tools.Result {
 
 	result := method(uri, m)
 	if result != nil {
-		return result
+		FuzzChan <- tools.Result{
+			Url:           result.Url,
+			Method:        m,
+			StatusCode:    result.StatusCode,
+			ContentLength: result.ContentLength,
+			Request:       result.Request,
+			Response:      result.Response,
+		}
+		return
 	}
 
 	result = headers(uri, m)
 	if result != nil {
-		return result
+		FuzzChan <- tools.Result{
+			Url:           result.Url,
+			Method:        m,
+			StatusCode:    result.StatusCode,
+			ContentLength: result.ContentLength,
+			Request:       result.Request,
+			Response:      result.Response,
+		}
+		return
 	}
 
 	result = endPaths(uri, m)
 	if result != nil {
-		return result
+		FuzzChan <- tools.Result{
+			Url:           result.Url,
+			Method:        m,
+			StatusCode:    result.StatusCode,
+			ContentLength: result.ContentLength,
+			Request:       result.Request,
+			Response:      result.Response,
+		}
+		return
 	}
 
 	result = midPaths(uri, m)
 	if result != nil {
-		return result
+		FuzzChan <- tools.Result{
+			Url:           result.Url,
+			Method:        m,
+			StatusCode:    result.StatusCode,
+			ContentLength: result.ContentLength,
+			Request:       result.Request,
+			Response:      result.Response,
+		}
+		return
 	}
 
 	result = capital(uri, m)
 	if result != nil {
-		return result
+		FuzzChan <- tools.Result{
+			Url:           result.Url,
+			Method:        m,
+			StatusCode:    result.StatusCode,
+			ContentLength: result.ContentLength,
+			Request:       result.Request,
+			Response:      result.Response,
+		}
+		return
 	}
 
-	return nil
+	return
 }
 
 // method 通过更改请求方法，尝试绕过 403

@@ -22,12 +22,12 @@ export function GetAttackDump(arg1, arg2) {
   return window['go']['main']['App']['GetAttackDump'](arg1, arg2);
 }
 
-export function GetHistoryDump(arg1) {
-  return window['go']['main']['App']['GetHistoryDump'](arg1);
+export function GetBurpSettings() {
+  return window['go']['main']['App']['GetBurpSettings']();
 }
 
-export function GetProxyPort() {
-  return window['go']['main']['App']['GetProxyPort']();
+export function GetHistoryDump(arg1) {
+  return window['go']['main']['App']['GetHistoryDump'](arg1);
 }
 
 export function Intercept(arg1, arg2, arg3) {

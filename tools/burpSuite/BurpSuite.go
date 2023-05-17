@@ -49,6 +49,8 @@ var Intercept bool
 
 var HttpBodyInter *HTTPBody
 
+var Settings *Setting
+
 func init() {
 	HttpHistory = make(chan HTTPHistory, 1)
 
@@ -59,6 +61,17 @@ func init() {
 	IntruderMap = make(map[string]*SMap)
 
 	RepeaterBodyMap = make(map[string]map[int]*HTTPBody)
+
+	Settings = &Setting{
+		ProxyPort: 9080,
+		Exclude: []string{
+			`^.*\.google.*$`,
+			`^.*\.firefox.*$`,
+			`^.*\.doubleclick.*$`,
+		},
+		Include: []string{},
+	}
+
 }
 
 func Run(port int) {

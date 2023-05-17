@@ -16,6 +16,7 @@ import (
 	"github.com/yhy0/ChYing/tools/swagger"
 	"github.com/yhy0/ChYing/tools/twj"
 	"github.com/yhy0/logging"
+	"strings"
 	"time"
 )
 
@@ -34,9 +35,11 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	burpSuite.Ctx = ctx
 	// 启动中间人代理
-	go burpSuite.Run(conf.ProxyPort)
+	go burpSuite.Run(burpSuite.Settings.ProxyPort)
 
-	runtime.EventsEmit(ctx, "ProxyPort", conf.ProxyPort)
+	runtime.EventsEmit(ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
+	runtime.EventsEmit(ctx, "Exclude", burpSuite.Settings.Exclude)
+	runtime.EventsEmit(ctx, "Include", burpSuite.Settings.Include)
 	// 通知前端各种数据更改
 	go func() {
 		for {
@@ -54,7 +57,19 @@ func (a *App) startup(ctx context.Context) {
 				runtime.EventsEmit(ctx, "swagger", _swagger)
 			// burp 相关
 			case history := <-burpSuite.HttpHistory:
-				runtime.EventsEmit(ctx, "HttpHistory", history)
+				if len(burpSuite.Settings.Exclude) > 0 {
+					if !utils.RegexpStr(burpSuite.Settings.Exclude, history.Host) {
+						if len(burpSuite.Settings.Include) > 0 && utils.RegexpStr(burpSuite.Settings.Include, history.Host) {
+							runtime.EventsEmit(ctx, "HttpHistory", history)
+						} else {
+							runtime.EventsEmit(ctx, "HttpHistory", history)
+						}
+					}
+				} else if len(burpSuite.Settings.Include) > 0 && utils.RegexpStr(burpSuite.Settings.Include, history.Host) {
+					runtime.EventsEmit(ctx, "HttpHistory", history)
+				} else {
+					runtime.EventsEmit(ctx, "HttpHistory", history)
+				}
 			}
 		}
 	}()
@@ -156,30 +171,35 @@ func (a *App) FuzzStop() {
 // burp 相关
 
 // Settings 配置
-func (a *App) Settings(port int) string {
-	logging.Logger.Infoln(conf.ProxyPort, port)
-	if conf.ProxyPort == port {
+func (a *App) Settings(setting burpSuite.SettingUI) string {
+	logging.Logger.Infoln(setting)
+
+	if burpSuite.Settings.ProxyPort == setting.ProxyPort {
 		return ""
 	}
 
-	if utils.IsPortOccupied(port) {
+	if utils.IsPortOccupied(setting.ProxyPort) {
 		return "端口被占用"
 	} else {
-		err := burpSuite.Restart(port)
+		err := burpSuite.Restart(setting.ProxyPort)
 		logging.Logger.Errorln(err)
 		if err != "" {
 			return err
 		}
-		conf.ProxyPort = port
-		logging.Logger.Infoln(conf.ProxyPort, port)
-		runtime.EventsEmit(a.ctx, "ProxyPort", conf.ProxyPort)
+		burpSuite.Settings.ProxyPort = setting.ProxyPort
+		burpSuite.Settings.Exclude = strings.Split(setting.Exclude, "\r\n")
+		burpSuite.Settings.Include = strings.Split(setting.Include, "\r\n")
+
+		runtime.EventsEmit(a.ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
+		runtime.EventsEmit(a.ctx, "Exclude", burpSuite.Settings.Exclude)
+		runtime.EventsEmit(a.ctx, "Include", burpSuite.Settings.Include)
 		return ""
 	}
 }
 
-// GetProxyPort 配置
-func (a *App) GetProxyPort() int {
-	return conf.ProxyPort
+// GetBurpSettings 配置
+func (a *App) GetBurpSettings() *burpSuite.Setting {
+	return burpSuite.Settings
 }
 
 // Intercept 拦截包

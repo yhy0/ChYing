@@ -52,12 +52,9 @@ import {ref, h, nextTick } from "vue";
 import {EventsOn} from "../../../../../wailsjs/runtime/runtime.js";
 import {GetHistoryDump, SendToRepeater, SendToIntruder} from "../../../../../wailsjs/go/main/App.js";
 
-
 const message = useMessage();
 
-
 // 右键
-
 const x = ref(0);
 const y = ref(0);
 const showDropdown = ref(false);
@@ -72,12 +69,16 @@ const options = [
         key: "intruder",
     },
     {
-        label: () => h("span", { style: { color: "red" } }, "删除"),
-        key: "delete"
+        label: () => h("span", { style: { color: "red" } }, "Clear all"),
+        key: "clear"
     }
 ];
 
 const rid = ref(0);
+const data = ref([]);
+const request = ref('');
+const response = ref('');
+const rowId = ref('');
 
 const handleSelect = (option) => {
     showDropdown.value = false;
@@ -87,24 +88,17 @@ const handleSelect = (option) => {
     } else if (option === "intruder") {
         SendToIntruder(rid.value);
         message.info("Send To Intruder Success");
-    } else if (option === "edit") {
-        // 打开编辑对话框
-        // ...
+    } else if (option === "clear") {
+        data.value = []
+        request.value = ''
+        response.value = ''
+        message.info("Clear All Success");
     }
 };
 
 const onClickOutSide = () => {
     showDropdown.value = false;
 };
-
-
-
-const data = ref([]);
-
-const request = ref('');
-const response = ref('');
-
-const rowId = ref('');
 
 const rowProps = (row) => {
     return {
@@ -142,7 +136,9 @@ const columns = [
         key: "Host",
         resizable: true,
         width: 200,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Method",
@@ -154,13 +150,17 @@ const columns = [
         key: "Url",
         width: 200,
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Params",
         key: "Params",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Edited",
@@ -181,52 +181,67 @@ const columns = [
         title: "MIMEType",
         key: "MIMEType",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Extension",
         key: "Extension",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Title",
         key: "Title",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Comment",
         key: "Comment",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "TLS",
         key: "TLS",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Ip",
         key: "Ip",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Cookies",
         key: "Cookies",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
     {
         title: "Time",
         key: "Time",
         resizable: true,
-        ellipsis: true
+        ellipsis: {
+            tooltip: true
+        }
     },
 ];
-
 
 EventsOn("HttpHistory", HttpHistory => {
     data.value.push({

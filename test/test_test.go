@@ -6,7 +6,6 @@ import (
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/tools"
 	"regexp"
-	"strings"
 	"testing"
 )
 
@@ -20,46 +19,22 @@ import (
 *
 */
 func Test(t *testing.T) {
-	input := "这是§一个§测试§字符串§ asdasdas "
-	re := regexp.MustCompile(`§(.*?)§`)            // 定义正则表达式
-	matches := re.FindAllStringSubmatch(input, -1) // 查找所有匹配项
+	pattern := `www.google.com`
 
-	for _, match := range matches {
-		fmt.Println(match[1]) // 输出匹配到的字符串
-	}
+	domain1 := "123123.google.com"
+	domain2 := "example.google.net"
+	domain3 := "www.google.com"
+	domain4 := "google.co"
 
-	str := "foo\rbar\nbaz\r\nqux"
+	match1, _ := regexp.MatchString(pattern, domain1)
+	match2, _ := regexp.MatchString(pattern, domain2)
+	match3, _ := regexp.MatchString(pattern, domain3)
+	match4, _ := regexp.MatchString(pattern, domain4)
 
-	// 定义分隔符的回调函数
-	splitFunc := func(r rune) bool {
-		return r == '\r' || r == '\n'
-	}
-
-	// 使用 FieldsFunc() 函数分割字符串
-	result := strings.FieldsFunc(str, splitFunc)
-
-	// 输出结果字符串切片
-	fmt.Println(result)
-
-	arr := [][]string{
-		{"a", "b"},
-		{"x", "y", "z"},
-		{"alpha", "beta"},
-	}
-
-	res := make([][]string, len(arr[0]))
-
-	for k := range arr[0] {
-		res[k] = []string{arr[0][k]}
-
-		for i := range arr {
-			if i > 0 {
-				res[k] = append(res[k], arr[i][k])
-			}
-		}
-
-	}
-	fmt.Println(res)
+	fmt.Println(match1)
+	fmt.Println(match2)
+	fmt.Println(match3)
+	fmt.Println(match4)
 
 }
 

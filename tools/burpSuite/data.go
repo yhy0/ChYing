@@ -38,3 +38,16 @@ type IntruderRes struct {
 	Status  string   `json:"status"`
 	Length  string   `json:"length"`
 }
+
+type Setting struct {
+	ProxyPort int      `json:"port"`
+	Exclude   []string `json:"exclude"` // Exclude 排除显示的域名
+	Include   []string `json:"include"`
+}
+
+// SettingUI 前端映射使用
+type SettingUI struct {
+	ProxyPort int    `json:"port"`
+	Exclude   string `json:"exclude"` // Exclude 排除显示的域名
+	Include   string `json:"include"`
+}

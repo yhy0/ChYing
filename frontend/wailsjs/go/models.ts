@@ -18,6 +18,38 @@ export namespace burpSuite {
 	        this.uuid = source["uuid"];
 	    }
 	}
+	export class Setting {
+	    port: number;
+	    exclude: string[];
+	    include: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Setting(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.port = source["port"];
+	        this.exclude = source["exclude"];
+	        this.include = source["include"];
+	    }
+	}
+	export class SettingUI {
+	    port: number;
+	    exclude: string;
+	    include: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SettingUI(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.port = source["port"];
+	        this.exclude = source["exclude"];
+	        this.include = source["include"];
+	    }
+	}
 
 }
 

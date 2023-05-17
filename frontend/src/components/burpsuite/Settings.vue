@@ -12,8 +12,15 @@
                 <n-input-number v-model:value="formValue.port">
                 </n-input-number>
             </n-input-group>
+        </n-form-item>
+        <n-form-item style="display: flex;">
+            <n-card title="Exclude" :bordered="false">
+                <n-input v-model:value="formValue.exclude" type="textarea" status="error" placeholder="可以清除" round clearable style="width: 200px; height: 200px;"/>
+            </n-card>
 
-
+            <n-card title="Include" :bordered="false">
+                <n-input v-model:value="formValue.include" type="textarea" status="warning" placeholder="可以清除" round clearable style="width: 200px; height: 200px;"/>
+            </n-card>
         </n-form-item>
         <n-form-item>
             <n-button ghost type="error" @click="submitForm">
@@ -27,21 +34,38 @@
 <script setup>
 import {ref} from "vue";
 import {useMessage} from "naive-ui";
-import {GetProxyPort, Settings} from "../../../wailsjs/go/main/App.js";
+import {GetBurpSettings, Settings} from "../../../wailsjs/go/main/App.js";
 import {EventsOn} from "../../../wailsjs/runtime/runtime.js";
 
 const message = useMessage();
 const formRef =ref()
 const formValue = ref({
     port: 9080,
+    exclude: '',
+    include: '',
 });
 
 EventsOn("ProxyPort", result => {
     formValue.value.port = result
 });
 
-GetProxyPort().then((res)=> {
-     formValue.value.port = res
+EventsOn("Exclude", result => {
+    formValue.value.exclude = result
+});
+EventsOn("Include", result => {
+    formValue.value.include = result
+});
+
+GetBurpSettings().then((res)=> {
+    formValue.value.port = res.port;
+    for (let i = 0; i < res.exclude.length; i++) {
+        formValue.value.exclude += res.exclude[i] + "\r\n"
+    }
+
+    for (let i = 0; i < res.include.length; i++) {
+        formValue.value.include += res.include[i] + "\r\n"
+    }
+
 })
 
 const rules = {
@@ -68,7 +92,7 @@ const submitForm = () => {
     formRef.value?.validate((valid) => {
         if (!valid) {
             // 表单验证通过
-            Settings(formValue.value.port).then((result) => {
+            Settings(formValue.value).then((result) => {
                 if(result === "") {
                     message.success('设置成功');
                 } else {

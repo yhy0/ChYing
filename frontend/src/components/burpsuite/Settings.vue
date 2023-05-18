@@ -51,6 +51,7 @@ EventsOn("ProxyPort", result => {
 
 EventsOn("Exclude", result => {
     formValue.value.exclude = result
+    console.log(formValue.value.exclude)
 });
 EventsOn("Include", result => {
     formValue.value.include = result
@@ -92,6 +93,7 @@ const submitForm = () => {
     formRef.value?.validate((valid) => {
         if (!valid) {
             // 表单验证通过
+            console.log(formValue.value)
             Settings(formValue.value).then((result) => {
                 if(result === "") {
                     message.success('设置成功');

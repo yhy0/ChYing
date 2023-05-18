@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/conf"
@@ -35,6 +36,9 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	burpSuite.Ctx = ctx
 	// 启动中间人代理
+	burpSuite.Init()
+	burpSuite.HotConf()
+
 	go burpSuite.Run(burpSuite.Settings.ProxyPort)
 
 	runtime.EventsEmit(ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
@@ -172,27 +176,47 @@ func (a *App) FuzzStop() {
 
 // Settings 配置
 func (a *App) Settings(setting burpSuite.SettingUI) string {
-	logging.Logger.Infoln(setting)
-
-	if burpSuite.Settings.ProxyPort == setting.ProxyPort {
-		return ""
-	}
-
-	if utils.IsPortOccupied(setting.ProxyPort) {
+	if burpSuite.Settings.ProxyPort != setting.ProxyPort && utils.IsPortOccupied(setting.ProxyPort) {
 		return "端口被占用"
 	} else {
-		err := burpSuite.Restart(setting.ProxyPort)
-		logging.Logger.Errorln(err)
-		if err != "" {
-			return err
+		if burpSuite.Settings.ProxyPort != setting.ProxyPort {
+			err := burpSuite.Restart(setting.ProxyPort)
+			if err != "" {
+				logging.Logger.Errorln(err)
+				return err
+			}
 		}
+
 		burpSuite.Settings.ProxyPort = setting.ProxyPort
-		burpSuite.Settings.Exclude = strings.Split(setting.Exclude, "\r\n")
-		burpSuite.Settings.Include = strings.Split(setting.Include, "\r\n")
+		burpSuite.Settings.Exclude = utils.SplitStringByLines(setting.Exclude)
+		burpSuite.Settings.Include = utils.SplitStringByLines(setting.Include)
 
 		runtime.EventsEmit(a.ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
-		runtime.EventsEmit(a.ctx, "Exclude", burpSuite.Settings.Exclude)
-		runtime.EventsEmit(a.ctx, "Include", burpSuite.Settings.Include)
+		runtime.EventsEmit(a.ctx, "Exclude", strings.Join(burpSuite.Settings.Exclude, "\r\n"))
+		runtime.EventsEmit(a.ctx, "Include", strings.Join(burpSuite.Settings.Include, "\r\n"))
+
+		// 更改配置文件
+		exclude := ""
+		if len(burpSuite.Settings.Exclude) == 0 {
+			exclude = "  - \r\n"
+		} else {
+			for _, e := range burpSuite.Settings.Exclude {
+				exclude += fmt.Sprintf("  - %s\r\n", e)
+			}
+		}
+
+		include := ""
+		if len(burpSuite.Settings.Include) == 0 {
+			include = "  - \r\n"
+		} else {
+			for _, i := range burpSuite.Settings.Include {
+				include += fmt.Sprintf("  - %s\r\n", i)
+			}
+		}
+		var defaultYamlByte = []byte(fmt.Sprintf("port: %d\r\nexclude:\r\n%sinclude:\r\n%s", burpSuite.Settings.ProxyPort, exclude, include))
+
+		burpSuite.WriteYamlConfig(defaultYamlByte)
+
 		return ""
 	}
 }

@@ -40,9 +40,9 @@ type IntruderRes struct {
 }
 
 type Setting struct {
-	ProxyPort int      `json:"port"`
-	Exclude   []string `json:"exclude"` // Exclude 排除显示的域名
-	Include   []string `json:"include"`
+	ProxyPort int      `mapstructure:"port" json:"port"`
+	Exclude   []string `mapstructure:"exclude" json:"exclude"` // Exclude 排除显示的域名
+	Include   []string `mapstructure:"include" json:"include"`
 }
 
 // SettingUI 前端映射使用

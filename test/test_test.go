@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/tools"
+	"github.com/yhy0/ChYing/tools/burpSuite"
+	"github.com/yhy0/logging"
 	"regexp"
 	"testing"
+	"time"
 )
 
 /*
@@ -35,6 +38,53 @@ func Test(t *testing.T) {
 	fmt.Println(match2)
 	fmt.Println(match3)
 	fmt.Println(match4)
+
+	logging.New(true, "test")
+	burpSuite.Init()
+	fmt.Println(burpSuite.Settings)
+	burpSuite.HotConf()
+	time.Sleep(3 * time.Second)
+
+	Settings := &burpSuite.Setting{
+		ProxyPort: 119080,
+		Exclude: []string{
+			`^.*\.google.*$`,
+			`^.*\.baidu.*$`,
+			`^.*\.doubleclick.*$`,
+		},
+		Include: []string{
+			`baidu.com`,
+		},
+	}
+
+	exclude := ""
+
+	for _, e := range Settings.Exclude {
+		exclude += fmt.Sprintf("  - %s\r\n", e)
+	}
+
+	include := ""
+
+	if len(Settings.Include) == 0 {
+		include = "  - "
+	} else {
+		for _, i := range Settings.Include {
+			include += fmt.Sprintf("  - %s\r\n", i)
+		}
+
+	}
+
+	var defaultYamlByte = []byte(fmt.Sprintf(`
+port: %d
+exclude:
+%s
+include:
+%s
+`, Settings.ProxyPort, exclude, include))
+
+	burpSuite.WriteYamlConfig(defaultYamlByte)
+
+	fmt.Println(burpSuite.Settings)
 
 }
 

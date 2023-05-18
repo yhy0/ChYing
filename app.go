@@ -39,6 +39,15 @@ func (a *App) startup(ctx context.Context) {
 	burpSuite.Init()
 	burpSuite.HotConf()
 
+	if utils.IsPortOccupied(burpSuite.Settings.ProxyPort) {
+		port, err := utils.GetRandomUnusedPort()
+		if err != nil {
+			logging.Logger.Errorln(err)
+			burpSuite.Settings.ProxyPort = 65530
+		}
+		burpSuite.Settings.ProxyPort = port
+	}
+
 	go burpSuite.Run(burpSuite.Settings.ProxyPort)
 
 	runtime.EventsEmit(ctx, "ProxyPort", burpSuite.Settings.ProxyPort)

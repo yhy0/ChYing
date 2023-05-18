@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/yhy0/ChYing/pkg/file"
+	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/ChYing/tools/burpSuite"
 	"github.com/yhy0/logging"
@@ -132,4 +133,8 @@ svchost.exe                   5056 Services                   0      3,316 K
 svchost.exe         
 `
 	fmt.Println(tools.Tasklist(out))
+
+	port, err := utils.GetRandomUnusedPort()
+
+	fmt.Println(port)
 }

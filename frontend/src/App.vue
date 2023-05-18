@@ -12,10 +12,15 @@ hljs.registerLanguage("json", json)
 hljs.registerLanguage("http", http)
 hljs.registerLanguage("xml", xml)
 
+import { useOsTheme, darkTheme } from "naive-ui";
+import {computed} from "vue";
+const osThemeRef = useOsTheme();
+const theme = computed(() => osThemeRef.value === "dark" ? darkTheme : null);
+
 </script>
 
 <template>
-    <n-config-provider :hljs="hljs">
+    <n-config-provider :hljs="hljs" :theme="theme">
       <Home/>
     </n-config-provider>
 </template>

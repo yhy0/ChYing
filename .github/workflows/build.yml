@@ -111,4 +111,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: target/*
-          body_path: ${{ env.commit-messages-path }}
+          body: "${{ env.commit-messages-path }}"

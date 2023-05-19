@@ -21,7 +21,9 @@ const theme = computed(() => osThemeRef.value === "dark" ? darkTheme : null);
 
 <template>
     <n-config-provider :hljs="hljs" :theme="theme">
-      <Home/>
+        <!-- https://www.naiveui.com/zh-CN/os-theme/components/global-style -->
+        <n-global-style />
+        <Home/>
     </n-config-provider>
 </template>
 

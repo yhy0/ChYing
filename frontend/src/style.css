@@ -1,6 +1,6 @@
 html {
-    text-align: center;
-    color: white;
+    height: 100%;
+    overflow: hidden;
 }
 
 body {

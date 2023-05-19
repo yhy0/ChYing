@@ -279,8 +279,8 @@ github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQ
 github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.4.1 h1:Ns7MOKWQM6l0ttBxpd5VcgYrH+GNPOnoDfnsBpbDnzM=
-github.com/wailsapp/wails/v2 v2.4.1/go.mod h1:jbOZbcr/zm79PxXxAjP8UoVlDd9wLW3uDs+isIthDfs=
+github.com/wailsapp/wails/v2 v2.5.1 h1:mfG+2kWqQXYOwdgI43HEILjOZDXbk5woPYI3jP2b+js=
+github.com/wailsapp/wails/v2 v2.5.1/go.mod h1:jbOZbcr/zm79PxXxAjP8UoVlDd9wLW3uDs+isIthDfs=
 github.com/yhy0/Jie v0.0.0-20230506123149-b6afd6f34dc0 h1:txNbzj8qwpLLhoh7AFAuEMyADmU8wH9xHuIfS4ATzS0=
 github.com/yhy0/Jie v0.0.0-20230506123149-b6afd6f34dc0/go.mod h1:IP58cjHE95xx/FPpiWw+AAJ6WiUQnzWObnYB0nzuKWU=
 github.com/yhy0/logging v0.0.0-20230316052906-9f857773c4b6 h1:FRLmkWS/KuRFP4a9wO+NDgPm8ivKFOjNjYGahCHlt+Q=

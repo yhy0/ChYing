@@ -20,7 +20,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/thoas/go-funk v0.9.3
 	github.com/tidwall/match v1.1.1
-	github.com/wailsapp/wails/v2 v2.4.1
+	github.com/wailsapp/wails/v2 v2.5.1
 	github.com/yhy0/Jie v0.0.0-20230506123149-b6afd6f34dc0
 	github.com/yhy0/logging v0.0.0-20230316052906-9f857773c4b6
 	go.uber.org/ratelimit v0.2.0

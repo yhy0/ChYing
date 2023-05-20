@@ -28,7 +28,7 @@
 </samp>
 </strong>
 
-https://github.com/yhy0/ChYing/assets/31311038/d5670bd2-5214-4509-a61e-86a2513333b8
+https://github.com/yhy0/ChYing/assets/31311038/54cc1130-fb95-4a8f-b90e-3479e9c5a2c7
 
 </div>
 

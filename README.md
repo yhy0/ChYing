@@ -105,7 +105,7 @@ https://github.com/gh0stkey/avList/blob/master/avlist.js
 
 ## License
 
-This code is distributed under the [MIT license](https://github.com/yhy0/ChYing/blob/main/LICENSE). See [LICENSE](https://github.com/yhy0/ChYing/blob/main/LICENSE) in this directory.
+This code is distributed under the [AGPL-3.0 license](https://github.com/yhy0/ChYing/blob/main/LICENSE). See [LICENSE](https://github.com/yhy0/ChYing/blob/main/LICENSE) in this directory.
 
 ## 鸣谢
 

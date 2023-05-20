@@ -1,8 +1,8 @@
 <template>
     <n-card>
         <n-space vertical align="center">
-            <n-space align="center">
-                <n-input v-model:value="targetUrl" autosize placeholder="https://example.com/swagger-ui.html" />
+            <n-space>
+                <n-input v-model:value="targetUrl" autosize style="min-width: 450px"  placeholder="https://example.com/swagger-ui.html" />
                 <n-button type="primary" @click="swagger">
                     解析
                 </n-button>
@@ -13,7 +13,6 @@
                     <template #checked>proxy</template>
                     <template #unchecked>unproxy</template>
                 </n-switch>
-                <n-tag size="small"> 使用 Burp 代理可以更好的获取展示 </n-tag>
             </n-space>
         </n-space>
     </n-card>
@@ -39,7 +38,7 @@
             :data="data"
             @update:filters="handleUpdateFilter"
             :row-props="rowProps"
-            :max-height="250"
+            :max-height="400"
             style="margin-top: 10px"
         >
         </n-data-table>
@@ -83,7 +82,7 @@ function handleCheckedChange(checked) {
     if (checked) {
         const inputValue = inputRef.value.$el.querySelector("input").value;
         Proxy(inputValue).then(result => {
-            if (result.Error !== "") {
+            if (result.error !== "") {
                 message.error(result.msg + "; " + result.error)
                 return
             }

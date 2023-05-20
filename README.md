@@ -8,7 +8,7 @@
     <img alt="Release" src="https://img.shields.io/github/license/yhy0/ChYing"/>
   </a>
   <a href="https://github.com/yhy0/ChYing">
-    <img alt="Release" src="https://img.shields.io/badge/release-v0.8.2-brightgreen"/>
+    <img alt="Release" src="https://img.shields.io/badge/release-v0.9-brightgreen"/>
   </a>
   <a href="https://github.com/yhy0/ChYing">
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/yhy0/ChYing?color=9cf"/>

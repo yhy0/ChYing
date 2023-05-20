@@ -3,13 +3,13 @@ package addon
 import (
 	"bytes"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"unicode"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/yhy0/ChYing/tools/burpSuite/mitmproxy/proxy"
 )
 

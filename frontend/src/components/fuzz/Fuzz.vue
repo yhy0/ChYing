@@ -63,8 +63,9 @@
             :data="data"
             @update:filters="handleUpdateFilter"
             :row-props="rowProps"
-            :max-height="250"
+            :max-height="300"
             style="margin-top: 10px"
+            striped
         >
         </n-data-table>
     </n-card>
@@ -130,6 +131,7 @@ function fuzz() {
             if(result === "") {
                 alertType.value = "success";
                 alertContent.value = target + " 扫描完成";
+                percentage.value = "100"
                 message.success(target + " 扫描完成");
             } else {
                 message.error(target + result);
@@ -150,11 +152,11 @@ function handleCheckedChange(checked) {
     if (checked) {
         const inputValue = inputRef.value.$el.querySelector("input").value;
         Proxy(inputValue).then(result => {
-            if (result.Error !== "") {
-                message.error(result.Msg + "; " + result.Error)
+            if (result.error !== "") {
+                message.error(result.msg + "; " + result.error)
                 return
             }
-            message.success(result.Msg)
+            message.success(result.msg)
         })
     } else {
         Proxy("").then(result => {
@@ -245,7 +247,10 @@ EventsOn("Fuzz", e => {
 
 
 const filterCode = () => {
-    statusColumn.filterOptionValue = fcode.value;
+    if(fcode.value !== "") {
+        statusColumn.filterOptionValue = fcode.value;
+    }
+
 };
 
 const filterLength = () => {

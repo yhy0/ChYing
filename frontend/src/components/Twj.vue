@@ -57,41 +57,41 @@ EventsOn("Percentage", Percentage => {
 </script>
 
 <template>
-  <n-grid x-gap="12" :cols="2">
-    <n-gi>
-      <n-space vertical>
-        <n-card :bordered="false" title="Encoded" size="small">
-          <n-input
-              v-model:value="twj.jwt"
-              type="textarea"
-              @input="parser"
-              :autosize="{
-                minRows: 10,
-                maxRows: 10,
-              }"
-          />
+    <n-grid x-gap="12" :cols="2">
+      <n-gi>
+        <n-space vertical>
+          <n-card :bordered="false" title="Encoded" size="small">
+            <n-input
+                v-model:value="twj.jwt"
+                type="textarea"
+                @input="parser"
+                :autosize="{
+                  minRows: 10,
+                  maxRows: 10,
+                }"
+            />
+          </n-card>
+
+          <n-card :bordered="false" title="Secret" size="small">
+            <n-input v-model:value="twj.secret" type="text" placeholder="secret" @input="verify" />
+          </n-card>
+        </n-space>
+      </n-gi>
+      <n-gi>
+        <n-card title="Header" size="small" style="margin-bottom: 16px; margin-top: 10px">
+            <n-code id="header" language="json" :code="twj.header" word-wrap style="white-space: pre-wrap; text-align: left;"/>
         </n-card>
 
-        <n-card :bordered="false" title="Secret" size="small">
-          <n-input v-model:value="twj.secret" type="text" placeholder="secret" @input="verify" />
+        <n-card title="Payload" size="small" style="margin-bottom: 16px; margin-top: 10px">
+            <n-code id="payload" language="json" :code="twj.payload" word-wrap style="white-space: pre-wrap; text-align: left;"/>
         </n-card>
-      </n-space>
-    </n-gi>
-    <n-gi>
-      <n-card title="Header" size="small" style="margin-bottom: 16px; margin-top: 10px">
-          <n-code id="header" language="json" :code="twj.header" word-wrap style="white-space: pre-wrap; text-align: left;"/>
-      </n-card>
 
-      <n-card title="Payload" size="small" style="margin-bottom: 16px; margin-top: 10px">
-          <n-code id="payload" language="json" :code="twj.payload" word-wrap style="white-space: pre-wrap; text-align: left;"/>
-      </n-card>
+        <n-card title="Verify" size="small" style="margin-bottom: 16px; margin-top: 10px">
+            <n-code id="signature" language="json" :code="twj.signature" word-wrap style="white-space: pre-wrap; text-align: left;"/>
+        </n-card>
 
-      <n-card title="Verify" size="small" style="margin-bottom: 16px; margin-top: 10px">
-          <n-code id="signature" language="json" :code="twj.signature" word-wrap style="white-space: pre-wrap; text-align: left;"/>
-      </n-card>
-
-    </n-gi>
-  </n-grid>
+      </n-gi>
+    </n-grid>
 
     <n-button type="primary" @click="brute">
         Brute
@@ -111,6 +111,5 @@ EventsOn("Percentage", Percentage => {
             </n-tag>
         </span>
     </div>
-
 </template>
 

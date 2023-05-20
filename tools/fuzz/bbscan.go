@@ -1,6 +1,7 @@
 package fuzz
 
 import (
+	"fmt"
 	"github.com/antlabs/strsim"
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
@@ -113,7 +114,10 @@ func BBscan(u string, indexContentLength int, indexbody string, _403 bool) {
 	wg := sync.WaitGroup{}
 	ch := make(chan struct{}, 20)
 
+	n := len(file.BBscanRules)
+	i := 0
 	for path, rule := range file.BBscanRules {
+		i += 1
 		if Stop {
 			return
 		}
@@ -126,9 +130,12 @@ func BBscan(u string, indexContentLength int, indexbody string, _403 bool) {
 
 		ch <- struct{}{}
 		wg.Add(1)
-		go func(path string, rule *file.Rule) {
+		go func(i int, path string, rule *file.Rule) {
 			defer wg.Done()
-			if target, res, err := ReqPage(u + path); err == nil && res != nil {
+			target, res, err := ReqPage(u + path)
+			FuzzPercentage <- fmt.Sprintf("%.2f", float64(i)/float64(n)*100)
+			if err == nil && res != nil {
+
 				if util.In(res.Body, conf.WafContent) {
 					<-ch
 					return
@@ -268,7 +275,7 @@ func BBscan(u string, indexContentLength int, indexbody string, _403 bool) {
 
 			<-time.After(time.Duration(500) * time.Millisecond)
 			<-ch
-		}(path, rule)
+		}(i, path, rule)
 	}
 
 	wg.Wait()

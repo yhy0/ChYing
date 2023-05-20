@@ -7,7 +7,6 @@ import (
 	"path"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/yhy0/ChYing/tools/burpSuite/mitmproxy/proxy"
 )
 
@@ -37,7 +36,7 @@ func (item *mapLocalItem) response(req *proxy.Request) (string, *proxy.Response)
 					StatusCode: 404,
 				}
 			}
-			log.Errorf("map local %v os.Stat error", filepath)
+			//log.Errorf("map local %v os.Stat error", filepath)
 			return nil, &proxy.Response{
 				StatusCode: 500,
 			}
@@ -48,7 +47,7 @@ func (item *mapLocalItem) response(req *proxy.Request) (string, *proxy.Response)
 	respFile := func(filepath string) *proxy.Response {
 		file, err := os.Open(filepath)
 		if err != nil {
-			log.Errorf("map local %v os.Open error", filepath)
+			//log.Errorf("map local %v os.Open error", filepath)
 			return &proxy.Response{
 				StatusCode: 500,
 			}
@@ -83,7 +82,7 @@ func (item *mapLocalItem) response(req *proxy.Request) (string, *proxy.Response)
 	if !stat.IsDir() {
 		return filepath, respFile(filepath)
 	} else {
-		log.Errorf("map local %v should be file", filepath)
+		//log.Errorf("map local %v should be file", filepath)
 		return filepath, &proxy.Response{
 			StatusCode: 500,
 		}
@@ -102,9 +101,10 @@ func (ml *MapLocal) Requestheaders(f *proxy.Flow) {
 	}
 	for _, item := range ml.Items {
 		if item.match(f.Request) {
-			aurl := f.Request.URL.String()
-			localfile, resp := item.response(f.Request)
-			log.Infof("map local %v to %v", aurl, localfile)
+			//aurl := f.Request.URL.String()
+			//localfile, resp := item.response(f.Request)
+			//log.Infof("map local %v to %v", aurl, localfile)
+			_, resp := item.response(f.Request)
 			f.Response = resp
 			return
 		}

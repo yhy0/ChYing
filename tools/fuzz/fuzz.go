@@ -6,6 +6,7 @@ import (
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/tools"
+	"github.com/yhy0/logging"
 	"strings"
 )
 
@@ -32,6 +33,7 @@ func Fuzz(target string, actions []string, filePath string) error {
 
 	res, err := httpx.Request(target, "GET", "", false, nil)
 	if err != nil {
+		logging.Logger.Errorln(err)
 		return err
 	}
 

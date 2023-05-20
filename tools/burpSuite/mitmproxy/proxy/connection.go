@@ -14,7 +14,6 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
-	log "github.com/sirupsen/logrus"
 )
 
 // client connection
@@ -151,7 +150,7 @@ func (connCtx *ConnContext) initHttpServerConn() {
 }
 
 func (connCtx *ConnContext) initServerTcpConn(req *http.Request) error {
-	log.Debugln("in initServerTcpConn")
+	//log.Debugln("in initServerTcpConn")
 	ServerConn := newServerConn()
 	connCtx.ServerConn = ServerConn
 	ServerConn.Address = connCtx.pipeConn.host
@@ -246,7 +245,7 @@ func (c *wrapClientConn) Close() error {
 	if c.closed {
 		return c.closeErr
 	}
-	log.Debugln("in wrapClientConn close", c.connCtx.ClientConn.Conn.RemoteAddr())
+	//log.Debugln("in wrapClientConn close", c.connCtx.ClientConn.Conn.RemoteAddr())
 
 	c.closed = true
 	c.closeErr = c.Conn.Close()
@@ -293,7 +292,7 @@ func (c *wrapServerConn) Close() error {
 	if c.closed {
 		return c.closeErr
 	}
-	log.Debugln("in wrapServerConn close", c.connCtx.ClientConn.Conn.RemoteAddr())
+	//log.Debugln("in wrapServerConn close", c.connCtx.ClientConn.Conn.RemoteAddr())
 
 	c.closed = true
 	c.closeErr = c.Conn.Close()

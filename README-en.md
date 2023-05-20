@@ -26,13 +26,14 @@
 
 [简体中文](./README.md) · [English](./README-en.md)
 
-
 </samp>
 </strong>
 </div>
 
 
 ChYing is a comprehensive security toolbox designed to simplify various security testing tasks. It provides a range of features and tools, including directory scanning, JWT , Swagger API testing, encoding/decoding utilities, a lightweight BurpSuite alternative, and antivirus assistance. ChYing aims to assist security professionals and developers in identifying vulnerabilities and strengthening the security of their applications.
+
+https://github.com/yhy0/ChYing/assets/31311038/54cc1130-fb95-4a8f-b90e-3479e9c5a2c7
 
 <video controls="controls" loop="loop" autoplay="autoplay"> 
     <source src="images/ChYing.mp4" type="video/mp4">

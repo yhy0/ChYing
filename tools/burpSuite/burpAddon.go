@@ -223,12 +223,9 @@ func (b *Burp) Request(f *proxy.Flow) {
 }
 
 func (b *Burp) Responseheaders(f *proxy.Flow) {
-	fmt.Println("Responseheaders")
-
 }
 
 func (b *Burp) Response(f *proxy.Flow) {
-	fmt.Println("Response ========================)))))))))))))))))")
 	if Intercept {
 		for {
 			if Sum != 0 {

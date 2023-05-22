@@ -62,7 +62,7 @@ Swagger 会自动进行 403 bypass
 
 https://github.com/devploit/dontgo403
 
-未实现https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
+https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 ### JWT
 

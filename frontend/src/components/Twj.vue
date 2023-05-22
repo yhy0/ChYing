@@ -37,7 +37,7 @@ function verify() {
       return
     }
     message.success("Signature Verified")
-    twj.signature = result.msg
+    twj.signature = JSON.stringify(JSON.parse(result.msg),null, 2);
   })
 }
 

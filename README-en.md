@@ -65,7 +65,7 @@ Automatic 403 bypass for the Swagger features.
 
 https://github.com/devploit/dontgo403
 
-Not implemented: https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
+https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 ### JWT
 

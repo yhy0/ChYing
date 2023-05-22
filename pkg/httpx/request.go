@@ -1,14 +1,17 @@
 package httpx
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"github.com/corpix/uarand"
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/logging"
 	"go.uber.org/ratelimit"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptrace"
@@ -282,4 +285,43 @@ func RequestRaw(target string, method string, postdata string, isredirect bool, 
 	}
 
 	return &Response{resp.Status, resp.StatusCode, respbody, string(requestDump), responseDump, resp.Header, contentLength, resp.Request.URL.String(), location, float64(time.Since(start).Milliseconds())}, nil
+}
+
+// Request10 发送 http/1.0
+func Request10(host, raw string) (*Response, error) {
+	conn, err := net.Dial("tcp", host)
+	if err != nil {
+		logging.Logger.Errorln("Error connecting:", err)
+		return nil, err
+	}
+	defer conn.Close()
+	// 发送请求
+	_, err = fmt.Fprint(conn, raw)
+	if err != nil {
+		logging.Logger.Errorln("Error sending request:", err)
+		return nil, err
+	}
+
+	// 读取响应
+	reader := bufio.NewReader(conn)
+	resp, err := http.ReadResponse(reader, nil)
+	if err != nil {
+		logging.Logger.Errorln("Error reading response:", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// 读取响应内容
+	responseDump, _ := httputil.DumpResponse(resp, true)
+	var location string
+	var respbody string
+	defer resp.Body.Close()
+	if bodytmp, err := ioutil.ReadAll(resp.Body); err == nil {
+		respbody = string(bodytmp)
+	}
+	if resplocation, err := resp.Location(); err == nil {
+		location = resplocation.String()
+	}
+
+	return &Response{resp.Status, resp.StatusCode, string(respbody), raw, string(responseDump), resp.Header, int(resp.ContentLength), resp.Request.URL.String(), location, 0}, nil
 }

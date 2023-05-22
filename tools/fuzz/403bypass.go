@@ -1,10 +1,12 @@
 package fuzz
 
 import (
+	"fmt"
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/logging"
+	"net/url"
 	"strings"
 	"unicode"
 )
@@ -13,6 +15,7 @@ import (
 	@author: yhy
 	@since: 2023/5/6
 	@desc: bypass 403 	https://github.com/devploit/dontgo403
+	todo 应该考虑一下带参数的，现在不能处理带参数的，直接拼接了，不好
 **/
 
 func Bypass403(uri, m string) {
@@ -79,6 +82,19 @@ func Bypass403(uri, m string) {
 	}
 
 	result = capital(uri, m)
+	if result != nil {
+		FuzzChan <- tools.Result{
+			Url:           result.Url,
+			Method:        m,
+			StatusCode:    result.StatusCode,
+			ContentLength: result.ContentLength,
+			Request:       result.Request,
+			Response:      result.Response,
+		}
+		return
+	}
+
+	result = http10(uri, m)
 	if result != nil {
 		FuzzChan <- tools.Result{
 			Url:           result.Url,
@@ -373,5 +389,34 @@ func capital(uri, m string) *tools.Result {
 	if flag {
 		return result
 	}
+	return nil
+}
+
+func http10(uri, m string) *tools.Result {
+	u, err := url.Parse(uri)
+	if err != nil {
+		logging.Logger.Errorln("Error url.Parse:", err)
+		return nil
+	}
+	// 设置请求行和请求头
+	raw := fmt.Sprintf("GET %s HTTP/1.0\r\n"+
+		"\r\n"+
+		"\r\n", u.Path+"?"+u.RawQuery)
+
+	resp, err := httpx.Request10(u.Host, raw)
+	if err != nil {
+		return nil
+	}
+	if resp != nil && resp.StatusCode == 200 {
+		return &tools.Result{
+			Url:           uri,
+			Method:        "GET",
+			StatusCode:    resp.StatusCode,
+			ContentLength: resp.ContentLength,
+			Request:       resp.RequestDump,
+			Response:      resp.ResponseDump,
+		}
+	}
+
 	return nil
 }

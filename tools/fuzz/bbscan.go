@@ -35,15 +35,6 @@ var (
 	path404 = "/file_not_support"
 )
 
-func getTitle(body string) string {
-	titleReg := regexp.MustCompile(`<title>([\s\S]{1,200})</title>`)
-	title := titleReg.FindStringSubmatch(body)
-	if len(title) > 1 {
-		return title[1]
-	}
-	return ""
-}
-
 func ReqPage(u string) (*Page, *httpx.Response, error) {
 	page := &Page{}
 	var backUpSuffixList = []string{".tar", ".tar.gz", ".zip", ".rar", ".7z", ".bz2", ".gz", ".war"}
@@ -60,7 +51,7 @@ func ReqPage(u string) (*Page, *httpx.Response, error) {
 		if util.IntInSlice(res.StatusCode, []int{301, 302, 307, 308}) {
 			page.is302 = true
 		}
-		page.title = getTitle(res.Body)
+		page.title = httpx.GetTitle(res.Body)
 		page.locationUrl = res.Location
 		regs := []string{"text/plain", "application/.*download", "application/.*file", "application/.*zip", "application/.*rar", "application/.*tar", "application/.*down", "application/.*compressed", "application/stream"}
 		for _, reg := range regs {
@@ -97,7 +88,7 @@ func BBscan(u string, indexContentLength int, indexbody string, _403 bool) {
 	)
 
 	other200Contentlen = append(other200Contentlen, indexContentLength)
-	other200Title = append(other200Title, getTitle(indexbody))
+	other200Title = append(other200Title, httpx.GetTitle(indexbody))
 	if url404, url404res, err = ReqPage(u + path404); err == nil {
 		if url404.is302 {
 			conf.Location404 = append(conf.Location404, url404.locationUrl)

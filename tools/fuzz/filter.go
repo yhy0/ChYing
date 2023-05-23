@@ -36,7 +36,7 @@ func filter(path string, resp *httpx.Response) bool {
 		return true
 	}
 
-	title := getTitle(resp.Body)
+	title := httpx.GetTitle(resp.Body)
 
 	if util.In(title, conf.Page404Title) {
 		return true

@@ -15,6 +15,12 @@ const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'Decoder', 'BurpSuite', 'About
 <template>
     <n-card>
         <n-tabs type="line" animated v-model="activeTabs">
+            <n-tab-pane name="BurpSuite" display-directive="show:lazy" tab="BurpSuite">
+                <n-message-provider>
+                    <BurpSuite/>
+                </n-message-provider>
+            </n-tab-pane>
+
             <!-- display-directive="show:lazy" ，切换不会情况数据，并且切换时懒加载 -->
             <n-tab-pane name="Fuzz" display-directive="show:lazy" tab="Fuzz">
                 <n-message-provider>
@@ -29,14 +35,8 @@ const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'Decoder', 'BurpSuite', 'About
             </n-tab-pane>
 
             <n-tab-pane name="TWJ" display-directive="show:lazy" tab="TWJ">
-                    <n-message-provider>
-                        <Twj/>
-                    </n-message-provider>
-            </n-tab-pane>
-
-            <n-tab-pane name="BurpSuite" display-directive="show:lazy" tab="BurpSuite">
                 <n-message-provider>
-                    <BurpSuite/>
+                    <Twj/>
                 </n-message-provider>
             </n-tab-pane>
 

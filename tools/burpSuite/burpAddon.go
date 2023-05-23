@@ -6,12 +6,14 @@ import (
 	"context"
 	"fmt"
 	urlutil "github.com/projectdiscovery/utils/url"
+	"github.com/thoas/go-funk"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/tools/burpSuite/mitmproxy/proxy"
 	"github.com/yhy0/logging"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -73,6 +75,32 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			remoteAddr = ""
 		}
 
+		ct := f.Response.Header.Get("Content-Type")
+		var MIMEType string
+
+		if funk.Contains(ct, "json") {
+			MIMEType = "json"
+		} else if funk.Contains(ct, "javascript") {
+			MIMEType = "script"
+		} else if funk.Contains(ct, "html") {
+			MIMEType = "html"
+		} else if funk.Contains(ct, "css") {
+			MIMEType = "css"
+		} else if funk.Contains(ct, "text/plain") {
+			MIMEType = "text"
+		} else if funk.Contains(ct, "image") {
+			MIMEType = "image"
+		} else if ct == "" {
+			MIMEType = ""
+		}
+
+		ext := ""
+
+		uri := strings.Split(f.Request.URL.RequestURI(), "?")
+		if len(uri) > 0 {
+			ext = filepath.Ext(uri[0])
+		}
+
 		HttpHistory <- HTTPHistory{
 			Id:        f.Id,
 			Host:      f.Request.URL.Host,
@@ -82,9 +110,9 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			Edited:    "",
 			Status:    strconv.Itoa(statusCode),
 			Length:    strconv.Itoa(contentLen),
-			MIMEType:  "",
-			Extension: "",
-			Title:     "",
+			MIMEType:  MIMEType,
+			Extension: ext,
+			Title:     httpx.GetTitle(string(f.Response.Body)),
 			Comment:   "",
 			TLS:       "√",
 			IP:        remoteAddr,

@@ -1,5 +1,49 @@
 <template>
     <n-card >
+        <n-collapse>
+            <n-collapse-item title="Filter">
+                <n-grid x-gap="12" :cols="2">
+                    <n-gi>
+                        <n-card title="Filter by MIME type">
+                            <n-checkbox-group v-model:value="filter.mime" @update:value="handleCheckedMime">
+                                <n-space >
+                                    <n-checkbox value="HTML">HTML</n-checkbox>
+                                    <n-checkbox value="Script">Script</n-checkbox>
+                                    <n-checkbox value="XML">XML</n-checkbox>
+                                    <n-checkbox value="CSS">CSS</n-checkbox>
+                                    <n-checkbox value="Other text">Other text</n-checkbox>
+                                    <n-checkbox value="Images">Images</n-checkbox>
+                                    <n-checkbox value="Flash">Flash</n-checkbox>
+                                    <n-checkbox value="Other binary">Other binary</n-checkbox>
+                                </n-space>
+                            </n-checkbox-group>
+                        </n-card>
+                    </n-gi>
+                    <n-gi>
+                        <n-card title="Filter by status type">
+                            <n-checkbox-group v-model:value="filter.status" @update:value="handleCheckedStatus">
+                                <n-space>
+                                    <n-checkbox value="2xx">2xx</n-checkbox>
+                                    <n-checkbox value="3xx">3xx</n-checkbox>
+                                    <n-checkbox value="4xx">4xx</n-checkbox>
+                                    <n-checkbox value="5xx">5xx</n-checkbox>
+                                </n-space>
+                            </n-checkbox-group>
+                        </n-card>
+                    </n-gi>
+                </n-grid>
+
+                <n-space align="center" style="margin-top: 10px">
+                    <n-input v-model:value="filter.ext" placeholder="Filter by file extension" @input="filterExt" />
+                    <n-input v-model:value="filter.term" placeholder="Filter by search term" @input="filterTerm" />
+                    <n-tag type="success" size="small">
+                        多个过滤条件以空格分开
+                    </n-tag>
+                </n-space>
+
+            </n-collapse-item>
+        </n-collapse>
+
         <n-data-table
                 size="small"
                 :columns="columns"
@@ -8,7 +52,9 @@
                 :max-height="300"
                 :scroll-x="1800"
                 :rowClassName="rowClassName"
+                @update:filters="handleUpdateFilter"
                 striped
+                style="margin-bottom: 16px; margin-top: 10px"
         >
         </n-data-table>
 
@@ -48,7 +94,7 @@
 
 <script setup>
 import {NCard, NDataTable, useMessage} from "naive-ui";
-import {ref, h, nextTick } from "vue";
+import {ref, h, nextTick, reactive} from "vue";
 import {EventsOn} from "../../../../../wailsjs/runtime/runtime.js";
 import {GetHistoryDump, SendToRepeater, SendToIntruder} from "../../../../../wailsjs/go/main/App.js";
 
@@ -123,6 +169,145 @@ const rowProps = (row) => {
     };
 };
 
+const StatusColumn = reactive({
+    title: "Status",
+    key: "Status",
+    filterMultiple: true,
+    filterOptionValue: null,
+    resizable: true,
+    sorter: "default",
+    filter(value, row) {
+        const status = parseInt(row.Status)
+        if(filter.value.status.includes('2xx')) {
+            if(status >= 200 && status < 300) {
+                return true;
+            }
+        } else if(filter.value.status.includes('3xx')) {
+            if(status >= 300 && status < 400) {
+                return true;
+            }
+        } else if(filter.value.status.includes('4xx')) {
+            if(status >= 400 && status < 500) {
+                return true;
+            }
+        } else if(filter.value.status.includes('5xx')) {
+            if(status >= 500) {
+                return true;
+            }
+        }
+        return false;
+    }
+});
+
+const MIMEColumn = reactive({
+    title: "MIMEType",
+    key: "MIMEType",
+    filterMultiple: true,
+    filterOptionValue: null,
+    resizable: true,
+    ellipsis: {
+        tooltip: true
+    },
+    sorter: "default",
+    filter(value, row) {
+        const mime = parseInt(row.MIMEType)
+        if(filter.value.mime.includes('HTML')) {
+            if(mime === "html") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('Script')) {
+            if(mime === "script" || mime === "json") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('XML')) {
+            if(mime === "xml") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('css')) {
+            if(mime === "CSS") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('Other text')) {
+            if(mime === "text" || mime === "") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('Images')) {
+            if(mime === "image") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('Flash')) {
+            if(mime === "Flash") {
+                return true;
+            }
+        } else if(filter.value.mime.includes('Other binary')) {
+            if(mime === "Other binary") {
+                return true;
+            }
+        }
+        return false;
+    }
+});
+
+const ExtColumn = reactive({
+    title: "Extension",
+    key: "Extension",
+    filterMultiple: true,
+    filterOptionValue: null,
+    resizable: true,
+    ellipsis: {
+        tooltip: true
+    },
+    sorter: "default",
+    filter(value, row) {
+        const exts = filter.value.ext.split(' ');
+        for (const ext of exts) {
+            if (row.Extension === ext) {
+                return true;
+            }
+        }
+        return false;
+    }
+});
+
+
+// filter
+const filter = ref({
+    status: ["3xx", "4xx", "5xx", "2xx"],
+    mime: ["HTML", "Script", "XML", "Other text"],
+    ext: null,
+    term: null,
+});
+
+
+function handleCheckedStatus(checked) {
+    filter.value.status = checked;
+    StatusColumn.filterOptionValue = checked;
+}
+
+function handleCheckedMime(checked) {
+    filter.value.mime = checked;
+    MIMEColumn.filterOptionValue = checked;
+}
+
+const filterExt = () => {
+    ExtColumn.filterOptionValue = filter.value.ext;
+};
+
+const filterTerm = () => {
+    ExtColumn.filterOptionValue = filter.value.term;
+};
+
+const handleUpdateFilter = (filters, sourceColumn) => {
+    StatusColumn.filterOptionValue = filters[sourceColumn.key];
+    filter.value.status = filters[sourceColumn.key];
+
+    MIMEColumn.filterOptionValue = filters[sourceColumn.key];
+    filter.value.mime = filters[sourceColumn.key];
+
+    ExtColumn.filterOptionValue = filters[sourceColumn.key];
+    filter.value.ext = filters[sourceColumn.key];
+};
+
 const columns = [
     {
         title: "Id",
@@ -167,32 +352,14 @@ const columns = [
         key: "Edited",
         resizable: true
     },
-    {
-        title: "Status",
-        key: "Status",
-        resizable: true
-    },
+    StatusColumn,
     {
         title: "Length",
         key: "Length",
         resizable: true
     },
-    {
-        title: "MIMEType",
-        key: "MIMEType",
-        resizable: true,
-        ellipsis: {
-            tooltip: true
-        }
-    },
-    {
-        title: "Extension",
-        key: "Extension",
-        resizable: true,
-        ellipsis: {
-            tooltip: true
-        }
-    },
+    MIMEColumn,
+    ExtColumn,
     {
         title: "Title",
         key: "Title",
@@ -243,6 +410,7 @@ const columns = [
     },
 ];
 
+
 EventsOn("HttpHistory", HttpHistory => {
     data.value.push({
         Id: HttpHistory["id"],
@@ -274,6 +442,6 @@ const rowClassName = (row) => {
 
 <style scoped>
 :deep(.table-tr-row-id) td {
-    background-color: #fffa65;
+    background-color: rgba(255, 165, 101, 0.98);
 }
 </style>

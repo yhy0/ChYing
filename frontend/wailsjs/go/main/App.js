@@ -42,6 +42,10 @@ export function Intruder(arg1, arg2, arg3, arg4, arg5, arg6) {
   return window['go']['main']['App']['Intruder'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
+export function Menu() {
+  return window['go']['main']['App']['Menu']();
+}
+
 export function Parser(arg1) {
   return window['go']['main']['App']['Parser'](arg1);
 }

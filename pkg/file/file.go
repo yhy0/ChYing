@@ -28,7 +28,7 @@ var (
 	Av          map[string]string
 )
 
-var chyingDir string
+var ChyingDir string
 
 type Rule struct {
 	Tag    string // 文本内容
@@ -144,13 +144,13 @@ func UserFile() {
 	// 判断 ChYing 文件夹是否存在
 	if _, err := os.Stat(filePath); err != nil {
 		// 不存在，创建
-		chyingDir = filepath.Join(userCfgDir, "ChYing")
-		if err := os.MkdirAll(chyingDir, 0755); err != nil {
+		ChyingDir = filepath.Join(userCfgDir, "ChYing")
+		if err := os.MkdirAll(ChyingDir, 0755); err != nil {
 			panic(err)
 		}
 		WriteToConfig()
 	} else {
-		chyingDir = filepath.Join(userCfgDir, "ChYing")
+		ChyingDir = filepath.Join(userCfgDir, "ChYing")
 		// 读取文件
 		ReadFiles()
 	}
@@ -164,12 +164,12 @@ func WriteToConfig() {
 	if err != nil {
 		panic(err)
 	}
-	if err = os.WriteFile(filepath.Join(chyingDir, "dicc.txt"), content, 0644); err != nil {
+	if err = os.WriteFile(filepath.Join(ChyingDir, "dicc.txt"), content, 0644); err != nil {
 		panic(err)
 	}
 
 	// 2. 释放 bbscan 规则文件
-	bbscan := filepath.Join(chyingDir, "bbscan")
+	bbscan := filepath.Join(ChyingDir, "bbscan")
 	if err := os.MkdirAll(bbscan, 0755); err != nil {
 		panic(err)
 	}
@@ -200,12 +200,12 @@ func WriteToConfig() {
 	if err != nil {
 		panic(err)
 	}
-	if err = os.WriteFile(filepath.Join(chyingDir, "twj.txt"), jwt, 0644); err != nil {
+	if err = os.WriteFile(filepath.Join(ChyingDir, "twj.txt"), jwt, 0644); err != nil {
 		panic(err)
 	}
 
 	// 4. 释放 403 bypass 规则文件
-	bypass := filepath.Join(chyingDir, "403bypass")
+	bypass := filepath.Join(ChyingDir, "403bypass")
 	if err = os.MkdirAll(bypass, 0755); err != nil {
 		panic(err)
 	}
@@ -236,14 +236,14 @@ func WriteToConfig() {
 	if err != nil {
 		panic(err)
 	}
-	if err = os.WriteFile(filepath.Join(chyingDir, "av.json"), av, 0644); err != nil {
+	if err = os.WriteFile(filepath.Join(ChyingDir, "av.json"), av, 0644); err != nil {
 		panic(err)
 	}
 }
 
 // ReadFiles 文件存在，读取文件内容
 func ReadFiles() {
-	diccData, err := os.ReadFile(filepath.Join(chyingDir, "dicc.txt"))
+	diccData, err := os.ReadFile(filepath.Join(ChyingDir, "dicc.txt"))
 	if err != nil {
 		logging.Logger.Errorln("ReadFiles(dicc.txt)", err)
 		diccData, err = fileDicc.ReadFile("dicc.txt")
@@ -253,7 +253,7 @@ func ReadFiles() {
 	}
 	DiccData = strings.Split(string(diccData), "\n")
 
-	jwt, err := os.ReadFile(filepath.Join(chyingDir, "twj.txt"))
+	jwt, err := os.ReadFile(filepath.Join(ChyingDir, "twj.txt"))
 	if err != nil {
 		logging.Logger.Errorln("ReadFiles(twj.txt)", err)
 		diccData, err = jwtSecrets.ReadFile("twj.txt")
@@ -269,7 +269,7 @@ func ReadFiles() {
 	regContentType, _ := regexp.Compile(`{type="(.*?)"}`)
 	regContentTypeNo, _ := regexp.Compile(`{type_no="(.*?)"}`)
 
-	bbscan := filepath.Join(chyingDir, "bbscan")
+	bbscan := filepath.Join(ChyingDir, "bbscan")
 	entries, err := os.ReadDir(bbscan)
 	if err != nil {
 		panic(err)
@@ -316,7 +316,7 @@ func ReadFiles() {
 
 	Bypass403 = make(map[string][]string)
 	// 返回[]fs.DirEntry
-	bypass := filepath.Join(chyingDir, "403bypass")
+	bypass := filepath.Join(ChyingDir, "403bypass")
 	entries, err = os.ReadDir(bypass)
 	if err != nil {
 		panic(err)
@@ -330,7 +330,7 @@ func ReadFiles() {
 		Bypass403[entry.Name()] = util.CvtLines(string(content))
 	}
 
-	avfile := filepath.Join(chyingDir, "av.json")
+	avfile := filepath.Join(ChyingDir, "av.json")
 	_, err = os.Stat(avfile)
 	if os.IsNotExist(err) {
 		av, err := AvFile.ReadFile("av.json")
@@ -342,7 +342,7 @@ func ReadFiles() {
 		}
 	} else {
 		// 读取 av.json 文件内容
-		data, err := os.ReadFile(filepath.Join(chyingDir, "av.json"))
+		data, err := os.ReadFile(filepath.Join(ChyingDir, "av.json"))
 		if err != nil {
 			logging.Logger.Errorln("ReadFiles(twj.txt)", err)
 			data, err = AvFile.ReadFile("av.json")

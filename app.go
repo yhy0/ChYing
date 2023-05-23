@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/buger/jsonparser"
 	uuid "github.com/satori/go.uuid"
+	"github.com/wailsapp/wails/v2/pkg/menu"
+	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/yhy0/ChYing/conf"
+	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/log"
 	"github.com/yhy0/ChYing/pkg/utils"
@@ -29,6 +33,98 @@ type App struct {
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
+}
+
+// Menu 应用菜单
+func (a *App) Menu() *menu.Menu {
+	return menu.NewMenuFromItems(
+		menu.SubMenu("承影", menu.NewMenuFromItems(
+			menu.Text("关于", nil, func(_ *menu.CallbackData) {
+				a.diag(conf.Description, false)
+			}),
+			menu.Text("检查更新", nil, func(_ *menu.CallbackData) {
+				resp, err := httpx.Get("https://api.github.com/repos/yhy0/ChYing/tags")
+				if err != nil {
+					a.diag("检查更新出错\n"+err.Error(), true)
+					return
+				}
+
+				lastVersion, err := jsonparser.GetString([]byte(resp.Body), "[0]", "name")
+				if err != nil {
+					a.diag("检查更新出错\n"+err.Error(), true)
+					return
+				}
+
+				needUpdate := conf.Version < lastVersion
+				msg := conf.VersionNewMsg
+				btns := []string{conf.BtnConfirmText}
+				if needUpdate {
+					msg = fmt.Sprintf(conf.VersionOldMsg, lastVersion)
+					btns = []string{"确定", "取消"}
+				}
+				selection, err := a.diag(msg, false, btns...)
+				if err != nil {
+					return
+				}
+				if needUpdate && selection == conf.BtnConfirmText {
+					url := fmt.Sprintf("https://github.com/yhy0/ChYing/releases/tag/%s", lastVersion)
+					runtime.BrowserOpenURL(a.ctx, url)
+				}
+			}),
+			menu.Text(
+				"主页",
+				keys.Combo("H", keys.CmdOrCtrlKey, keys.ShiftKey),
+				func(_ *menu.CallbackData) {
+					runtime.BrowserOpenURL(a.ctx, "https://github.com/yhy0/ChYing/")
+				},
+			),
+			menu.Separator(),
+			menu.Text("退出", keys.CmdOrCtrl("Q"), func(_ *menu.CallbackData) {
+				runtime.Quit(a.ctx)
+			}),
+		)),
+
+		menu.EditMenu(),
+		menu.SubMenu("Help", menu.NewMenuFromItems(
+			menu.Text(
+				"打开配置文件夹",
+				keys.Combo("C", keys.CmdOrCtrlKey, keys.ShiftKey),
+				func(_ *menu.CallbackData) {
+					err := utils.OpenFolder(file.ChyingDir)
+					if err != nil {
+						a.diag("Failed to open folder: \n"+err.Error(), true)
+						return
+					}
+				},
+			),
+		)),
+	)
+}
+
+// diag ...
+func (a *App) diag(message string, error bool, buttons ...string) (string, error) {
+	if len(buttons) == 0 {
+		buttons = []string{
+			conf.BtnConfirmText,
+		}
+	}
+
+	var t runtime.DialogType
+
+	if error {
+		t = runtime.ErrorDialog
+	} else {
+		t = runtime.InfoDialog
+	}
+
+	return runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		Type:          t,
+		Title:         conf.Title,
+		Message:       message,
+		CancelButton:  conf.BtnCancelText,
+		DefaultButton: conf.BtnConfirmText,
+		Buttons:       buttons,
+	})
 }
 
 // startup is called when the app starts. The context is saved ,so we can call the runtime methods

@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"os/exec"
+	"runtime"
 	"time"
 )
 
@@ -64,4 +66,28 @@ func Exists(path string) bool {
 		return false
 	}
 	return true
+}
+
+func OpenFolder(path string) error {
+	var err error
+
+	switch runtime.GOOS {
+	case "windows":
+		err = exec.Command("cmd", "/c", "explorer", path).Start()
+	case "linux":
+		err = execCmd("xdg-open", path)
+	case "darwin":
+		err = execCmd("open", path)
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+
+	return err
+}
+
+func execCmd(cmd string, args ...string) error {
+	command := exec.Command(cmd, args...)
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	return command.Run()
 }

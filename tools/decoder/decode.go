@@ -22,11 +22,16 @@ func DecodeUnicode(str string) string {
 		if r == "" {
 			continue
 		}
-		code, err := strconv.ParseInt(r, 16, 32)
-		if err != nil {
-			result.WriteString(r)
+		if len(r) >= 4 {
+			code, err := strconv.ParseInt(r[:4], 16, 32)
+			if err != nil {
+				result.WriteString(r)
+			} else {
+				result.WriteRune(rune(code))
+				result.WriteString(r[4:])
+			}
 		} else {
-			result.WriteRune(rune(code))
+			result.WriteString(r)
 		}
 	}
 	return result.String()

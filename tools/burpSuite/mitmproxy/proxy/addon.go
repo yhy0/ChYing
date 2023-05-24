@@ -1,10 +1,9 @@
 package proxy
 
 import (
+	"github.com/yhy0/logging"
 	"io"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type Addon interface {
@@ -69,19 +68,19 @@ type LogAddon struct {
 }
 
 func (addon *LogAddon) ClientConnected(client *ClientConn) {
-	log.Infof("%v client connect\n", client.Conn.RemoteAddr())
+	logging.Logger.Infof("%v client connect\n", client.Conn.RemoteAddr())
 }
 
 func (addon *LogAddon) ClientDisconnected(client *ClientConn) {
-	log.Infof("%v client disconnect\n", client.Conn.RemoteAddr())
+	logging.Logger.Infof("%v client disconnect\n", client.Conn.RemoteAddr())
 }
 
 func (addon *LogAddon) ServerConnected(connCtx *ConnContext) {
-	log.Infof("%v server connect %v (%v->%v)\n", connCtx.ClientConn.Conn.RemoteAddr(), connCtx.ServerConn.Address, connCtx.ServerConn.Conn.LocalAddr(), connCtx.ServerConn.Conn.RemoteAddr())
+	logging.Logger.Infof("%v server connect %v (%v->%v)\n", connCtx.ClientConn.Conn.RemoteAddr(), connCtx.ServerConn.Address, connCtx.ServerConn.Conn.LocalAddr(), connCtx.ServerConn.Conn.RemoteAddr())
 }
 
 func (addon *LogAddon) ServerDisconnected(connCtx *ConnContext) {
-	log.Infof("%v server disconnect %v (%v->%v) - %v\n", connCtx.ClientConn.Conn.RemoteAddr(), connCtx.ServerConn.Address, connCtx.ServerConn.Conn.LocalAddr(), connCtx.ServerConn.Conn.RemoteAddr(), connCtx.FlowCount)
+	logging.Logger.Infof("%v server disconnect %v (%v->%v) - %v\n", connCtx.ClientConn.Conn.RemoteAddr(), connCtx.ServerConn.Address, connCtx.ServerConn.Conn.LocalAddr(), connCtx.ServerConn.Conn.RemoteAddr(), connCtx.FlowCount)
 }
 
 func (addon *LogAddon) Requestheaders(f *Flow) {
@@ -96,6 +95,6 @@ func (addon *LogAddon) Requestheaders(f *Flow) {
 		if f.Response != nil && f.Response.Body != nil {
 			contentLen = len(f.Response.Body)
 		}
-		log.Infof("%v %v %v %v %v - %v ms\n", f.ConnContext.ClientConn.Conn.RemoteAddr(), f.Request.Method, f.Request.URL.String(), StatusCode, contentLen, time.Since(start).Milliseconds())
+		logging.Logger.Infof("%v %v %v %v %v - %v ms\n", f.ConnContext.ClientConn.Conn.RemoteAddr(), f.Request.Method, f.Request.URL.String(), StatusCode, contentLen, time.Since(start).Milliseconds())
 	}()
 }

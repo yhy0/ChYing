@@ -16,13 +16,13 @@ require (
 	github.com/projectdiscovery/utils v0.0.19
 	github.com/samber/lo v1.38.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.2
 	github.com/spf13/viper v1.15.0
 	github.com/thoas/go-funk v0.9.3
 	github.com/tidwall/match v1.1.1
 	github.com/wailsapp/wails/v2 v2.5.1
 	github.com/yhy0/Jie v0.0.0-20230506123149-b6afd6f34dc0
-	github.com/yhy0/logging v0.0.0-20230316052906-9f857773c4b6
+	github.com/yhy0/logging v0.0.0-20230524073457-06ef86fd9ef3
 	go.uber.org/ratelimit v0.2.0
 )
 
@@ -47,7 +47,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/microcosm-cc/bluemonday v1.0.23 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -67,11 +67,11 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.8.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230420155640-133eef4313cb // indirect
-	golang.org/x/net v0.9.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

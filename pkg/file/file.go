@@ -38,6 +38,23 @@ type Rule struct {
 	Root   bool   // 是否为一级目录
 }
 
+func init() {
+	// 获取用户配置文件夹的路径
+	homedir := folderutil.HomeDirOrDefault("")
+
+	userCfgDir := filepath.Join(homedir, ".config")
+
+	ChyingDir = filepath.Join(userCfgDir, "ChYing")
+	// 判断 ChYing 文件夹是否存在
+	if _, err := os.Stat(ChyingDir); err != nil {
+		// 不存在，创建
+		if err = os.MkdirAll(ChyingDir, 0755); err != nil {
+			panic(err)
+		}
+		WriteToConfig()
+	}
+}
+
 func New() {
 	diccData, err := fileDicc.ReadFile("dicc.txt")
 	if err != nil {
@@ -129,31 +146,8 @@ func New() {
 		panic(err)
 	}
 
-	// 将文件释放
-	UserFile()
-}
-
-func UserFile() {
-	// 获取用户配置文件夹的路径
-	homedir := folderutil.HomeDirOrDefault("")
-
-	userCfgDir := filepath.Join(homedir, ".config")
-
-	filePath := filepath.Join(userCfgDir, "ChYing")
-
-	// 判断 ChYing 文件夹是否存在
-	if _, err := os.Stat(filePath); err != nil {
-		// 不存在，创建
-		ChyingDir = filepath.Join(userCfgDir, "ChYing")
-		if err := os.MkdirAll(ChyingDir, 0755); err != nil {
-			panic(err)
-		}
-		WriteToConfig()
-	} else {
-		ChyingDir = filepath.Join(userCfgDir, "ChYing")
-		// 读取文件
-		ReadFiles()
-	}
+	// 读取文件
+	ReadFiles()
 }
 
 // WriteToConfig 将内置文件全部释放到配置文件夹下

@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/yhy0/logging"
 	"io"
 	"io/ioutil"
 	"math/big"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/golang/groupcache/lru"
 	"github.com/golang/groupcache/singleflight"
-	log "github.com/sirupsen/logrus"
 )
 
 // reference
@@ -116,14 +116,14 @@ func NewCA(path string) (*CA, error) {
 			return nil, err
 		}
 	} else {
-		log.Debug("load root ca")
+		logging.Logger.Debug("load root ca")
 		return ca, nil
 	}
 
 	if err := ca.create(); err != nil {
 		return nil, err
 	}
-	log.Debug("create root ca")
+	logging.Logger.Debug("create root ca")
 	return ca, nil
 }
 
@@ -303,7 +303,7 @@ func (ca *CA) GetCert(commonName string) (*tls.Certificate, error) {
 	ca.cacheMu.Lock()
 	if val, ok := ca.cache.Get(commonName); ok {
 		ca.cacheMu.Unlock()
-		log.Debugf("ca GetCert: %v", commonName)
+		logging.Logger.Debugf("ca GetCert: %v", commonName)
 		return val.(*tls.Certificate), nil
 	}
 	ca.cacheMu.Unlock()
@@ -327,7 +327,7 @@ func (ca *CA) GetCert(commonName string) (*tls.Certificate, error) {
 
 // TODO: 是否应该支持多个 SubjectAltName
 func (ca *CA) DummyCert(commonName string) (*tls.Certificate, error) {
-	log.Debugf("ca DummyCert: %v", commonName)
+	logging.Logger.Debugf("ca DummyCert: %v", commonName)
 	template := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().UnixNano() / 100000),
 		Subject: pkix.Name{

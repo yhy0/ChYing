@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
+	"github.com/yhy0/logging"
 	"net"
 	"net/http"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/yhy0/ChYing/tools/burpSuite/mitmproxy/cert"
 )
 
@@ -171,7 +171,7 @@ func (m *middle) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func (m *middle) intercept(pipeServerConn *pipeConn) {
 	buf, err := pipeServerConn.Peek(3)
 	if err != nil {
-		log.Errorf("Peek error: %v\n", err)
+		logging.Logger.Errorf("Peek error: %v\n", err)
 		pipeServerConn.Close()
 		return
 	}

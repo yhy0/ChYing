@@ -78,7 +78,7 @@ func Run(port int) {
 
 	// 这种不错，通过添加插件的形式，这样只要实现了接口,p.AddAddon(xxxx), 然后就会自动执行相应的操作
 	// 添加一个日志记录插件
-	//Proxy.AddAddon(&proxy.LogAddon{})
+	Proxy.AddAddon(&proxy.LogAddon{})
 
 	Proxy.AddAddon(&Burp{})
 

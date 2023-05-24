@@ -182,15 +182,18 @@ const StatusColumn = reactive({
             if(status >= 200 && status < 300) {
                 return true;
             }
-        } else if(filter.value.status.includes('3xx')) {
+        }
+        if(filter.value.status.includes('3xx')) {
             if(status >= 300 && status < 400) {
                 return true;
             }
-        } else if(filter.value.status.includes('4xx')) {
+        }
+        if(filter.value.status.includes('4xx')) {
             if(status >= 400 && status < 500) {
                 return true;
             }
-        } else if(filter.value.status.includes('5xx')) {
+        }
+        if(filter.value.status.includes('5xx')) {
             if(status >= 500) {
                 return true;
             }
@@ -210,36 +213,43 @@ const MIMEColumn = reactive({
     },
     sorter: "default",
     filter(value, row) {
-        const mime = parseInt(row.MIMEType)
+        const mime = row.MIMEType
         if(filter.value.mime.includes('HTML')) {
             if(mime === "html") {
                 return true;
             }
-        } else if(filter.value.mime.includes('Script')) {
+        }
+        if(filter.value.mime.includes('Script')) {
             if(mime === "script" || mime === "json") {
                 return true;
             }
-        } else if(filter.value.mime.includes('XML')) {
+        }
+        if(filter.value.mime.includes('XML')) {
             if(mime === "xml") {
                 return true;
             }
-        } else if(filter.value.mime.includes('css')) {
+        }
+        if(filter.value.mime.includes('CSS')) {
             if(mime === "CSS") {
                 return true;
             }
-        } else if(filter.value.mime.includes('Other text')) {
+        }
+        if(filter.value.mime.includes('Other text')) {
             if(mime === "text" || mime === "") {
                 return true;
             }
-        } else if(filter.value.mime.includes('Images')) {
+        }
+        if(filter.value.mime.includes('Images')) {
             if(mime === "image") {
                 return true;
             }
-        } else if(filter.value.mime.includes('Flash')) {
+        }
+        if(filter.value.mime.includes('Flash')) {
             if(mime === "Flash") {
                 return true;
             }
-        } else if(filter.value.mime.includes('Other binary')) {
+        }
+        if(filter.value.mime.includes('Other binary')) {
             if(mime === "Other binary") {
                 return true;
             }

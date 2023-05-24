@@ -3,7 +3,7 @@ package addon
 import (
 	"bytes"
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"github.com/yhy0/logging"
 	"io"
 	"net/http"
 	"os"
@@ -57,7 +57,7 @@ func (d *Dumper) dump(f *proxy.Flow) {
 
 	err := f.Request.Header.WriteSubset(buf, nil)
 	if err != nil {
-		log.Error(err)
+		logging.Logger.Error(err)
 	}
 	buf.WriteString("\r\n")
 
@@ -70,7 +70,7 @@ func (d *Dumper) dump(f *proxy.Flow) {
 		fmt.Fprintf(buf, "%v %v %v\r\n", f.Request.Proto, f.Response.StatusCode, http.StatusText(f.Response.StatusCode))
 		err = f.Response.Header.WriteSubset(buf, nil)
 		if err != nil {
-			log.Error(err)
+			logging.Logger.Error(err)
 		}
 		buf.WriteString("\r\n")
 
@@ -85,10 +85,10 @@ func (d *Dumper) dump(f *proxy.Flow) {
 
 	buf.WriteString("\r\n\r\n")
 
-	//_, err = d.out.Write(buf.Bytes())
-	//if err != nil {
-	//	log.Error(err)
-	//}
+	_, err = d.out.Write(buf.Bytes())
+	if err != nil {
+		logging.Logger.Error(err)
+	}
 }
 
 func canPrint(content []byte) bool {

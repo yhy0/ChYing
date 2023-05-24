@@ -14,7 +14,7 @@ import (
 var assets embed.FS
 
 func main() {
-	logging.New(true, "CY")
+	logging.New(true, file.ChyingDir, "CY")
 	file.New()
 	// Create an instance of the app structure
 	app := NewApp()

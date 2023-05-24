@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"github.com/yhy0/logging"
 	"io"
 	"net"
 	"net/http"
@@ -97,7 +98,7 @@ func (proxy *Proxy) Start() error {
 
 	go proxy.interceptor.start()
 
-	log.Infof("Proxy start listen at %v\n", proxy.server.Addr)
+	logging.Logger.Infof("Proxy start listen at %v\n", proxy.server.Addr)
 	pln := &wrapListener{
 		Listener: ln,
 		proxy:    proxy,
@@ -123,7 +124,7 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log := log.WithFields(log.Fields{
+	log := logging.Logger.WithFields(log.Fields{
 		"in":     "Proxy.ServeHTTP",
 		"url":    req.URL,
 		"method": req.Method,
@@ -133,7 +134,7 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(400)
 		_, err := io.WriteString(res, "此为代理服务器，不能直接发起请求")
 		if err != nil {
-			log.Error(err)
+			logging.Logger.Error(err)
 		}
 		return
 	}
@@ -174,7 +175,7 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// when addons panic
 	defer func() {
 		if err := recover(); err != nil {
-			log.Warnf("Recovered: %v\n", err)
+			logging.Logger.Warnf("Recovered: %v\n", err)
 		}
 	}()
 
@@ -200,13 +201,13 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		reqBuf, r, err := readerToBuffer(req.Body, proxy.Opts.StreamLargeBodies)
 		reqBody = r
 		if err != nil {
-			log.Error(err)
+			logging.Logger.Error(err)
 			res.WriteHeader(502)
 			return
 		}
 
 		if reqBuf == nil {
-			log.Warnf("request body size >= %v\n", proxy.Opts.StreamLargeBodies)
+			logging.Logger.Warnf("request body size >= %v\n", proxy.Opts.StreamLargeBodies)
 			f.Stream = true
 		} else {
 			f.Request.Body = reqBuf
@@ -228,7 +229,7 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 	proxyReq, err := http.NewRequest(f.Request.Method, f.Request.URL.String(), reqBody)
 	if err != nil {
-		log.Error(err)
+		logging.Logger.Error(err)
 		res.WriteHeader(502)
 		return
 	}
@@ -278,12 +279,12 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		resBuf, r, err := readerToBuffer(proxyRes.Body, proxy.Opts.StreamLargeBodies)
 		resBody = r
 		if err != nil {
-			log.Error(err)
+			logging.Logger.Error(err)
 			res.WriteHeader(502)
 			return
 		}
 		if resBuf == nil {
-			log.Warnf("response body size >= %v\n", proxy.Opts.StreamLargeBodies)
+			logging.Logger.Warnf("response body size >= %v\n", proxy.Opts.StreamLargeBodies)
 			f.Stream = true
 		} else {
 			f.Response.Body = resBuf
@@ -302,7 +303,7 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 func (proxy *Proxy) handleConnect(res http.ResponseWriter, req *http.Request) {
-	log := log.WithFields(log.Fields{
+	log := logging.Logger.WithFields(log.Fields{
 		"in":   "Proxy.handleConnect",
 		"host": req.Host,
 	})
@@ -322,14 +323,14 @@ func (proxy *Proxy) handleConnect(res http.ResponseWriter, req *http.Request) {
 	var conn net.Conn
 	var err error
 	if shouldIntercept {
-		log.Debugf("begin intercept %v", req.Host)
+		logging.Logger.Debugf("begin intercept %v", req.Host)
 		conn, err = proxy.interceptor.dial(req)
 	} else {
-		log.Debugf("begin transpond %v", req.Host)
+		logging.Logger.Debugf("begin transpond %v", req.Host)
 		conn, err = getConnFrom(req.Host, proxy.Opts.Upstream)
 	}
 	if err != nil {
-		log.Error(err)
+		logging.Logger.Error(err)
 		res.WriteHeader(502)
 		return
 	}
@@ -337,7 +338,7 @@ func (proxy *Proxy) handleConnect(res http.ResponseWriter, req *http.Request) {
 
 	cconn, _, err := res.(http.Hijacker).Hijack()
 	if err != nil {
-		log.Error(err)
+		logging.Logger.Error(err)
 		res.WriteHeader(502)
 		return
 	}
@@ -348,7 +349,7 @@ func (proxy *Proxy) handleConnect(res http.ResponseWriter, req *http.Request) {
 
 	_, err = io.WriteString(cconn, "HTTP/1.1 200 Connection Established\r\n\r\n")
 	if err != nil {
-		log.Error(err)
+		logging.Logger.Error(err)
 		return
 	}
 

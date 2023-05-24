@@ -12,7 +12,6 @@ import (
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
-	"github.com/yhy0/ChYing/pkg/log"
 	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/ChYing/tools/burpSuite"
@@ -182,11 +181,6 @@ func (a *App) startup(ctx context.Context) {
 			}
 		}
 	}()
-
-	log.GuiLog = &log.GuiLogger{
-		Ctx: ctx,
-	}
-	logging.Logger.AddHook(log.GuiLog)
 
 	httpx.NewSession()
 }

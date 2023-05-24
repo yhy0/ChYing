@@ -54,6 +54,10 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			remoteAddr string
 		)
 
+		var (
+			MIMEType string
+			title    string
+		)
 		if f.Response != nil {
 			statusCode = f.Response.StatusCode
 			if f.Response.Body != nil {
@@ -67,31 +71,31 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			if f.Response.Header != nil && f.Response.Header.Get("Set-Cookie") != "" {
 				cookies = f.Response.Header.Get("Set-Cookie")
 			}
+
+			title = httpx.GetTitle(string(f.Response.Body))
+			ct := f.Response.Header.Get("Content-Type")
+
+			if funk.Contains(ct, "json") {
+				MIMEType = "json"
+			} else if funk.Contains(ct, "javascript") {
+				MIMEType = "script"
+			} else if funk.Contains(ct, "html") {
+				MIMEType = "html"
+			} else if funk.Contains(ct, "css") {
+				MIMEType = "css"
+			} else if funk.Contains(ct, "text/plain") {
+				MIMEType = "text"
+			} else if funk.Contains(ct, "image") {
+				MIMEType = "image"
+			} else if ct == "" {
+				MIMEType = ""
+			}
 		}
 
 		if f.ConnContext.ServerConn.Conn != nil {
 			remoteAddr = f.ConnContext.ServerConn.Conn.RemoteAddr().String()
 		} else {
 			remoteAddr = ""
-		}
-
-		ct := f.Response.Header.Get("Content-Type")
-		var MIMEType string
-
-		if funk.Contains(ct, "json") {
-			MIMEType = "json"
-		} else if funk.Contains(ct, "javascript") {
-			MIMEType = "script"
-		} else if funk.Contains(ct, "html") {
-			MIMEType = "html"
-		} else if funk.Contains(ct, "css") {
-			MIMEType = "css"
-		} else if funk.Contains(ct, "text/plain") {
-			MIMEType = "text"
-		} else if funk.Contains(ct, "image") {
-			MIMEType = "image"
-		} else if ct == "" {
-			MIMEType = ""
 		}
 
 		ext := ""
@@ -113,7 +117,7 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 				Length:    strconv.Itoa(contentLen),
 				MIMEType:  MIMEType,
 				Extension: ext,
-				Title:     httpx.GetTitle(string(f.Response.Body)),
+				Title:     title,
 				Comment:   "",
 				TLS:       "√",
 				IP:        remoteAddr,

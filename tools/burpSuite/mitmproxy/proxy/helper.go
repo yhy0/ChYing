@@ -3,6 +3,7 @@ package proxy
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/yhy0/logging"
 	"io"
 	"net"
 	"net/http"
@@ -31,12 +32,12 @@ func logErr(log *log.Entry, err error) (loged bool) {
 
 	for _, str := range normalErrMsgs {
 		if strings.Contains(msg, str) {
-			log.Debug(err)
+			logging.Logger.Debug(err)
 			return
 		}
 	}
 
-	log.Error(err)
+	logging.Logger.Error(err)
 	loged = true
 	return
 }
@@ -49,7 +50,7 @@ func transfer(log *log.Entry, server, client io.ReadWriteCloser) {
 	errChan := make(chan error)
 	go func() {
 		_, err := io.Copy(server, client)
-		log.Debugln("client copy end", err)
+		logging.Logger.Debugln("client copy end", err)
 		client.Close()
 		select {
 		case <-done:
@@ -60,12 +61,12 @@ func transfer(log *log.Entry, server, client io.ReadWriteCloser) {
 	}()
 	go func() {
 		_, err := io.Copy(client, server)
-		log.Debugln("server copy end", err)
+		logging.Logger.Debugln("server copy end", err)
 		server.Close()
 
 		if clientConn, ok := client.(*wrapClientConn); ok {
 			err := clientConn.Conn.(*net.TCPConn).CloseRead()
-			log.Debugln("clientConn.Conn.(*net.TCPConn).CloseRead()", err)
+			logging.Logger.Debugln("clientConn.Conn.(*net.TCPConn).CloseRead()", err)
 		}
 
 		select {
@@ -119,7 +120,7 @@ func getTlsKeyLogWriter() io.Writer {
 
 		writer, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			log.Debugf("getTlsKeyLogWriter OpenFile error: %v", err)
+			logging.Logger.Debugf("getTlsKeyLogWriter OpenFile error: %v", err)
 			return
 		}
 

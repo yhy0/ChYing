@@ -13,15 +13,12 @@ import (
 	"time"
 )
 
-/*
-*
-
+/**
 	@author: yhy
 	@since: 2023/5/7
 	@desc: //TODO
+**/
 
-*
-*/
 func Test(t *testing.T) {
 	pattern := `www.google.com`
 
@@ -40,7 +37,7 @@ func Test(t *testing.T) {
 	fmt.Println(match3)
 	fmt.Println(match4)
 
-	logging.New(true, "test")
+	logging.New(true, "", "test")
 	burpSuite.Init()
 	fmt.Println(burpSuite.Settings)
 	burpSuite.HotConf()

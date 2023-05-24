@@ -22,6 +22,7 @@ export namespace burpSuite {
 	    port: number;
 	    exclude: string[];
 	    include: string[];
+	    filterSuffix: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Setting(source);
@@ -32,12 +33,14 @@ export namespace burpSuite {
 	        this.port = source["port"];
 	        this.exclude = source["exclude"];
 	        this.include = source["include"];
+	        this.filterSuffix = source["filterSuffix"];
 	    }
 	}
 	export class SettingUI {
 	    port: number;
 	    exclude: string;
 	    include: string;
+	    filterSuffix: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new SettingUI(source);
@@ -48,6 +51,7 @@ export namespace burpSuite {
 	        this.port = source["port"];
 	        this.exclude = source["exclude"];
 	        this.include = source["include"];
+	        this.filterSuffix = source["filterSuffix"];
 	    }
 	}
 

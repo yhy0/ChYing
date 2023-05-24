@@ -17,8 +17,6 @@ import (
   @desc: //TODO
 **/
 
-var FilterSuffix = []string{".woff2", ".woff", ".ttf", ".mkv", ".mov", ".mp3", ".mp4", ".m4a", ".m4v"}
-
 var Settings *Setting
 
 var defaultYamlByte = []byte(`
@@ -30,6 +28,16 @@ exclude:
   - ^.*\.mozilla.*$
 include:
   - 
+filterSuffix: 
+  - .woff2
+  - .woff
+  - .ttf
+  - .mkv
+  - .mov
+  - .mp3
+  - .mp4
+  - .m4a
+  - .m4v
 `)
 
 var configFileName = "burpsuite.yaml"
@@ -86,7 +94,7 @@ func ReadYamlConfig() {
 	}
 }
 
-func WriteYamlConfig(str []byte) {
+func WriteYamlConfig(str []byte) error {
 	if str == nil {
 		str = defaultYamlByte
 	}
@@ -95,38 +103,14 @@ func WriteYamlConfig(str []byte) {
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(str))
 	if err != nil {
-		logging.Logger.Fatalf("setting.Setup, fail to read default config bytes: %v", err)
+		logging.Logger.Errorln("setting.Setup, fail to read default config bytes: %v", err)
+		return err
 	}
 	// 写文件
 	err = viper.WriteConfigAs(configFile)
 	if err != nil {
 		logging.Logger.Fatalf("setting.Setup, fail to write 'config.yaml': %v", err)
+		return err
 	}
+	return nil
 }
-
-//func (s *Setting) SetPort(value int) {
-//	s.ProxyPort = value
-//	updateConfigFile(s)
-//}
-//
-//func (s *Setting) SetExclude(value []string) {
-//	s.Exclude = value
-//	updateConfigFile(s)
-//}
-//
-//func (s *Setting) SetInclude(value []string) {
-//	s.Include = value
-//	updateConfigFile(s)
-//}
-//
-//func updateConfigFile(s *Setting) {
-//	// 将结构体 写入配置文件
-//	viper.Set("port", s.ProxyPort)
-//	viper.Set("exclude", s.Exclude)
-//	viper.Set("include", s.Include)
-//	err := viper.WriteConfig()
-//	if err != nil {
-//		logging.Logger.Errorln(err)
-//		return
-//	}
-//}

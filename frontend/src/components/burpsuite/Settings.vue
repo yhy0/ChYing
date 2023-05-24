@@ -9,10 +9,18 @@
                 <n-button type="primary">
                     Port
                 </n-button>
-                <n-input-number v-model:value="formValue.port">
+                <n-input-number v-model:value="formValue.port" style="width: 110px">
                 </n-input-number>
             </n-input-group>
         </n-form-item>
+
+        <n-form-item label="过滤后缀" >
+            <n-button type="error">
+                FilterSuffix
+            </n-button>
+            <n-input v-model:value="formValue.filterSuffix" status="error" autosize style="min-width: 50%" />
+        </n-form-item>
+
         <n-form-item style="display: flex;">
             <n-card title="Exclude" :bordered="false">
                 <n-input v-model:value="formValue.exclude" type="textarea" status="error" placeholder="可以清除" round clearable style="width: 200px; height: 200px;"/>
@@ -43,16 +51,19 @@ const formValue = ref({
     port: 9080,
     exclude: '',
     include: '',
+    filterSuffix: '',
 });
 
 EventsOn("ProxyPort", result => {
     formValue.value.port = result
 });
-
 EventsOn("Exclude", result => {
     formValue.value.exclude = result
-    console.log(formValue.value.exclude)
 });
+EventsOn("FilterSuffix", result => {
+    formValue.value.filterSuffix = result
+});
+
 EventsOn("Include", result => {
     formValue.value.include = result
 });
@@ -67,6 +78,9 @@ GetBurpSettings().then((res)=> {
         formValue.value.include += res.include[i] + "\r\n"
     }
 
+    for (let i = 0; i < res.filterSuffix.length; i++) {
+        formValue.value.filterSuffix += res.filterSuffix[i] + ","
+    }
 })
 
 const rules = {
@@ -93,7 +107,6 @@ const submitForm = () => {
     formRef.value?.validate((valid) => {
         if (!valid) {
             // 表单验证通过
-            console.log(formValue.value)
             Settings(formValue.value).then((result) => {
                 if(result === "") {
                     message.success('设置成功');

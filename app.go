@@ -148,6 +148,7 @@ func (a *App) startup(ctx context.Context) {
 	runtime.EventsEmit(ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
 	runtime.EventsEmit(ctx, "Exclude", burpSuite.Settings.Exclude)
 	runtime.EventsEmit(ctx, "Include", burpSuite.Settings.Include)
+	runtime.EventsEmit(ctx, "FilterSuffix", burpSuite.Settings.FilterSuffix)
 	// 通知前端各种数据更改
 	go func() {
 		for {
@@ -289,10 +290,12 @@ func (a *App) Settings(setting burpSuite.SettingUI) string {
 		burpSuite.Settings.ProxyPort = setting.ProxyPort
 		burpSuite.Settings.Exclude = utils.SplitStringByLines(setting.Exclude)
 		burpSuite.Settings.Include = utils.SplitStringByLines(setting.Include)
+		burpSuite.Settings.FilterSuffix = strings.Split(setting.FilterSuffix, ",")
 
 		runtime.EventsEmit(a.ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
 		runtime.EventsEmit(a.ctx, "Exclude", strings.Join(burpSuite.Settings.Exclude, "\r\n"))
 		runtime.EventsEmit(a.ctx, "Include", strings.Join(burpSuite.Settings.Include, "\r\n"))
+		runtime.EventsEmit(a.ctx, "FilterSuffix", strings.Join(burpSuite.Settings.FilterSuffix, ","))
 
 		// 更改配置文件
 		exclude := ""
@@ -312,9 +315,22 @@ func (a *App) Settings(setting burpSuite.SettingUI) string {
 				include += fmt.Sprintf("  - %s\r\n", i)
 			}
 		}
-		var defaultYamlByte = []byte(fmt.Sprintf("port: %d\r\nexclude:\r\n%sinclude:\r\n%s", burpSuite.Settings.ProxyPort, exclude, include))
+		filterSuffix := ""
+		if len(burpSuite.Settings.FilterSuffix) == 0 {
+			filterSuffix = "  - \r\n"
+		} else {
+			for _, i := range burpSuite.Settings.FilterSuffix {
+				filterSuffix += fmt.Sprintf("  - %s\r\n", i)
+			}
+		}
 
-		burpSuite.WriteYamlConfig(defaultYamlByte)
+		var defaultYamlByte = []byte(fmt.Sprintf("port: %d\r\nexclude:\r\n%sinclude:\r\n%s\r\nfilterSuffix:\r\n%s", burpSuite.Settings.ProxyPort, exclude, include, filterSuffix))
+
+		err := burpSuite.WriteYamlConfig(defaultYamlByte)
+		if err != nil {
+			a.diag(err.Error(), true)
+			return err.Error()
+		}
 
 		return ""
 	}

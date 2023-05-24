@@ -104,7 +104,10 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			ext = filepath.Ext(uri[0])
 		}
 		// 过滤一些后缀，不显示
-		var flag = funk.Contains(FilterSuffix, ext)
+		var flag = false
+		if ext != "" {
+			flag = funk.Contains(Settings.FilterSuffix, ext)
+		}
 		if !flag {
 			HttpHistory <- HTTPHistory{
 				Id:        f.Id,

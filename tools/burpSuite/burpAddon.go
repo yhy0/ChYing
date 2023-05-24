@@ -95,29 +95,31 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 		}
 
 		ext := ""
-
 		uri := strings.Split(f.Request.URL.RequestURI(), "?")
 		if len(uri) > 0 {
 			ext = filepath.Ext(uri[0])
 		}
-
-		HttpHistory <- HTTPHistory{
-			Id:        f.Id,
-			Host:      f.Request.URL.Host,
-			Method:    f.Request.Method,
-			URL:       f.Request.URL.RequestURI(),
-			Params:    params,
-			Edited:    "",
-			Status:    strconv.Itoa(statusCode),
-			Length:    strconv.Itoa(contentLen),
-			MIMEType:  MIMEType,
-			Extension: ext,
-			Title:     httpx.GetTitle(string(f.Response.Body)),
-			Comment:   "",
-			TLS:       "√",
-			IP:        remoteAddr,
-			Cookies:   cookies,
-			Time:      time.Now().Format("2006-01-02 15:04:05"),
+		// 过滤一些后缀，不显示
+		var flag = funk.Contains(FilterSuffix, ext)
+		if !flag {
+			HttpHistory <- HTTPHistory{
+				Id:        f.Id,
+				Host:      f.Request.URL.Host,
+				Method:    f.Request.Method,
+				URL:       f.Request.URL.RequestURI(),
+				Params:    params,
+				Edited:    "",
+				Status:    strconv.Itoa(statusCode),
+				Length:    strconv.Itoa(contentLen),
+				MIMEType:  MIMEType,
+				Extension: ext,
+				Title:     httpx.GetTitle(string(f.Response.Body)),
+				Comment:   "",
+				TLS:       "√",
+				IP:        remoteAddr,
+				Cookies:   cookies,
+				Time:      time.Now().Format("2006-01-02 15:04:05"),
+			}
 		}
 
 		buf := bytes.NewBuffer(make([]byte, 0))
@@ -161,12 +163,13 @@ func (b *Burp) Requestheaders(f *proxy.Flow) {
 			}
 		}
 		responseDump := buf.String()
-
-		HTTPBodyMap.WriteMap(f.Id, &HTTPBody{
-			TargetUrl: f.Request.URL.String(),
-			Request:   requestDump,
-			Response:  responseDump,
-		})
+		if !flag {
+			HTTPBodyMap.WriteMap(f.Id, &HTTPBody{
+				TargetUrl: f.Request.URL.String(),
+				Request:   requestDump,
+				Response:  responseDump,
+			})
+		}
 	}()
 }
 

@@ -17,6 +17,8 @@ import (
   @desc: //TODO
 **/
 
+var FilterSuffix = []string{".woff2", ".woff", ".ttf", ".mkv", ".mov", ".mp3", ".mp4", ".m4a", ".m4v"}
+
 var Settings *Setting
 
 var defaultYamlByte = []byte(`
@@ -25,6 +27,7 @@ exclude:
   - ^.*\.google.*$
   - ^.*\.firefox.*$
   - ^.*\.doubleclick.*$
+  - ^.*\.mozilla.*$
 include:
   - 
 `)

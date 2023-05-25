@@ -49,12 +49,13 @@
                 :columns="columns"
                 :data="data"
                 :row-props="rowProps"
+                :row-class-name="rowClassName"
                 :max-height="300"
                 :scroll-x="1800"
-                :rowClassName="rowClassName"
                 @update:filters="handleUpdateFilter"
                 striped
                 style="margin-bottom: 16px; margin-top: 10px"
+                virtual-scroll
         >
         </n-data-table>
 
@@ -94,7 +95,7 @@
 
 <script setup>
 import {NCard, NDataTable, useMessage} from "naive-ui";
-import {ref, h, nextTick, reactive} from "vue";
+import {ref, h, nextTick, reactive, onBeforeUnmount, onMounted} from "vue";
 import {EventsOn} from "../../../../../wailsjs/runtime/runtime.js";
 import {GetHistoryDump, SendToRepeater, SendToIntruder} from "../../../../../wailsjs/go/main/App.js";
 
@@ -146,11 +147,35 @@ const onClickOutSide = () => {
     showDropdown.value = false;
 };
 
+// 监听键盘事件，发送到 Repeater、Intruder
+onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+});
+
+function handleKeyDown(event) {
+    if(rid.value === 0) {
+        return
+    }
+    if ((event.ctrlKey || event.metaKey)&& event.key === 'r') {
+        SendToRepeater(rid.value);
+        message.info("Send To Repeater Success");
+    }
+    if ((event.ctrlKey || event.metaKey)&& event.key === 'i') {
+        SendToIntruder(rid.value);
+        message.info("Send To Intruder Success");
+    }
+}
+
 const rowProps = (row) => {
     return {
         style: "cursor: pointer;",
         onClick: () => {
             rowId.value = row.Id;
+            rid.value = row.Id;
             GetHistoryDump(row.Id).then(HTTPBody => {
                 request.value = HTTPBody["request"];
                 response.value = HTTPBody["response"];
@@ -164,6 +189,7 @@ const rowProps = (row) => {
                 x.value = e.clientX;
                 y.value = e.clientY;
             });
+            rowId.value = row.Id;
             rid.value = row.Id;
         },
     };
@@ -443,15 +469,18 @@ EventsOn("HttpHistory", HttpHistory => {
 });
 
 
-// todo 点击之后要等一会才会高亮，待优化
 const rowClassName = (row) => {
-    return row.Id === rowId.value ? 'table-tr-row-id' : '';
+    if(row.Id === rowId.value) {
+        return 'selectRow'
+    } else {
+        return ''
+    }
 }
 
 </script>
 
 <style scoped>
-:deep(.table-tr-row-id) td {
-    background-color: rgba(255, 165, 101, 0.98);
+:deep(.selectRow td) {
+    background-color: rgba(255, 165, 101, 0.98) !important;
 }
 </style>

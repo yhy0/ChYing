@@ -58,7 +58,9 @@ EventsOn("RepeaterBody", result => {
 const request = ref('');
 
 function send(panel) {
-    request.value = document.getElementById("myCodeR").textContent;
+    // console.log(document.getElementById("myCodeR"))
+    // request.value = document.getElementById("myCodeR").textContent;
+    console.log(request.value)
     if (request.value === "") {
         request.value = panel.req;
     }
@@ -68,6 +70,22 @@ function send(panel) {
         panel.res = result.response;
         panel.id = result.uuid;
     })
+}
+
+// import Prism Editor
+import { PrismEditor } from 'vue-prism-editor';
+import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
+
+// import highlighting library (you can use any library you want just return html string)
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-http.js';
+import 'prismjs/themes/prism.css'; // import syntax highlighting styles
+
+
+function highlighter(code) {
+    request.value = code.toString()
+    return highlight(code, Prism.languages.http,'http'); // languages.<insert language> to return html with markup
 }
 
 </script>
@@ -93,8 +111,7 @@ function send(panel) {
                     <n-gi>
                         <n-tabs type="line" animated >
                             <n-tab-pane name="Request" style="width: 100%; overflow-x: auto;">
-                                <!-- contenteditable 设置为可修改, 这样通过 id 获取值 不能再使用 show-line-numbers 显示行号，不然会将行号带到请求中 -->
-                                <n-code id="myCodeR" contenteditable language="http" :code="panel.req" style="white-space: pre-wrap; text-align: left;" />
+                                <prism-editor class="my-editor" id="myCodeR" v-model="panel.req" :highlight="highlighter" line-numbers></prism-editor>
                             </n-tab-pane>
                         </n-tabs>
                     </n-gi>
@@ -111,3 +128,15 @@ function send(panel) {
         </n-tab-pane>
     </n-tabs>
 </template>
+
+<style scoped>
+.my-editor {
+    line-height: 1.8;
+    padding: 5px;
+    white-space: nowrap;
+}
+/* optional class for removing the outline */
+.prism-editor__textarea:focus {
+    outline: none;
+}
+</style>

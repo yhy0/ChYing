@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "highlight.js": "^11.7.0",
+    "prismjs": "^1.29.0",
     "uuid": "^9.0.0",
-    "vue": "^3.2.37"
+    "vue": "^3.2.37",
+    "vue-prism-editor": "^2.0.0-alpha.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",

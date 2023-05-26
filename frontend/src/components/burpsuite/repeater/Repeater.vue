@@ -1,6 +1,6 @@
 <script setup>
-import {computed, ref} from "vue";
-import {NCard, useMessage} from "naive-ui";
+import {computed, onMounted, ref, watch} from "vue";
+import {darkTheme, NCard, useMessage, useOsTheme} from "naive-ui";
 import {EventsOn} from "../../../../wailsjs/runtime/runtime.js";
 import {Raw} from "../../../../wailsjs/go/main/App.js";
 
@@ -58,8 +58,6 @@ EventsOn("RepeaterBody", result => {
 const request = ref('');
 
 function send(panel) {
-    // console.log(document.getElementById("myCodeR"))
-    // request.value = document.getElementById("myCodeR").textContent;
     console.log(request.value)
     if (request.value === "") {
         request.value = panel.req;
@@ -77,14 +75,18 @@ import { PrismEditor } from 'vue-prism-editor';
 import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
 
 // import highlighting library (you can use any library you want just return html string)
-import { highlight, languages } from 'prismjs/components/prism-core';
+import { highlight } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-http.js';
-import 'prismjs/themes/prism.css'; // import syntax highlighting styles
+import 'prismjs/themes/prism.css';
 
 
 function highlighter(code) {
     request.value = code.toString()
+    return highlight(code, Prism.languages.http,'http'); // languages.<insert language> to return html with markup
+}
+
+function highlighterSimple(code) {
     return highlight(code, Prism.languages.http,'http'); // languages.<insert language> to return html with markup
 }
 
@@ -110,8 +112,8 @@ function highlighter(code) {
                 <n-grid :x-gap="12" :cols="2">
                     <n-gi>
                         <n-tabs type="line" animated >
-                            <n-tab-pane name="Request" style="width: 100%; overflow-x: auto;">
-                                <prism-editor class="my-editor" id="myCodeR" v-model="panel.req" :highlight="highlighter" line-numbers></prism-editor>
+                            <n-tab-pane name="Request">
+                                <PrismEditor class="my-editor" :tabSize="4" v-model="panel.req" :highlight="highlighter" line-numbers></PrismEditor>
                             </n-tab-pane>
                         </n-tabs>
                     </n-gi>
@@ -119,7 +121,8 @@ function highlighter(code) {
                     <n-gi>
                         <n-tabs type="line" animated>
                             <n-tab-pane name="Response" style="width: 100%; overflow-x: auto;">
-                                <n-code language="http" word-wrap :code="panel.res" show-line-numbers style="white-space: pre-wrap; text-align: left; " />
+                                <PrismEditor class="my-editor" v-model="panel.res" :highlight="highlighterSimple" line-numbers ></PrismEditor>
+<!--                                <n-code language="http" word-wrap :code="panel.res" show-line-numbers style="white-space: pre-wrap; text-align: left; " />-->
                             </n-tab-pane>
                         </n-tabs>
                     </n-gi>
@@ -129,12 +132,27 @@ function highlighter(code) {
     </n-tabs>
 </template>
 
-<style scoped>
+<style>
 .my-editor {
+    font-size: 15px;
     line-height: 1.8;
     padding: 5px;
-    white-space: nowrap;
 }
+/* 行号不能正确处理自动换行 解决办法 https://github.com/koca/vue-prism-editor/issues/87#issuecomment-726228705 */
+.prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea {
+    white-space: pre !important;
+}
+
+.prism-editor__textarea {
+    width: 999999px !important;
+}
+.prism-editor__editor {
+    white-space: pre !important;
+}
+.prism-editor__container {
+    overflow-x: scroll !important;
+}
+
 /* optional class for removing the outline */
 .prism-editor__textarea:focus {
     outline: none;

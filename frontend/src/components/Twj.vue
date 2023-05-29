@@ -54,6 +54,8 @@ function brute() {
                 message.success("Signature Verified")
                 twj.signature = JSON.stringify(JSON.parse(result.msg),null, 2);
             })
+        } else {
+          message.warning("没爆出来，换个字典吧(⊙o⊙)…")
         }
     })
 }
@@ -63,7 +65,6 @@ function stopBrute() {
         message.success("爆破已停止");
     })
 }
-
 
 EventsOn("Percentage", Percentage => {
     twj.percentage = Percentage
@@ -93,15 +94,15 @@ EventsOn("Percentage", Percentage => {
         </n-space>
       </n-gi>
       <n-gi>
-        <n-card title="Header" size="small" style="margin-bottom: 16px; margin-top: 10px">
+        <n-card title="Header" size="small" style="margin-bottom: 16px; margin-top: 10px; height: 150px;overflow: auto;">
             <n-code id="header" language="json" :code="twj.header" word-wrap style="white-space: pre-wrap; text-align: left;"/>
         </n-card>
 
-        <n-card title="Payload" size="small" style="margin-bottom: 16px; margin-top: 10px">
+        <n-card title="Payload" size="small" style="margin-bottom: 16px; margin-top: 10px; height: 260px;overflow: auto;">
             <n-code id="payload" language="json" :code="twj.payload" word-wrap style="white-space: pre-wrap; text-align: left;"/>
         </n-card>
 
-        <n-card title="Verify" size="small" style="margin-bottom: 16px; margin-top: 10px">
+        <n-card title="Verify" size="small" style="margin-bottom: 16px; margin-top: 10px; height: 130px;overflow: auto;">
             <n-code id="signature" language="json" :code="twj.signature" word-wrap style="white-space: pre-wrap; text-align: left;"/>
         </n-card>
 

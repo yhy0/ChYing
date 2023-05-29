@@ -110,6 +110,7 @@ func BBscan(u string, indexContentLength int, indexbody string, _403 bool) {
 	for path, rule := range file.BBscanRules {
 		i += 1
 		if Stop {
+			Stop = false
 			return
 		}
 		var is404Page = false

@@ -224,7 +224,18 @@ func (a *App) Verify(jwt string, secret string) (msg Message) {
 }
 
 func (a *App) Brute() string {
+	// 爆破前判断是否有进程在爆破，如果有停止
+	if twj.Flag {
+		twj.Stop = true
+		time.Sleep(1 * time.Second)
+		twj.Stop = false
+	}
 	return twj.GenerateSignature()
+}
+func (a *App) TwjStop() {
+	twj.Stop = true
+	time.Sleep(2 * time.Second)
+	twj.Stop = false
 }
 
 func (a *App) Proxy(proxy string) (msg Message) {

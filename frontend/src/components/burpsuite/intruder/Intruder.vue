@@ -5,6 +5,7 @@ import {NButton, NCard, useMessage} from "naive-ui";
 import {EventsOn} from "../../../../wailsjs/runtime/runtime.js";
 import {Intruder} from "../../../../wailsjs/go/main/App.js";
 import Attack from "./Attack.vue";
+import {PrismEditor} from "vue-prism-editor";
 
 const message = useMessage();
 
@@ -86,14 +87,30 @@ const options = [
 ]
 const payloadCount = ref(0);
 
+
+// import Prism Editor
+import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
+// import highlighting library (you can use any library you want just return html string)
+import { highlight } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-http.js';
+import 'prismjs/themes/prism.css';
+
+
+function highlighter(code) {
+    request.value = code.toString()
+    return highlight(code, Prism.languages.http,'http'); // languages.<insert language> to return html with markup
+}
+
+const selectedText = ref('')
+function  handleMouseUp() {
+    selectedText.value = window.getSelection().toString();
+}
+
 // 鼠标选中 ,点击按钮，增加 §§
 function Add(panel) {
-    const selection = window.getSelection().toString();
-    // 注意 <n-code id="myCodeI"> 中的 id 值 别一样了,应该说所有的 id 值都不能一样
-    request.value = document.getElementById("myCodeI").textContent;
-
-    if(selection) {
-        request.value = request.value.replace(selection, `§${selection}§`)
+    if(selectedText) {
+        request.value = request.value.replace(selectedText.value, `§${selectedText.value}§`)
         const count = (request.value.match(/§/g) || []).length; // 计算 § 符号的数量
         payloadCount.value = count / 2;
         if(["Sniper", "Battering ram"].includes(attackTypes.value[Number(value.value)])){
@@ -218,7 +235,7 @@ function startAattack(panel) {
                         <n-card title="Payload positions" size="large" style="margin-bottom: 16px; margin-top: 10px">
                             <n-layout has-sider sider-placement="right">
                                 <n-layout-content content-style="padding: 5px; overflow-x: auto;">
-                                    <n-code id="myCodeI" contenteditable language="http" :code="panel.req" style="white-space: pre-wrap; text-align: left;" />
+                                    <PrismEditor class="my-editor" v-model="panel.req" :highlight="highlighter" line-numbers @mouseup="handleMouseUp"></PrismEditor>
                                 </n-layout-content>
                                 <n-layout-sider :width="90" content-style="padding: 5px;">
                                     <n-button @click="Add(panel)">Add§</n-button>
@@ -262,3 +279,30 @@ function startAattack(panel) {
     </n-tabs>
 
 </template>
+
+<style>
+.my-editor {
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 5px;
+}
+/* 行号不能正确处理自动换行 解决办法 https://github.com/koca/vue-prism-editor/issues/87#issuecomment-726228705 */
+.prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea {
+    white-space: pre !important;
+}
+
+.prism-editor__textarea {
+    width: 999999px !important;
+}
+.prism-editor__editor {
+    white-space: pre !important;
+}
+.prism-editor__container {
+    overflow-x: scroll !important;
+}
+
+/* optional class for removing the outline */
+.prism-editor__textarea:focus {
+    outline: none;
+}
+</style>

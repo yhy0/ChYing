@@ -11,7 +11,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/yhy0/ChYing/pkg/file"
 	"strings"
-	"time"
 )
 
 /**
@@ -35,6 +34,8 @@ type Claims struct {
 
 var Percentage chan string
 var Twj *Jwt
+var Stop = false
+var Flag = false
 
 func init() {
 	Percentage = make(chan string, 1)
@@ -84,19 +85,35 @@ func GenerateSignature() string {
 	if Twj == nil {
 		return ""
 	}
+	// 代表有进程在爆破
+	Flag = true
+	var res = ""
+	ch := make(chan struct{}, 20)
 
 	n := len(file.JwtSecrets)
 	for i, s := range file.JwtSecrets {
-		Percentage <- fmt.Sprintf("%.2f", float64(i+1)/float64(n)*100)
-		hasher := hmac.New(sha256.New, []byte(s))
-		hasher.Write(Twj.message)
-		msg := hasher.Sum(nil)
-		if bytes.Equal(Twj.signature, msg) {
-			return s
+		if Stop {
+			Stop = false
+			Flag = false
+			return res
 		}
 
-		time.Sleep(1 * time.Second)
+		ch <- struct{}{}
+		go func(i int, s string) {
+			Percentage <- fmt.Sprintf("%.2f", float64(i+1)/float64(n)*100)
+			hasher := hmac.New(sha256.New, []byte(s))
+			hasher.Write(Twj.message)
+			msg := hasher.Sum(nil)
+			if bytes.Equal(Twj.signature, msg) {
+				res = s
+				Stop = true
+			}
+			<-ch
+		}(i, s)
 
 	}
-	return ""
+	close(ch)
+	Stop = false
+	Flag = false
+	return res
 }

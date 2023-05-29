@@ -58,7 +58,6 @@ EventsOn("RepeaterBody", result => {
 const request = ref('');
 
 function send(panel) {
-    console.log(request.value)
     if (request.value === "") {
         request.value = panel.req;
     }
@@ -73,7 +72,6 @@ function send(panel) {
 // import Prism Editor
 import { PrismEditor } from 'vue-prism-editor';
 import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
-
 // import highlighting library (you can use any library you want just return html string)
 import { highlight } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
@@ -122,7 +120,6 @@ function highlighterSimple(code) {
                         <n-tabs type="line" animated>
                             <n-tab-pane name="Response" style="width: 100%; overflow-x: auto;">
                                 <PrismEditor class="my-editor" v-model="panel.res" :highlight="highlighterSimple" line-numbers ></PrismEditor>
-<!--                                <n-code language="http" word-wrap :code="panel.res" show-line-numbers style="white-space: pre-wrap; text-align: left; " />-->
                             </n-tab-pane>
                         </n-tabs>
                     </n-gi>

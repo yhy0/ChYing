@@ -78,6 +78,10 @@ export function TaskList(arg1) {
   return window['go']['main']['App']['TaskList'](arg1);
 }
 
+export function TwjStop() {
+  return window['go']['main']['App']['TwjStop']();
+}
+
 export function Verify(arg1, arg2) {
   return window['go']['main']['App']['Verify'](arg1, arg2);
 }

@@ -117,6 +117,9 @@ func method(uri, m string) *tools.Result {
 	result := &tools.Result{}
 	var flag = false
 	for _, line := range file.Bypass403["httpmethods.txt"] {
+		if Stop {
+			return nil
+		}
 		if m == line {
 			continue
 		}
@@ -160,6 +163,9 @@ func headers(uri, m string) *tools.Result {
 
 	for _, ip := range file.Bypass403["ips.txt"] {
 		for _, line := range file.Bypass403["headers.txt"] {
+			if Stop {
+				return nil
+			}
 			if flag {
 				break
 			}
@@ -196,6 +202,9 @@ func headers(uri, m string) *tools.Result {
 	}
 
 	for _, line := range file.Bypass403["simpleheaders.txt"] {
+		if Stop {
+			return nil
+		}
 		if flag {
 			break
 		}
@@ -238,6 +247,10 @@ func endPaths(uri, m string) *tools.Result {
 	result := &tools.Result{}
 	var flag = false
 	for _, line := range file.Bypass403["endpaths.txt"] {
+		if Stop {
+
+			return nil
+		}
 		if flag {
 			break
 		}
@@ -289,6 +302,10 @@ func midPaths(uri, m string) *tools.Result {
 	baseuri = baseuri[:len(baseuri)-1]
 
 	for _, line := range file.Bypass403["midpaths.txt"] {
+		if Stop {
+
+			return nil
+		}
 		if flag {
 			break
 		}
@@ -345,6 +362,9 @@ func capital(uri, m string) *tools.Result {
 	baseuri = baseuri[:len(baseuri)-1]
 
 	for _, z := range uripath {
+		if Stop {
+			return nil
+		}
 		if flag {
 			break
 		}

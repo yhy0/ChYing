@@ -50,7 +50,7 @@ func Fuzz(target string, actions []string, filePath string) error {
 		DirSearch(target, actions, _403)
 	}
 
-	if len(actions) == 1 && _403 {
+	if len(actions) == 1 && _403 && !Stop {
 		Bypass403(target, "GET")
 	}
 
@@ -63,11 +63,6 @@ func DirSearch(target string, actions []string, _403 bool) {
 	var paths []string
 
 	for _, p := range file.DiccData {
-		if Stop {
-			Stop = false
-			return
-		}
-
 		// 替换后缀
 		if strings.Contains(p, "%EXT%") {
 			for _, ext := range actions {
@@ -87,6 +82,10 @@ func DirSearch(target string, actions []string, _403 bool) {
 
 	ch := make(chan struct{}, 30)
 	for i, p := range paths {
+		if Stop {
+			return
+		}
+
 		ch <- struct{}{}
 		go func(ii int, path string) {
 			resp, err := httpx.Get(target + "/" + path)

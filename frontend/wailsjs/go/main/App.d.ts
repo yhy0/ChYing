@@ -43,4 +43,6 @@ export function Swagger(arg1:string):Promise<void>;
 
 export function TaskList(arg1:string):Promise<{[key: string]: string}>;
 
+export function TwjStop():Promise<void>;
+
 export function Verify(arg1:string,arg2:string):Promise<main.Message>;

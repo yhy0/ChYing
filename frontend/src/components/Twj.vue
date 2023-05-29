@@ -1,7 +1,7 @@
 <script setup>
 import {reactive} from 'vue'
-import { useMessage} from 'naive-ui'
-import {Parser, Verify, Brute} from '../../wailsjs/go/main/App'
+import {NButton, useMessage} from 'naive-ui'
+import {Parser, Verify, Brute, TwjStop} from '../../wailsjs/go/main/App'
 import {EventsOn} from "../../wailsjs/runtime";
 
 const message = useMessage()    // 使用这个组件外面一层必须使用包裹   <n-message-provider> </n-message-provider>
@@ -46,9 +46,24 @@ function brute() {
         if(result !== "") {
             message.success("brute success")
             twj.secret = result
+            Verify(twj.jwt, twj.secret).then(result => {
+                if(result.error !== "") {
+                    message.error(result.error)
+                    return
+                }
+                message.success("Signature Verified")
+                twj.signature = JSON.stringify(JSON.parse(result.msg),null, 2);
+            })
         }
     })
 }
+
+function stopBrute() {
+    TwjStop().then(result => {
+        message.success("爆破已停止");
+    })
+}
+
 
 EventsOn("Percentage", Percentage => {
     twj.percentage = Percentage
@@ -93,9 +108,16 @@ EventsOn("Percentage", Percentage => {
       </n-gi>
     </n-grid>
 
-    <n-button type="primary" @click="brute">
+
+    <n-button type="primary" @click="brute" style="margin-right: 20px; ">
         Brute
     </n-button>
+
+    <n-button type="error" @click="stopBrute" style="margin-right: 20px; ">
+        Stop
+    </n-button>
+
+
     <p></p>
     <n-progress
             type="line"

@@ -63,38 +63,39 @@ jobs:
 
   collect-release:
     name: Collect and release
-    needs: [ build-gui ]
+    needs: [build-gui]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
         with:
-          name: target
-          path: target
+          fetch-depth: 0
       - name: Fetch commit messages since last release
         run: |
           # Get current tag
           current_tag=$(git describe --tags --abbrev=0)
           
           # Get previous tag (latest one before the current one)
-          previous_tag=$(git describe --abbrev=0 --tags ${current_tag})
+          previous_commit=$(git rev-list --tags --skip=1 --max-count=1)
+          previous_tag=$(git describe --abbrev=0 --tags ${previous_commit})
           
           # List commits between the previous and current tag
-          commit_messages=$(git log --pretty=format:"- %s (%h)" ${previous_tag}..${current_tag})
+          commit_messages=$(git log --pretty=format:"- [%s](https://github.com/yhy0/ChYing/commit/%H)" ${previous_tag}..${current_tag})
 
           # Save commit messages to an output file
           echo "$commit_messages" > commits.txt
           echo "Commit messages since last release:" 
           cat commits.txt
+          echo commit_messages_path=$(pwd)/commits.txt >> $GITHUB_ENV
         shell: bash
-          
-      - name: Upload commit messages
-        run: echo commit-messages-path=$(pwd)/commits.txt >> $GITHUB_ENV
-      - run: ls -al target && ls -R target/
+      - uses: actions/download-artifact@v3
+        with:
+          name: target
+          path: target
       - working-directory: target
         run: |
+          ls -al target && ls -R target/
           rm -rf ChYing-amd64-installer.exe
           rm -rf ChYing.pkg
           mv ChYing.app.zip ChYing-darwin.app.zip
@@ -111,4 +112,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: target/*
-          body: ${{ env.commit-messages-path }}
+          body_path: ${{ env.commit_messages_path }}

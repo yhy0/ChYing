@@ -32,6 +32,10 @@ function openURL(url) {
                     <n-p> JWT token 解析，<n-button @click="openURL('https://jwt.io/')" quaternary type="primary">jwt.io</n-button> 样式显示</n-p>
                     <n-p> JWT 秘钥爆破 </n-p>
                 </n-card>
+                <n-card style="text-align: left;">
+                  <n-h3> NucleiY </n-h3>
+                  <n-p> 基于 nuclei 实现的重点漏洞扫描  </n-p>
+                </n-card>
 
                 <n-card style="text-align: left;">
                     <n-h3> BurpSuite </n-h3>

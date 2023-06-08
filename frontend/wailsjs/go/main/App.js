@@ -46,6 +46,14 @@ export function Menu() {
   return window['go']['main']['App']['Menu']();
 }
 
+export function NucleiLoad() {
+  return window['go']['main']['App']['NucleiLoad']();
+}
+
+export function NucleiY(arg1, arg2, arg3) {
+  return window['go']['main']['App']['NucleiY'](arg1, arg2, arg3);
+}
+
 export function Parser(arg1) {
   return window['go']['main']['App']['Parser'](arg1);
 }

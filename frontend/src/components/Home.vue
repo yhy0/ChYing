@@ -7,8 +7,9 @@ import Decoder from "./Decoder.vue";
 import BurpSuite from "./burpsuite/BurpSuite.vue";
 import About from "./About.vue";
 import Tools from "./tools/Tools.vue";
+import NucleiY from "./nucleiY/NucleiY.vue";
 
-const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'Decoder', 'BurpSuite', 'About'])
+const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'NucleiY', 'Decoder', 'BurpSuite', 'About'])
 
 </script>
 
@@ -39,6 +40,12 @@ const activeTabs = ref(['Fuzz', 'Swagger', 'TWJ', 'Decoder', 'BurpSuite', 'About
                     <Twj/>
                 </n-message-provider>
             </n-tab-pane>
+
+          <n-tab-pane name="NucleiY" display-directive="show:lazy" tab="NucleiY">
+            <n-message-provider>
+              <NucleiY/>
+            </n-message-provider>
+          </n-tab-pane>
 
             <n-tab-pane name="Decoder" display-directive="show:lazy" tab="Decoder">
                 <n-message-provider>

@@ -8,7 +8,7 @@
     <img alt="Release" src="https://img.shields.io/github/license/yhy0/ChYing"/>
   </a>
   <a href="https://github.com/yhy0/ChYing">
-    <img alt="Release" src="https://img.shields.io/badge/release-v1.0-brightgreen"/>
+    <img alt="Release" src="https://img.shields.io/badge/release-v1.1-brightgreen"/>
   </a>
   <a href="https://github.com/yhy0/ChYing">
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/yhy0/ChYing?color=9cf"/>
@@ -68,6 +68,10 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 - JWT token 解析，[jwt.io](https://jwt.io/) 样式显示
 - JWT 秘钥爆破
+
+### NucleiY
+
+基于 nuclei 实现的重点漏洞扫描, 使用前往 https://github.com/yhy0/nucleiY 查看说明
 
 ### BurpSuite
 

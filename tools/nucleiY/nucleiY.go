@@ -1,11 +1,11 @@
 package nucleiY
 
 import (
+	"fmt"
 	"github.com/projectdiscovery/nuclei/v2/pkg/core/inputs"
 	"github.com/projectdiscovery/nuclei/v2/pkg/protocols/common/contextargs"
 	"github.com/projectdiscovery/nuclei/v2/pkg/templates"
 	"github.com/thoas/go-funk"
-	"github.com/yhy0/logging"
 	"strings"
 )
 
@@ -20,24 +20,36 @@ type Info struct {
 	Template []*templates.Template `json:"template"`
 }
 
-var Pocs = make(map[string][]*templates.Template)
+type Options struct {
+	Label    string   `json:"label"`
+	Children []string `json:"children"`
+}
 
-func Scan(target string, tag string) {
-	if nuclei.Engine == nil || nuclei.Store == nil {
-		logging.Logger.Errorln("nuclei == nil")
-		return
+type Result struct {
+	Url      string `json:"url"`
+	Name     string `json:"name"`
+	Request  string `json:"request"`
+	Response string `json:"response"`
+}
+
+var Pocs map[string][]*templates.Template
+
+func Scan(target string, tag string, proxy string) string {
+	nuclei := New(proxy)
+	if nuclei == nil {
+		return "nuclei == nil"
 	}
 	var ts []*templates.Template
 
 	if tag == "all" { // 使用全部 poc 探测
 		ts = nuclei.Store.Templates()
 	} else if funk.Contains(tag, "-all") { // 使用每个分类的全部 poc 探测
+		tag = strings.ReplaceAll(tag, "-all", "")
 		value, ok := Pocs[tag]
 		if ok {
 			ts = value
 		} else {
-			logging.Logger.Warning("not find tag")
-			return
+			return fmt.Sprintf("tag[%s] not find", tag)
 		}
 	} else { // 单个探测
 		_tag := strings.Split(tag, ":")
@@ -53,5 +65,8 @@ func Scan(target string, tag string) {
 		input := &inputs.SimpleInputProvider{Inputs: []*contextargs.MetaInput{{Input: target}}}
 		_ = nuclei.Engine.Execute(ts, input)
 		nuclei.Engine.WorkPool().Wait() // Wait for the scan to finish
+		return ""
+	} else {
+		return "没有模板"
 	}
 }

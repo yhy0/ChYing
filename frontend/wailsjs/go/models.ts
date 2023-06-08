@@ -76,6 +76,25 @@ export namespace main {
 
 }
 
+export namespace nucleiY {
+	
+	export class Options {
+	    label: string;
+	    children: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Options(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.label = source["label"];
+	        this.children = source["children"];
+	    }
+	}
+
+}
+
 export namespace twj {
 	
 	export class Jwt {

@@ -8,7 +8,7 @@
     <img alt="Release" src="https://img.shields.io/github/license/yhy0/ChYing"/>
   </a>
   <a href="https://github.com/yhy0/ChYing">
-    <img alt="Release" src="https://img.shields.io/badge/release-v1.0-brightgreen"/>
+    <img alt="Release" src="https://img.shields.io/badge/release-v1.1-brightgreen"/>
   </a>
   <a href="https://github.com/yhy0/ChYing">
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/yhy0/ChYing?color=9cf"/>
@@ -71,6 +71,12 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 
 - JWT token parsing with visual display similar to [jwt.io](https://jwt.io/).
 - JWT key cracking.
+
+### NucleiY
+
+Key vulnerability scanning based on nuclei
+
+https://github.com/yhy0/nucleiY
 
 ### BurpSuite
 

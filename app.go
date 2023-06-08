@@ -17,9 +17,12 @@ import (
 	"github.com/yhy0/ChYing/tools/burpSuite"
 	"github.com/yhy0/ChYing/tools/decoder"
 	"github.com/yhy0/ChYing/tools/fuzz"
+	"github.com/yhy0/ChYing/tools/nucleiY"
 	"github.com/yhy0/ChYing/tools/swagger"
 	"github.com/yhy0/ChYing/tools/twj"
 	"github.com/yhy0/logging"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -149,6 +152,7 @@ func (a *App) startup(ctx context.Context) {
 	runtime.EventsEmit(ctx, "Exclude", burpSuite.Settings.Exclude)
 	runtime.EventsEmit(ctx, "Include", burpSuite.Settings.Include)
 	runtime.EventsEmit(ctx, "FilterSuffix", burpSuite.Settings.FilterSuffix)
+
 	// 通知前端各种数据更改
 	go func() {
 		for {
@@ -179,6 +183,15 @@ func (a *App) startup(ctx context.Context) {
 				} else {
 					runtime.EventsEmit(ctx, "HttpHistory", history)
 				}
+
+			case event := <-nucleiY.ResultEvent:
+				res := nucleiY.Result{
+					Url:      event.Matched,
+					Name:     event.Info.Name,
+					Request:  event.Request,
+					Response: event.Response,
+				}
+				runtime.EventsEmit(ctx, "nucleiYRes", res)
 			}
 		}
 	}()
@@ -468,4 +481,32 @@ func (a *App) Decoder(str string, mode string) string {
 
 func (a *App) TaskList(out string) map[string]string {
 	return tools.Tasklist(out)
+}
+
+// NucleiLoad 加载模板
+func (a *App) NucleiLoad() []nucleiY.Options {
+	nucleiY.New("")
+
+	var options []nucleiY.Options
+	for k, v := range nucleiY.Pocs {
+		var child []string
+		for _, t := range v {
+			child = append(child, t.Info.Name)
+		}
+		options = append(options, nucleiY.Options{Label: k, Children: child})
+	}
+	return options
+}
+
+// NucleiY 漏洞扫描
+func (a *App) NucleiY(target string, tag string, proxy string) string {
+	templatesTempDir := filepath.Join(file.ChyingDir, "nucleiY")
+
+	if _, err := os.Stat(templatesTempDir); err != nil {
+		// 不存在，创建
+		logging.Logger.Errorln("")
+		return "nucleiY not find, https://github.com/yhy0/nucleiY"
+	}
+
+	return nucleiY.Scan(target, tag, proxy)
 }

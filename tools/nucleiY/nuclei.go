@@ -1,6 +1,7 @@
 package nucleiY
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"github.com/logrusorgru/aurora"
@@ -20,9 +21,15 @@ import (
 	"github.com/projectdiscovery/nuclei/v2/pkg/testutils"
 	"github.com/projectdiscovery/nuclei/v2/pkg/types"
 	"github.com/projectdiscovery/ratelimit"
+	errorutil "github.com/projectdiscovery/utils/errors"
+	fileutil "github.com/projectdiscovery/utils/file"
+	proxyutils "github.com/projectdiscovery/utils/proxy"
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/logging"
+	"net/url"
+	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -37,10 +44,18 @@ type Nuclei struct {
 	Store  *loader.Store
 }
 
-var nuclei Nuclei
+var ResultEvent = make(chan *output.ResultEvent)
 
-func New() {
+func New(proxy string) *Nuclei {
 	templatesTempDir := filepath.Join(file.ChyingDir, "nucleiY")
+
+	if _, err := os.Stat(templatesTempDir); err != nil {
+		// 不存在，创建
+		logging.Logger.Errorln("nucleiY not find")
+		return nil
+	}
+
+	var nuclei = &Nuclei{}
 
 	cache := hosterrorscache.New(30, hosterrorscache.DefaultMaxHostsCount, nil)
 	defer cache.Close()
@@ -49,17 +64,26 @@ func New() {
 	reportingClient, _ := reporting.New(&reporting.Options{}, "")
 	defer reportingClient.Close()
 
-	outputWriter := testutils.NewMockOutputWriter()
-	outputWriter.WriteCallback = func(event *output.ResultEvent) {
-		fmt.Printf("Got Result: %v\n", event)
-	}
-
 	defaultOpts := types.DefaultOptions()
 	protocolstate.Init(defaultOpts)
 	protocolinit.Init(defaultOpts)
 
 	// 模板路径是通过这个指定的
 	defaultOpts.Templates = goflags.StringSlice{templatesTempDir}
+	if proxy != "" {
+		defaultOpts.Proxy = goflags.StringSlice{proxy}
+		if err := loadProxyServers(defaultOpts); err != nil {
+			logging.Logger.Errorln(err)
+		}
+	}
+	outputWriter := testutils.NewMockOutputWriter()
+	outputWriter.WriteCallback = func(event *output.ResultEvent) {
+		// 这样写，不能 单独 这样 ResultEvent <- event ，不然会阻塞
+		select {
+		case ResultEvent <- event:
+		default:
+		}
+	}
 
 	interactOpts := interactsh.DefaultOptions(outputWriter, reportingClient, mockProgress)
 	interactClient, err := interactsh.New(interactOpts)
@@ -96,16 +120,70 @@ func New() {
 	}
 	store.Load()
 
+	Pocs = make(map[string][]*templates.Template)
+
 	for _, t := range store.Templates() {
 		tag := t.Info.Tags.ToSlice()[0]
-		value, ok := Pocs[tag]
-		if ok {
-			Pocs[tag] = append(value, t)
-		} else {
-			Pocs[tag] = []*templates.Template{t}
+		if tag != "" {
+			value, ok := Pocs[tag]
+			if ok {
+				Pocs[tag] = append(value, t)
+			} else {
+				Pocs[tag] = []*templates.Template{t}
+			}
 		}
 	}
 
 	nuclei.Engine = engine
 	nuclei.Store = store
+
+	return nuclei
+}
+
+// loadProxyServers load list of proxy servers from file or comma seperated
+func loadProxyServers(options *types.Options) error {
+	if len(options.Proxy) == 0 {
+		return nil
+	}
+	proxyList := []string{}
+	for _, p := range options.Proxy {
+		if fileutil.FileExists(p) {
+			file, err := os.Open(p)
+			if err != nil {
+				return fmt.Errorf("could not open proxy file: %w", err)
+			}
+			defer file.Close()
+			scanner := bufio.NewScanner(file)
+			for scanner.Scan() {
+				proxy := scanner.Text()
+				if strings.TrimSpace(proxy) == "" {
+					continue
+				}
+				proxyList = append(proxyList, proxy)
+			}
+		} else {
+			proxyList = append(proxyList, p)
+		}
+	}
+	aliveProxy, err := proxyutils.GetAnyAliveProxy(options.Timeout, proxyList...)
+	if err != nil {
+		return err
+	}
+	proxyURL, err := url.Parse(aliveProxy)
+	if err != nil {
+		return errorutil.WrapfWithNil(err, "failed to parse proxy got %v", err)
+	}
+	if options.ProxyInternal {
+		os.Setenv(types.HTTP_PROXY_ENV, proxyURL.String())
+	}
+	if proxyURL.Scheme == proxyutils.HTTP || proxyURL.Scheme == proxyutils.HTTPS {
+		types.ProxyURL = proxyURL.String()
+		types.ProxySocksURL = ""
+		logging.Logger.Infof("Using %s as proxy server", proxyURL.String())
+	} else if proxyURL.Scheme == proxyutils.SOCKS5 {
+		types.ProxyURL = ""
+		types.ProxySocksURL = proxyURL.String()
+		logging.Logger.Infof("Using %s as socket proxy server", proxyURL.String())
+	}
+	return nil
 }

@@ -13,10 +13,10 @@ import (
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/httpx"
 	"github.com/yhy0/ChYing/pkg/utils"
-	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/ChYing/tools/burpSuite"
 	"github.com/yhy0/ChYing/tools/decoder"
 	"github.com/yhy0/ChYing/tools/fuzz"
+	"github.com/yhy0/ChYing/tools/gadget"
 	"github.com/yhy0/ChYing/tools/nucleiY"
 	"github.com/yhy0/ChYing/tools/swagger"
 	"github.com/yhy0/ChYing/tools/twj"
@@ -480,7 +480,18 @@ func (a *App) Decoder(str string, mode string) string {
 }
 
 func (a *App) TaskList(out string) map[string]string {
-	return tools.Tasklist(out)
+	return gadget.Tasklist(out)
+}
+
+func (a *App) ShiroDecrypt(key, data string) *gadget.Shiro {
+	if data == "" {
+		return nil
+	}
+	shiro, err := gadget.DecryptShiro(key, data)
+	if err != nil {
+		return nil
+	}
+	return shiro
 }
 
 // NucleiLoad 加载模板

@@ -1,4 +1,4 @@
-package tools
+package gadget
 
 import (
 	"github.com/yhy0/ChYing/pkg/file"

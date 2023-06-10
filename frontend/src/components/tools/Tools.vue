@@ -1,5 +1,6 @@
 <script setup>
 import TaskList from "./Tasklist.vue";
+import Shiro from "./Shiro.vue";
 </script>
 
 <template>
@@ -10,6 +11,12 @@ import TaskList from "./Tasklist.vue";
                 <n-message-provider>
                     <TaskList/>
                 </n-message-provider>
+            </n-tab-pane>
+
+            <n-tab-pane name="Shiro" display-directive="show:lazy" tab="Shiro解密">
+              <n-message-provider>
+                <Shiro/>
+              </n-message-provider>
             </n-tab-pane>
         </n-tabs>
     </n-card>

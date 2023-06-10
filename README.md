@@ -96,9 +96,10 @@ https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
 Unicode 、URL、Hex、Base64 编/解码
 
 MD5 加密
-### 杀软识别
-
+### 其它
+- 杀软识别
 https://github.com/gh0stkey/avList/blob/master/avlist.js
+- Shiro 解密
 
 ## 问题
 前端不会，全靠 ChatGPT 

@@ -46,16 +46,16 @@ type Nuclei struct {
 
 var ResultEvent = make(chan *output.ResultEvent)
 
-func New(proxy string) *Nuclei {
+var nuclei = &Nuclei{}
+
+func New(proxy string) {
 	templatesTempDir := filepath.Join(file.ChyingDir, "nucleiY")
 
 	if _, err := os.Stat(templatesTempDir); err != nil {
 		// 不存在，创建
 		logging.Logger.Errorln("nucleiY not find")
-		return nil
+		return
 	}
-
-	var nuclei = &Nuclei{}
 
 	cache := hosterrorscache.New(30, hosterrorscache.DefaultMaxHostsCount, nil)
 	defer cache.Close()
@@ -123,21 +123,21 @@ func New(proxy string) *Nuclei {
 	Pocs = make(map[string][]*templates.Template)
 
 	for _, t := range store.Templates() {
-		tag := t.Info.Tags.ToSlice()[0]
-		if tag != "" {
-			value, ok := Pocs[tag]
-			if ok {
-				Pocs[tag] = append(value, t)
-			} else {
-				Pocs[tag] = []*templates.Template{t}
+		for _, tag := range t.Info.Tags.ToSlice() {
+			if tag != "" {
+				value, ok := Pocs[tag]
+				if ok {
+					Pocs[tag] = append(value, t)
+				} else {
+					Pocs[tag] = []*templates.Template{t}
+				}
 			}
 		}
+
 	}
 
 	nuclei.Engine = engine
 	nuclei.Store = store
-
-	return nuclei
 }
 
 // loadProxyServers load list of proxy servers from file or comma seperated

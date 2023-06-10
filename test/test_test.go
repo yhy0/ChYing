@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/yhy0/ChYing/pkg/file"
 	"github.com/yhy0/ChYing/pkg/utils"
-	"github.com/yhy0/ChYing/tools"
 	"github.com/yhy0/ChYing/tools/burpSuite"
+	"github.com/yhy0/ChYing/tools/gadget"
 	"github.com/yhy0/logging"
 	"regexp"
 	"testing"
@@ -129,7 +129,7 @@ svchost.exe                   4752 Services                   0      5,084 K
 svchost.exe                   5056 Services                   0      3,316 K
 svchost.exe         
 `
-	fmt.Println(tools.Tasklist(out))
+	fmt.Println(gadget.Tasklist(out))
 
 	port, err := utils.GetRandomUnusedPort()
 

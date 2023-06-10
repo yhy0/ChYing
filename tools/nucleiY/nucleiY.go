@@ -35,7 +35,6 @@ type Result struct {
 var Pocs map[string][]*templates.Template
 
 func Scan(target string, tag string, proxy string) string {
-	nuclei := New(proxy)
 	if nuclei == nil {
 		return "nuclei == nil"
 	}

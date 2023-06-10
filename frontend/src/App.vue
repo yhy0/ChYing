@@ -6,11 +6,13 @@ import accesslog from 'highlight.js/lib/languages/accesslog'
 import json from 'highlight.js/lib/languages/json'
 import http from 'highlight.js/lib/languages/http'
 import xml from 'highlight.js/lib/languages/xml'
+import java from 'highlight.js/lib/languages/java'
 
 hljs.registerLanguage("accesslog", accesslog)
 hljs.registerLanguage("json", json)
 hljs.registerLanguage("http", http)
 hljs.registerLanguage("xml", xml)
+hljs.registerLanguage("java", java)
 
 import { useOsTheme, darkTheme } from "naive-ui";
 import {computed} from "vue";

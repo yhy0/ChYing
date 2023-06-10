@@ -5,6 +5,7 @@ import {menu} from '../models';
 import {nucleiY} from '../models';
 import {twj} from '../models';
 import {main} from '../models';
+import {gadget} from '../models';
 
 export function Brute():Promise<string>;
 
@@ -43,6 +44,8 @@ export function SendToIntruder(arg1:number):Promise<void>;
 export function SendToRepeater(arg1:number):Promise<void>;
 
 export function Settings(arg1:burpSuite.SettingUI):Promise<string>;
+
+export function ShiroDecrypt(arg1:string,arg2:string):Promise<gadget.Shiro>;
 
 export function Swagger(arg1:string):Promise<void>;
 

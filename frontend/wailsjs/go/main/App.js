@@ -78,6 +78,10 @@ export function Settings(arg1) {
   return window['go']['main']['App']['Settings'](arg1);
 }
 
+export function ShiroDecrypt(arg1, arg2) {
+  return window['go']['main']['App']['ShiroDecrypt'](arg1, arg2);
+}
+
 export function Swagger(arg1) {
   return window['go']['main']['App']['Swagger'](arg1);
 }

@@ -20,10 +20,10 @@
         </n-space>
       </n-grid-item>
 
-      <n-grid-item :offset="0.8">
+      <n-grid-item>
         <n-space align="center">
           <n-button type="primary" @click="nuclei">Nuclei</n-button>
-          <n-button type="error" @click="nucleiStop">Stop</n-button>
+          <n-button type="warning" @click="reload">Reload</n-button>
         </n-space>
       </n-grid-item>
     </n-grid>
@@ -68,7 +68,7 @@
 <script setup>
 import { useMessage, NButton, NCard, NDataTable} from "naive-ui";
 import {ref} from "vue";
-import {NucleiY, FuzzStop, NucleiLoad} from '../../../wailsjs/go/main/App'
+import {NucleiY, NucleiLoad} from '../../../wailsjs/go/main/App'
 import {EventsOn} from "../../../wailsjs/runtime";
 
 const checkedRef = ref(false);
@@ -101,6 +101,29 @@ NucleiLoad().then(result =>{
   }
 })
 
+function reload() {
+  pocs.value = []
+  NucleiLoad().then(result =>{
+    for (let i = 0; i < result.length; ++i) {
+      const childrens = [];
+      result[i].children.forEach((element) => {
+        childrens.push({
+          label: element,
+          value: result[i].label + ":" +element,
+        });
+      });
+
+      pocs.value.push({
+        label: result[i].label,
+        value: result[i].label + "-all",
+        children: childrens,
+      });
+    }
+    message.info("reload success")
+  })
+
+}
+
 function nuclei() {
   const target = targetUrl.value.trim();
   if(target !== "") {
@@ -117,13 +140,6 @@ function nuclei() {
     });
   }
 }
-
-function nucleiStop() {
-  FuzzStop().then(result => {
-    message.success(targetUrl.value + " 扫描已停止");
-  })
-}
-
 
 function handleCheckedChange(checked) {
   checkedRef.value = checked;

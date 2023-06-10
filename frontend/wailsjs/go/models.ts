@@ -57,6 +57,33 @@ export namespace burpSuite {
 
 }
 
+export namespace gadget {
+	
+	export class Shiro {
+	    key: string;
+	    iv: string;
+	    type: string;
+	    decrypt: string;
+	    decryptB64: string;
+	    serialization: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Shiro(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.iv = source["iv"];
+	        this.type = source["type"];
+	        this.decrypt = source["decrypt"];
+	        this.decryptB64 = source["decryptB64"];
+	        this.serialization = source["serialization"];
+	    }
+	}
+
+}
+
 export namespace main {
 	
 	export class Message {

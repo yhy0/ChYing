@@ -1,0 +1,763 @@
+/* 代理模块特有样式 */
+
+/* 表格样式 */
+.proxy-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+/* 代理表格表头 - 移除布局样式，只保留模块特定样式 */
+.proxy-table th {
+  /* 只保留模块特定的样式，所有布局样式由 compact-table.css 控制 */
+  font-size: 0.7rem; /* 与 compact-table 保持一致 */
+  letter-spacing: 0.05em; /* 模块特定的字母间距 */
+  text-transform: uppercase; /* 模块特定的大写转换 */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 移除所有布局相关的样式，包括：
+   - background, backdrop-filter (由 compact-table.css 控制)
+   - border, border-radius (由 compact-table.css 控制)
+   - padding (由 compact-table.css 控制)
+   - position, z-index (由 compact-table.css 控制)
+   - box-shadow (由 compact-table.css 控制)
+   - 光泽效果 (由 compact-table.css 控制)
+*/
+
+/* 移除所有表格布局样式，由 compact-table.css 统一控制 */
+/*
+   移除的样式包括：
+   - thead tr 的边框 (由 compact-table.css 控制)
+   - tbody tr 的边框、悬停、选中效果 (由 compact-table.css 控制)
+   - 所有与表格结构相关的样式
+*/
+
+.proxy-table td {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+/* 移除所有深色模式的表格样式，由 compact-table.css 统一控制 */
+
+/* 列宽调整器 */
+.column-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  background-color: transparent;
+  cursor: col-resize;
+  z-index: 11;
+}
+
+.column-resizer:hover, 
+.column-resizer.resizing {
+  background-color: var(--color-brand);
+}
+
+.proxy-table th.resizing {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+.proxy-table .resize-handle-line {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background-color: var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.proxy-table th:hover .resize-handle-line {
+  background-color: var(--color-brand-light);
+}
+
+/* 表格容器可滚动 */
+.proxy-table-container {
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+}
+
+.dark .proxy-table .resize-handle-line {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+/* 方法标签和状态码标签使用统一样式 - 从method-tag.css引入 */
+/* 已删除重复的方法标签和状态码样式 */
+
+/* 代理过滤器样式 */
+.proxy-filter {
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+.proxy-filter-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.proxy-filter-input {
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: all var(--transition-duration) ease;
+}
+
+.proxy-filter-input:focus {
+  outline: none;
+  border-color: var(--color-brand-light);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+.dark .proxy-filter-input {
+  background-color: rgba(49, 49, 70, 0.8);
+  border-color: var(--color-border-light);
+}
+
+.dark .proxy-filter-input:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* 上下文菜单已统一 - 使用contextmenu.css中的样式 */
+/* 已删除重复的上下文菜单样式定义 */
+
+/* 颜色选择器样式已统一到 components/color-picker.css */
+
+/* 使用统一按钮样式 - 从button.css引入 */
+/* 已删除重复的按钮样式定义，改用.btn, .btn-primary等类 */
+
+/* 通知提示样式 */
+.proxy-notification {
+  position: fixed;
+  top: 3rem;
+  right: 2rem;
+  min-width: 280px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.05);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  animation: notification-slide-in 0.3s ease-out forwards;
+}
+
+.proxy-notification.closing {
+  animation: notification-slide-out 0.3s ease-in forwards;
+}
+
+@keyframes notification-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes notification-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.proxy-notification-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.proxy-notification-icon {
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.proxy-notification-message {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.proxy-notification-close {
+  margin-left: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.proxy-notification-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.proxy-notification-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.4);
+  animation: notification-progress 2s linear forwards;
+}
+
+@keyframes notification-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.proxy-notification-success {
+  background-color: rgba(16, 185, 129, 0.95);
+  color: white;
+}
+
+.proxy-notification-error {
+  background-color: rgba(239, 68, 68, 0.95);
+  color: white;
+}
+
+.dark .proxy-notification {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 3px 6px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .proxy-notification-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 拦截面板样式 */
+.intercept-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--color-bg-card);
+}
+
+/* 拦截队列表格样式 */
+.intercept-queue-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.intercept-queue-table th {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-light);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  user-select: none;
+}
+
+.intercept-queue-table tbody tr {
+  border-bottom: 1px solid var(--color-border-light);
+  transition: all var(--transition-duration) ease;
+  cursor: pointer;
+}
+
+.intercept-queue-table tbody tr:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.intercept-queue-table tbody tr.selected {
+  background-color: rgba(59, 130, 246, 0.08);
+  border-left: 2px solid rgb(59, 130, 246);
+}
+
+.intercept-queue-table td {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+/* 队列统计信息样式 */
+.queue-stats {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  padding: 0.25rem 0.5rem;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 0.25rem;
+}
+
+/* 清空队列按钮样式 */
+.clear-queue-btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--color-text-tertiary);
+  background-color: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clear-queue-btn:hover {
+  color: rgb(239, 68, 68);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* 深色模式适配 */
+.dark .intercept-queue-table th {
+  background-color: rgba(42, 42, 66, 0.8);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-queue-table tbody tr:hover {
+  background-color: rgba(49, 49, 69, 0.6);
+}
+
+.dark .intercept-queue-table tbody tr.selected {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* 拦截面板状态栏 */
+.intercept-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-secondary);
+  flex-shrink: 0;
+}
+
+.intercept-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.intercept-status-indicator.enabled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: rgb(185, 28, 28);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.intercept-status-indicator.disabled {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: rgb(107, 114, 128);
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+/* 拦截内容区域 */
+.intercept-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.intercept-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: rgba(249, 250, 251, 0.5);
+  flex-shrink: 0;
+}
+
+.intercept-item-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.intercept-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* 拦截按钮样式 */
+.intercept-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 5rem;
+}
+
+.intercept-action-btn.forward {
+  background-color: rgb(34, 197, 94);
+  color: white;
+}
+
+.intercept-action-btn.forward:hover {
+  background-color: rgb(22, 163, 74);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
+}
+
+.intercept-action-btn.drop {
+  background-color: rgb(239, 68, 68);
+  color: white;
+}
+
+.intercept-action-btn.drop:hover {
+  background-color: rgb(220, 38, 38);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.intercept-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 编辑器区域布局 */
+.intercept-editors {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.intercept-editor-panel {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  overflow: hidden;
+}
+
+.intercept-editor-panel.full-width {
+  width: 100%;
+}
+
+.intercept-editor-header {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-secondary);
+  flex-shrink: 0;
+}
+
+.intercept-editor-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.intercept-editor-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 等待状态样式 */
+.intercept-waiting-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.intercept-waiting-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.intercept-waiting-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.intercept-waiting-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 24rem;
+}
+
+/* 响应等待提示 */
+.intercept-response-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--color-bg-tertiary);
+  border-left: 1px solid var(--color-border-light);
+}
+
+.intercept-response-waiting .waiting-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+.intercept-response-waiting .waiting-text {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.intercept-response-waiting .waiting-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  margin-top: 0.5rem;
+}
+
+/* 快捷键提示 */
+.intercept-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  opacity: 0.7;
+}
+
+.intercept-shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+/* 深色模式适配 */
+.dark .intercept-panel {
+  background-color: var(--color-bg-card-dark);
+}
+
+.dark .intercept-status-bar {
+  background-color: rgba(42, 42, 66, 0.8);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-status-indicator.enabled {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: rgb(248, 113, 113);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.dark .intercept-status-indicator.disabled {
+  background-color: rgba(75, 85, 99, 0.2);
+  color: rgb(156, 163, 175);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-item-header {
+  background-color: rgba(42, 42, 66, 0.3);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-editor-header {
+  background-color: rgba(42, 42, 66, 0.5);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-response-waiting {
+  background-color: rgba(31, 41, 55, 0.5);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-shortcut-key {
+  background-color: rgba(55, 65, 81, 0.5);
+  border-color: rgba(75, 85, 99, 0.4);
+  color: var(--color-text-secondary);
+}
+
+/* 动画效果 */
+.intercept-fade-enter-active,
+.intercept-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.intercept-fade-enter-from,
+.intercept-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .intercept-editors {
+    flex-direction: column;
+  }
+  
+  .intercept-editor-panel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  
+  .intercept-editor-panel:last-child {
+    border-bottom: none;
+  }
+  
+  .intercept-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .intercept-item-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .intercept-action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* 状态指示动画 */
+@keyframes intercept-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.intercept-status-indicator.enabled {
+  animation: intercept-pulse 2s ease-in-out infinite;
+}
+
+/* 按钮加载状态 */
+.intercept-action-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.intercept-action-btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  color: white;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.intercept-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.intercept-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.intercept-info {
+  background-color: var(--color-bg-secondary);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-border-light);
+}
+
+.intercept-method {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: rgb(37, 99, 235);
+}
+
+.dark .intercept-info {
+  background-color: rgba(42, 42, 66, 0.5);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+.dark .intercept-method {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: rgb(96, 165, 250);
+} 

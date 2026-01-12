@@ -1,0 +1,7 @@
+/p.php          {tag="allow_url_fopen"}     {status=200}                {type="html"}       {fingprints="php"}
+/phpinfo.php    {tag="allow_url_fopen"}     {status=200}                {type="html"}       {fingprints="php"}
+/info.php       {tag="allow_url_fopen"}     {status=200}                {type="html"}       {fingprints="php"}
+/pi.php         {tag="allow_url_fopen"}     {status=200}                {type="html"}       {fingprints="php"}
+/i.php          {tag="allow_url_fopen"}     {status=200}                {type="html"}       {fingprints="php"}
+/php.php        {tag="allow_url_fopen"}     {status=200}                {type="html"}       {fingprints="php"}
+/apc.php        {status=200}                {tag="<title>APC INFO"}                         {fingprints="php"}

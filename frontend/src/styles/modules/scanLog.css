@@ -1,0 +1,450 @@
+/* 扫描日志模块特定样式 */
+
+/* 扫描日志视图 - 玻璃态设计 */
+.scan-log-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  color: var(--color-text-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.scan-log-view::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 扫描日志内容区域 */
+.scan-log-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 扫描日志面板 - 玻璃态设计 */
+.scan-log-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.scan-log-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 扫描日志表格容器 - 玻璃态设计 */
+.scan-log-table-container {
+  overflow: hidden;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  position: relative;
+}
+
+/* 扫描日志表格优化 - 不破坏虚拟滚动 */
+.scan-log-table-container .http-traffic-table-container {
+  height: 100%;
+}
+
+.scan-log-table-container .virtual-table-container {
+  height: 100%;
+}
+
+/* 扫描日志详情面板 */
+.scan-log-detail-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 扫描日志详情摘要 */
+.scan-log-detail-summary {
+  padding: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.scan-log-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  font-size: var(--text-sm);
+}
+
+.scan-log-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.scan-log-summary-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.scan-log-summary-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 状态指示器特殊样式 */
+.scan-status-pending {
+  color: var(--color-text-tertiary);
+}
+
+.scan-status-running {
+  color: var(--color-info);
+  animation: pulse 2s infinite;
+}
+
+.scan-status-success {
+  color: var(--color-success);
+}
+
+.scan-status-failed {
+  color: var(--color-danger);
+}
+
+.scan-status-timeout {
+  color: var(--color-warning);
+}
+
+/* 统计容器样式 */
+.statistics-container {
+  padding: var(--spacing-md);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.stats-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.stats-section h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* 总览网格 */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* 2x2 总览网格 */
+.overview-grid-2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.stat-card {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.stat-card.status-success::before {
+  background: var(--color-success);
+}
+
+.stat-card.status-info::before {
+  background: var(--color-info);
+}
+
+.stat-card.status-warning::before {
+  background: var(--color-warning);
+}
+
+.stat-card.status-danger::before {
+  background: var(--color-danger);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-header i {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
+
+.stat-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+/* 状态和风险等级列表 */
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.stat-item {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.stat-info i {
+  font-size: 1rem;
+  width: 1.2rem;
+  text-align: center;
+}
+
+.stat-value {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.stat-value .stat-number {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  min-width: 2rem;
+  text-align: right;
+}
+
+/* 进度条 */
+.progress-bar {
+  width: 80px;
+  height: 6px;
+  background: var(--color-shadow);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: currentColor;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+/* 状态颜色样式 */
+.stat-item.status-success {
+  background: rgba(var(--color-success-rgb), 0.1);
+  border-color: rgba(var(--color-success-rgb), 0.2);
+  color: var(--color-success);
+}
+
+.stat-item.status-info {
+  background: rgba(var(--color-info-rgb), 0.1);
+  border-color: rgba(var(--color-info-rgb), 0.2);
+  color: var(--color-info);
+}
+
+.stat-item.status-warning {
+  background: rgba(var(--color-warning-rgb), 0.1);
+  border-color: rgba(var(--color-warning-rgb), 0.2);
+  color: var(--color-warning);
+}
+
+.stat-item.status-danger {
+  background: rgba(var(--color-danger-rgb), 0.1);
+  border-color: rgba(var(--color-danger-rgb), 0.2);
+  color: var(--color-danger);
+}
+
+.stat-item.status-secondary {
+  background: rgba(var(--color-text-secondary-rgb), 0.1);
+  border-color: rgba(var(--color-text-secondary-rgb), 0.2);
+  color: var(--color-text-secondary);
+}
+
+/* 深色模式状态颜色 */
+.dark .stat-item.status-success {
+  background: rgba(var(--color-success-rgb), 0.15);
+  border-color: rgba(var(--color-success-rgb), 0.3);
+  color: var(--color-success);
+}
+
+.dark .stat-item.status-info {
+  background: rgba(var(--color-info-rgb), 0.15);
+  border-color: rgba(var(--color-info-rgb), 0.3);
+  color: var(--color-info);
+}
+
+.dark .stat-item.status-warning {
+  background: rgba(var(--color-warning-rgb), 0.15);
+  border-color: rgba(var(--color-warning-rgb), 0.3);
+  color: var(--color-warning);
+}
+
+.dark .stat-item.status-danger {
+  background: rgba(var(--color-danger-rgb), 0.15);
+  border-color: rgba(var(--color-danger-rgb), 0.3);
+  color: var(--color-danger);
+}
+
+.dark .stat-item.status-secondary {
+  background: rgba(var(--color-text-secondary-rgb), 0.15);
+  border-color: rgba(var(--color-text-secondary-rgb), 0.3);
+  color: var(--color-text-secondary);
+}
+
+/* 快速操作按钮 */
+.quick-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.quick-actions .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .scan-log-summary-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .overview-grid-2x2 {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+  }
+  
+  .stat-value .stat-number {
+    font-size: var(--text-base);
+  }
+  
+  .progress-bar {
+    width: 60px;
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+  }
+  
+  .quick-actions .btn {
+    min-width: unset;
+  }
+}
+
+/* 扫描日志模块徽章样式 */
+.module-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--color-text-primary) !important;
+  white-space: nowrap !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 扫描日志紧凑表格样式 */
+.scan-log-table.compact-table .http-traffic-table td {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.scan-log-table.compact-table .http-traffic-table th {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+} 

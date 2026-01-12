@@ -1,0 +1,3 @@
+# add golang pprof
+/debug/pprof/goroutine?debug=1      {status=200}        {type="text/plain"}       {tag="goroutine profile"}
+/pprof/goroutine?debug=1            {status=200}        {type="text/plain"}       {tag="goroutine profile"}

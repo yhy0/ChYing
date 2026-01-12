@@ -1,0 +1,349 @@
+/* HTTP 流量表格样式 - 玻璃态设计 */
+.http-traffic-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+}
+
+.http-traffic-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* HTTP流量表格表头 - 移除布局样式，只保留模块特定样式 */
+.http-traffic-table th {
+  /* 只保留模块特定的样式，所有布局样式由 compact-table.css 控制 */
+  font-size: 0.7rem; /* 与 compact-table 保持一致 */
+  overflow: visible !important; /* 确保列调整器可见 */
+}
+
+/* 特别处理：当表格同时有 rules-table 和 compact-table 类时 */
+.rules-table.http-traffic-table.compact-table th {
+  /* 确保规则表格的表头正确显示 */
+  font-size: 0.7rem !important;
+  padding: 2px 8px !important;
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+/* 移除所有布局相关的样式，包括：
+   - background, backdrop-filter (由 compact-table.css 控制)
+   - border-bottom, border-radius (由 compact-table.css 控制)
+   - padding (由 compact-table.css 控制)
+   - position, z-index (由 compact-table.css 控制)
+   - 光泽效果 (由 compact-table.css 控制)
+*/
+
+.http-traffic-table td {
+  font-size: 0.75rem;
+  padding: 0.5rem 0.3rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.dark .http-traffic-table td {
+  border-color: var(--color-border-light);
+}
+
+/* 优化：减少不必要的transition，只对必要属性进行过渡 */
+.http-traffic-table tbody tr {
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+
+/* 虚拟滚动行优化：移除transition以提高性能 */
+.http-traffic-table tbody tr.virtual-row {
+  transition: none;
+}
+
+.http-traffic-table tbody tr:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.dark .http-traffic-table tbody tr:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* === 全新优化的选中行样式 === */
+/* 基础选中行样式 - 使用背景色而非边框，避免列间断裂 */
+.http-traffic-table tr.selected {
+  background-color: rgba(var(--color-primary-rgb), 0.08) !important;
+  position: relative;
+  z-index: 3;
+}
+
+/* 选中行左侧指示条 */
+.http-traffic-table tr.selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, 
+    var(--color-primary) 0%, 
+    rgba(var(--color-primary-rgb), 0.8) 50%, 
+    var(--color-primary) 100%);
+  z-index: 4;
+  border-radius: 0 2px 2px 0;
+}
+
+/* 选中行整体光晕效果 */
+.http-traffic-table tr.selected::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    rgba(var(--color-primary-rgb), 0.15) 0%, 
+    rgba(var(--color-primary-rgb), 0.05) 50%, 
+    rgba(var(--color-primary-rgb), 0.15) 100%);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* 选中行hover增强效果 */
+.http-traffic-table tr.selected:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.12) !important;
+}
+
+.http-traffic-table tr.selected:hover::after {
+  background: linear-gradient(90deg, 
+    rgba(var(--color-primary-rgb), 0.2) 0%, 
+    rgba(var(--color-primary-rgb), 0.08) 50%, 
+    rgba(var(--color-primary-rgb), 0.2) 100%);
+}
+
+/* 选中行文字增强 */
+.http-traffic-table tr.selected {
+  font-weight: 500;
+}
+
+.http-traffic-table tr.selected td {
+  color: var(--color-text-primary);
+  position: relative;
+  z-index: 2;
+}
+
+/* === 深色模式选中行样式 === */
+.dark .http-traffic-table tr.selected {
+  background-color: rgba(var(--color-primary-rgb), 0.15) !important;
+}
+
+.dark .http-traffic-table tr.selected::before {
+  background: linear-gradient(180deg, 
+    #8b93ff 0%, 
+    rgba(139, 147, 255, 0.8) 50%, 
+    #8b93ff 100%);
+}
+
+.dark .http-traffic-table tr.selected::after {
+  background: linear-gradient(90deg, 
+    rgba(var(--color-primary-rgb), 0.25) 0%, 
+    rgba(var(--color-primary-rgb), 0.1) 50%, 
+    rgba(var(--color-primary-rgb), 0.25) 100%);
+}
+
+.dark .http-traffic-table tr.selected:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.2) !important;
+}
+
+.dark .http-traffic-table tr.selected:hover::after {
+  background: linear-gradient(90deg, 
+    rgba(var(--color-primary-rgb), 0.3) 0%, 
+    rgba(var(--color-primary-rgb), 0.15) 50%, 
+    rgba(var(--color-primary-rgb), 0.3) 100%);
+}
+
+/* === 自定义行颜色样式 === */
+/* 为应用背景色的伪元素设置 stacking context */
+.http-traffic-table tr[data-row-color] {
+  position: relative;
+  z-index: 1;
+}
+
+/* 使用::after伪元素创建整行背景，避免影响文字清晰度 */
+.http-traffic-table tr[data-row-color]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--row-color);
+  opacity: 0.2; /* 提高不透明度，使其更明显 */
+  pointer-events: none;
+  z-index: -1; /* 将背景置于内容之下 */
+  transition: opacity 0.2s ease;
+}
+
+/* 确保单元格内容在背景之上 */
+.http-traffic-table tr[data-row-color] td {
+  position: relative;
+}
+
+/* 自定义颜色行在hover时更亮 */
+.http-traffic-table tr[data-row-color]:not(.selected):hover::after {
+  opacity: 0.3;
+}
+
+/* 当自定义颜色的行被选中时的特殊处理 */
+.http-traffic-table tr.selected[data-row-color] {
+  /* 覆盖.selected提供的默认背景，以便显示我们的自定义颜色 */
+  background-color: transparent !important;
+}
+
+/* 选中时，自定义颜色背景更深，以示强调 */
+.http-traffic-table tr.selected[data-row-color]::after {
+  opacity: 0.35; /* 最高的不透明度 */
+}
+
+/* 注意：.selected::before的左侧蓝色指示条仍会显示，作为清晰的选中标记 */
+
+/* === ID单元格颜色选择交互样式 === */
+.http-traffic-table td[data-id-cell="true"] {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  position: relative;
+}
+
+.http-traffic-table td[data-id-cell="true"]:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.http-traffic-table td[data-id-cell="true"]:hover .bx-chevron-down {
+  opacity: 1 !important;
+  color: var(--color-primary);
+}
+
+/* ID单元格的下拉箭头样式优化 */
+.http-traffic-table td[data-id-cell="true"] .bx-chevron-down {
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+}
+
+/* 深色模式下的ID单元格样式 */
+.dark .http-traffic-table td[data-id-cell="true"]:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* 通用样式 */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 颜色选择器样式已统一到 components/color-picker.css */
+
+/* 方法标签和状态码样式已统一到 components/method-tag.css */
+
+/* 列宽调整器样式 - 移除全局样式，由 compact-table.css 统一控制 */
+/*
+   移除全局 .resizer 样式，避免覆盖 compact-table.css 中的修复
+   所有调整器样式现在由 compact-table.css 统一管理
+*/
+
+/*
+   移除所有 .resizer 相关样式，由 compact-table.css 统一管理
+   包括：
+   - .http-traffic-table th:hover .resizer
+   - .resizer::after
+   - .resizer.resizing::after
+
+   这些样式现在在 compact-table.css 中统一定义，避免样式冲突
+*/
+
+/* 排序图标样式 */
+.sort-icon {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.sort-icon:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* 虚拟滚动表格优化样式 */
+.virtual-table-container {
+  /* 优化滚动性能 */
+  will-change: scroll-position;
+  contain: strict;
+}
+
+.virtual-table {
+  /* 确保CSS Grid正常工作 */
+  width: 100%;
+}
+
+.virtual-table thead th {
+  /* 虚拟滚动模式下的表头优化 */
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.3rem;
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.virtual-table tbody tr.virtual-row {
+  /* 虚拟行的基础样式 */
+  height: 33px; /* 固定行高，与estimateRowHeight保持一致 */
+  min-height: 33px;
+}
+
+.virtual-table tbody tr.virtual-row td {
+  /* 虚拟行单元格优化 */
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.3rem;
+  border-bottom: 1px solid var(--color-border-light);
+  overflow: hidden;
+}
+
+/* 虚拟滚动中的文本截断优化 */
+.virtual-table .truncate-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 深色模式虚拟表格 */
+.dark .virtual-table thead th {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .virtual-table tbody tr.virtual-row td {
+  border-color: var(--color-border-light);
+}
+
+/* 虚拟表格空状态行样式 */
+.virtual-table .empty-state-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.virtual-table .empty-state-row td {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: none;
+} 

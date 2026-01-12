@@ -1,0 +1,583 @@
+/* ==========================================================================
+   通用标签页和分组组件样式
+   用于RepeaterTabs.vue和IntruderTabs.vue的共享样式
+   ========================================================================== */
+
+/* 
+这个CSS文件使用CSS变量来处理不同组件间的差异
+使用方法：每个组件需要定义以下CSS变量：
+--tab-prefix: 组件前缀，如 'repeater' 或 'intruder'
+--tab-border: 边框颜色
+--tab-text-primary: 主要文本颜色
+--tab-text-muted: 次要文本颜色
+--tab-bg-primary: 主要背景色
+--tab-bg-secondary: 次要背景色
+--tab-bg-tertiary: 第三级背景色
+--tab-bg-hover: 悬停背景色
+--tab-border-focus: 焦点边框色
+*/
+
+/* 标签页容器 */
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0.4rem;
+  width: 100%;
+  overflow-y: auto;
+  max-height: calc(100vh - 180px);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabs-container {
+  /* 使用通用滚动条样式 */
+  @apply scrollbar-thin;
+}
+
+/* 分组容器 - 水平排列 */
+.tabs-groups-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 12px;
+  width: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  position: relative;
+  padding: 0 2px 2px 2px;
+  margin-top: -4px;
+}
+
+.tabs-groups-container {
+  /* 使用通用滚动条样式 */
+  @apply scrollbar-thin;
+}
+
+/* 标签组 - 玻璃态设计 */
+.tabs-group {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--glass-radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  position: relative;
+  box-shadow: var(--glass-shadow-sm);
+  transition: all 0.25s ease-in-out;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.tabs-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.tabs-group:hover {
+  box-shadow: var(--glass-shadow-md);
+  transform: translateY(-2px);
+  background: var(--glass-bg-primary);
+  border-color: var(--glass-border-strong);
+}
+
+.tabs-group.no-group {
+  border: none;
+  background-color: transparent;
+  width: 100%;
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+}
+
+.tabs-groups-container .tabs-group {
+  flex: 0 0 auto;
+  width: 240px;
+  min-width: 150px;
+  max-width: 300px;
+  margin-bottom: 2px;
+  transition: all 0.25s ease-in-out;
+}
+
+.tabs-groups-container .tabs-group:hover {
+  transform: translateY(-2px);
+}
+
+/* 组标题 - 玻璃态设计 */
+.group-header {
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--tab-text-primary, #111827);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md) var(--glass-radius-md) 0 0;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  position: sticky;
+  left: 0;
+  cursor: move;
+  height: 32px;
+  user-select: none;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.no-group .tabs-row {
+  min-height: 32px;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
+
+.group-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.375rem;
+  flex-shrink: 0;
+}
+
+.group-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* 标签行 */
+.tabs-row {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-x: auto;
+  gap: 2px;
+  padding: 0.15rem 0.5rem;
+  min-height: 28px;
+  width: 100%;
+}
+
+.tabs-row {
+  /* 使用通用滚动条样式 */
+  @apply scrollbar-thin;
+}
+
+/* 单个标签 - 玻璃态设计 */
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--tab-text-primary, #111827);
+  border-radius: var(--glass-radius-sm);
+  border-top: 2px solid transparent;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  box-shadow: var(--glass-shadow-sm);
+  border: 1px solid var(--glass-border-light);
+  flex-shrink: 0;
+  margin: 1px;
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.tab::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.tab:hover {
+  box-shadow: var(--glass-shadow-md);
+  transform: translateY(-2px);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+}
+
+/* 活动标签样式 - 玻璃态增强视觉效果 */
+.tab.active {
+  border-top: 2px solid var(--tab-border-focus, #6366f1);
+  background: var(--glass-bg-hover);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--glass-border-strong);
+  font-weight: 500;
+  transform: translateY(-2px);
+  position: relative;
+  z-index: 2;
+}
+
+/* 暗色主题下的活动标签 */
+.dark .tab.active {
+  background-color: var(--color-gray-800, #1f2937);
+  border-top: 2px solid var(--tab-border-focus, #818cf8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 添加左侧边框指示器 */
+.tab.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: var(--tab-border-focus, #6366f1);
+  border-radius: 2px 0 0 2px;
+}
+
+.tab-color {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 3px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.tab-name {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.tab-edit {
+  position: relative;
+  width: 100%;
+}
+
+.tab-input {
+  width: 100%;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.25rem;
+  outline: none;
+  background: white;
+}
+
+.tab-close {
+  opacity: 0.5;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  transition: all 0.15s ease;
+  margin-left: 0.25rem;
+  font-size: 0.7rem;
+}
+
+.tab-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.2);
+}
+
+.tab-dragging {
+  opacity: 0.7;
+}
+
+.tab-dragover {
+  border-left: 2px dashed var(--color-primary);
+  padding-left: calc(0.5rem - 2px); 
+}
+
+.tabs-group:not(.no-group) .tab-dragover {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+  z-index: 5;
+}
+
+.tab.cross-group-target {
+  animation: pulse-target 1.5s infinite;
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+  z-index: 5;
+}
+
+@keyframes pulse-target {
+  0% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  }
+}
+
+.group-dragging {
+  opacity: 0.7;
+}
+
+.group-dragover {
+  border: 2px dashed var(--color-primary-light);
+  padding: 0.5rem;
+}
+
+.tabs-group.group-dragover:not(.no-group) .group-header {
+  background-color: var(--tab-bg-hover, #f3f4f8);
+  border-color: var(--color-primary-light);
+}
+
+.tabs-group.receiving-from-other-group {
+  transform: scale(1.02);
+}
+
+.tabs-group.receiving-from-other-group .group-header {
+  background-color: var(--tab-bg-hover, #f3f4f8);
+  border-color: var(--color-primary-light);
+}
+
+.no-group.group-dragover {
+  background-color: rgba(99, 102, 241, 0.05);
+  border-radius: 0.5rem;
+  box-shadow: inset 0 0 0 2px var(--color-primary-light);
+  padding: 0.75rem 0.5rem;
+}
+
+.no-group.receiving-from-group {
+  background-color: rgba(99, 102, 241, 0.08);
+  border-radius: 0.5rem;
+  box-shadow: inset 0 0 0 2px var(--color-primary-light);
+  padding: 0.75rem 0.5rem;
+}
+
+@keyframes pulse-border {
+  0% {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+  }
+  100% {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3);
+  }
+}
+
+.group-toggle {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.7;
+  background-color: transparent;
+  color: var(--tab-text-muted, #6b7280);
+  transition: all 0.15s ease-in-out;
+}
+
+.group-header {
+  cursor: move;
+}
+
+.tabs-group:not(.no-group) .group-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem 0.5rem 0 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: -1;
+}
+
+.tabs-group:not(.no-group) .group-header.droppable-hover::after {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+.group-toggle:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+.group-collapsed {
+  height: 32px;
+}
+
+.group-collapsed-info {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+}
+
+.group-tab-count {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+.group-active-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: 4px;
+  background-color: var(--color-primary);
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.running-indicator {
+  display: inline-flex;
+  margin-left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* 暗色主题样式覆盖 */
+:root.dark .tabs-container {
+  background-color: transparent;
+}
+
+:root.dark .tabs-group {
+  border-color: var(--glass-border);
+  background: var(--glass-bg-secondary);
+}
+
+:root.dark .tabs-group::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+:root.dark .tabs-group.no-group {
+  background: transparent;
+}
+
+:root.dark .group-header {
+  color: var(--tab-text-primary, #f3f4f6);
+  border-color: var(--glass-border);
+  background: var(--glass-bg-tertiary);
+}
+
+:root.dark .tab {
+  color: var(--tab-text-primary, #f3f4f6);
+  background: var(--glass-bg-primary);
+  border-color: var(--glass-border-light);
+}
+
+:root.dark .tab::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+:root.dark .tab:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+}
+
+:root.dark .tab.active {
+  border-top-color: var(--color-primary);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-strong);
+}
+
+:root.dark .tab-input {
+  border-color: var(--color-primary);
+  background-color: var(--tab-bg-primary, #2a2a42);
+  color: var(--tab-text-primary, #f3f4f6);
+}
+
+:root.dark .tab-close {
+  color: var(--tab-text-muted, #9ca3af);
+}
+
+:root.dark .tab-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+:root.dark .group-toggle {
+  color: var(--tab-text-muted, #9ca3af);
+}
+
+:root.dark .group-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+:root.dark .group-collapsed-info {
+  color: var(--tab-text-primary, #f3f4f6);
+}
+
+:root.dark .tab-dragover {
+  border-left-color: var(--color-primary);
+}
+
+:root.dark .group-dragover {
+  border-color: var(--color-primary);
+}
+
+:root.dark .tabs-group.group-dragover:not(.no-group) .group-header {
+  background-color: var(--tab-bg-hover, #323248);
+  border-color: var(--color-primary);
+}
+
+:root.dark .tabs-group.receiving-from-other-group {
+  background-color: var(--tab-bg-hover, #323248);
+}
+
+:root.dark .tabs-group.receiving-from-other-group .group-header {
+  border-color: var(--color-primary);
+}
+
+:root.dark .no-group.group-dragover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+:root.dark .no-group.receiving-from-group {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+:root.dark .tabs-group:not(.no-group) .group-header.droppable-hover::after {
+  background-color: rgba(99, 102, 241, 0.15);
+}
+
+:root.dark .group-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+} 

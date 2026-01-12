@@ -1,0 +1,506 @@
+/* Dialog Styles - 玻璃态设计 */
+
+/* ========== 通用对话框样式 ========== */
+
+/* 对话框遮罩层 */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+/* 对话框容器 */
+.dialog-container {
+  background: var(--color-bg-primary);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: var(--glass-shadow-strong);
+  border: 1px solid var(--glass-border-strong);
+  max-width: 90vw;
+  max-height: 90vh;
+  position: relative;
+  overflow: hidden;
+  transition: var(--glass-transition-normal);
+  animation: dialog-slide-up 0.3s ease-out;
+}
+
+/* 对话框尺寸变体 */
+.dialog-sm {
+  width: 400px;
+}
+
+.dialog-md {
+  width: 600px;
+}
+
+.dialog-lg {
+  width: 800px;
+}
+
+.dialog-xl {
+  width: 1000px;
+}
+
+/* 对话框头部 */
+.dialog-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+}
+
+/* 对话框内容 */
+.dialog-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* 对话框底部 */
+.dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--glass-border);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* 对话框动画 */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========== 特定对话框样式 ========== */
+.rule-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+.rule-dialog {
+  background: var(--color-bg-primary);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border-radius: var(--radius-lg);
+  width: 520px;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px var(--glass-border-light);
+  position: relative;
+  overflow: hidden;
+  transition: var(--glass-transition-normal);
+  animation: dialog-slide-up 0.3s ease-out;
+}
+
+/* 顶部装饰线 */
+.rule-dialog::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    var(--color-primary) 0%,
+    var(--color-info) 50%,
+    var(--color-primary) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 移除不需要的伪元素 */
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--glass-border-light);
+  background: var(--color-bg-secondary);
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dialog-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  width: 28px;
+  height: 28px;
+}
+
+.dialog-close:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-error);
+}
+
+.dialog-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  max-height: 65vh;
+  background: var(--color-bg-primary);
+}
+
+/* 对话框内的表单组样式 */
+.rule-dialog .form-group,
+.dialog .form-group {
+  margin-bottom: 1rem;
+}
+
+.rule-dialog .form-group label,
+.dialog .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.rule-dialog .form-group input[type="text"],
+.rule-dialog .form-group select,
+.rule-dialog .form-group textarea,
+.dialog .form-group input[type="text"],
+.dialog .form-group select,
+.dialog .form-group textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.rule-dialog .form-group input[type="text"]:focus,
+.rule-dialog .form-group select:focus,
+.rule-dialog .form-group textarea:focus,
+.dialog .form-group input[type="text"]:focus,
+.dialog .form-group select:focus,
+.dialog .form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background: var(--color-bg-primary);
+}
+
+.rule-dialog .form-group input[type="text"]::placeholder,
+.rule-dialog .form-group textarea::placeholder,
+.dialog .form-group input[type="text"]::placeholder,
+.dialog .form-group textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* 保留旧的通用样式作为后备 */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="checkbox"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--color-bg-input, var(--color-bg-primary));
+  color: var(--color-text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input[type="checkbox"] {
+  width: auto; /* Checkboxes shouldn't be full width */
+  margin-right: 8px;
+}
+
+
+.form-group input[type="text"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3); /* Standard focus ring */
+}
+
+.input-with-example { /* If used, ensure it's part of forms in dialogs */
+  position: relative;
+}
+
+.input-example {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.checkbox-group { /* Can be used to group a checkbox and its label */
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label { /* Style for labels associated with checkboxes */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: normal; /* Overriding .form-group label if nested, or for plain span labels */
+  color: var(--color-text-primary);
+}
+
+/* Ensure direct span children also get styled if used as label */
+.checkbox-label span {
+  font-size: 14px;
+}
+
+/* 开关样式已移至 form.css 统一管理，避免重复定义 */
+/* 如需对话框中的特殊开关样式，请在 form.css 中添加 .dialog .toggle-switch 选择器 */
+
+.form-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.filter-config-dialog {
+  max-width: 600px !important;
+  width: 90% !important;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--glass-border-light);
+}
+
+.dialog-footer .button,
+.dialog-footer .save-button,
+.dialog-footer .cancel-button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+}
+
+.dialog-footer .save-button {
+  background-color: var(--color-brand);
+  color: white;
+  border-color: var(--color-brand); /* Ensure border for consistency */
+}
+
+.dialog-footer .save-button:hover {
+  background-color: var(--color-brand-dark);
+  border-color: var(--color-brand-dark);
+  transform: translateY(-1px);
+}
+
+.dialog-footer .save-button:active {
+  transform: translateY(0);
+}
+
+.dialog-footer .save-button:disabled {
+  background-color: var(--color-gray);
+  border-color: var(--color-gray);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.dialog-footer .cancel-button {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.dialog-footer .cancel-button:hover {
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-text-secondary);
+}
+
+/* Standard variables that might be used by these dialog styles.
+   Ensure these are defined in your global variables or adjust as needed.
+:root {
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+  --color-bg-card: #ffffff;
+  --color-bg-primary: #f7f8fa;
+  --color-bg-secondary: #f2f3f5;
+  --color-bg-hover: #e9ecef;
+  --color-bg-input: #ffffff;
+  --color-border: #d1d5db;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-text-primary: #212529;
+  --color-text-secondary: #6c757d;
+  --color-text-disabled: #adb5bd;
+  --color-brand: #007bff;
+  --color-brand-dark: #0056b3;
+  --color-red: #dc3545;
+  --color-success: #28a745;
+  --color-gray: #ced4da;
+  --color-gray-light: #d1d5db;
+  --color-success-dark: #1e7e34;
+  --color-success-light: #75c798;
+  --color-text-code: #333;
+  --color-bg-code: #f1f1f1;
+}
+
+.dark-theme {
+  --color-bg-overlay: rgba(0, 0, 0, 0.7);
+  --color-bg-card: #2d2d2d;
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252525;
+  --color-bg-hover: #3a3a3a;
+  --color-bg-input: #333333;
+  --color-border: #424242;
+  --color-shadow: rgba(0, 0, 0, 0.25);
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #9e9e9e;
+  --color-text-disabled: #757575;
+  --color-brand: #90caf9;
+  --color-brand-dark: #64b5f6;
+  --color-red: #f48fb1;
+  --color-success: #a5d6a7;
+  --color-gray: #555555;
+  --color-gray-light: #424242;
+  --color-success-dark: #81c784;
+  --color-success-light: #c8e6c9;
+  --color-text-code: #ccc;
+  --color-bg-code: #383838;
+}
+*/
+
+/* ========== 深色模式适配 ========== */
+.dark .rule-dialog-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .rule-dialog {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .rule-dialog::before {
+  /* 保持顶部装饰线的渐变效果 */
+  background: linear-gradient(90deg,
+    var(--color-primary) 0%,
+    var(--color-info) 50%,
+    var(--color-primary) 100%);
+  opacity: 0.8;
+}
+
+.dark .dialog-header {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .dialog-body {
+  background: var(--color-bg-primary);
+}
+
+.dark .dialog-footer {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+/* 深色模式下的表单输入框样式 */
+.dark .rule-dialog .form-group input[type="text"],
+.dark .rule-dialog .form-group select,
+.dark .rule-dialog .form-group textarea,
+.dark .dialog .form-group input[type="text"],
+.dark .dialog .form-group select,
+.dark .dialog .form-group textarea {
+  background: var(--color-bg-tertiary, var(--color-bg-secondary));
+  border-color: var(--color-border);
+}
+
+.dark .rule-dialog .form-group input[type="text"]:focus,
+.dark .rule-dialog .form-group select:focus,
+.dark .rule-dialog .form-group textarea:focus,
+.dark .dialog .form-group input[type="text"]:focus,
+.dark .dialog .form-group select:focus,
+.dark .dialog .form-group textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+} 

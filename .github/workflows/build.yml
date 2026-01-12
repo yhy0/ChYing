@@ -6,110 +6,129 @@ on:
       - v*
   workflow_dispatch:
 
-permissions:
-  contents: read
 
 jobs:
-  prepare:
-    name: Prepare release environment
-    runs-on: ubuntu-latest
-    steps:
-      - run: env
-  build-gui:
-    name: Build gui
-    needs: prepare
+  release:
+    # 只在创建标签时运行，而不是在创建分支时运行
+    if: startsWith(github.ref, 'refs/tags/')
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - os: windows-latest
-            platform: windows/amd64
-            output: ChYing.exe
-          - os: macos-latest
-            platform: darwin/universal
-            # wails bug, mac 的 output file 不生效, 先用这个保证能用
-            output: ChYing
-          - os: ubuntu-latest
-            platform: linux/amd64
-            output: ChYing-linux
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        go-version: [1.23]
+
     runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Setup NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm install && npm run build
-        working-directory: frontend
-      - uses: dAppServer/wails-build-action@v2
-        with:
-          build-name: ${{ matrix.output }}
-          build-platform: ${{ matrix.platform }}
-          go-version: 1.20.x
-          package: false
-      - if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          rm -rf ./build/bin/${{ matrix.output }}.app.zip
-          ditto -c -k --keepParent ./build/bin/${{matrix.output}}.app ./build/bin/${{matrix.output}}.app.zip
-          rm -rf ./build/bin/${{ matrix.output }}.app
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: target
-          path: build/bin/*
-
-  collect-release:
-    name: Collect and release
-    needs: [build-gui]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Install Linux Dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          packages: libgtk-3-dev libwebkit2gtk-4.1-dev build-essential pkg-config
+          version: 1.0
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.TOKEN }}
+
       - name: Fetch commit messages since last release
         run: |
           # Get current tag
           current_tag=$(git describe --tags --abbrev=0)
           
-          # Get previous tag (latest one before the current one)
-          previous_commit=$(git rev-list --tags --skip=1 --max-count=1)
-          previous_tag=$(git describe --abbrev=0 --tags ${previous_commit})
+          # Try to get previous tag
+          previous_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           
-          # List commits between the previous and current tag
-          commit_messages=$(git log --pretty=format:"- [%s](https://github.com/yhy0/ChYing/commit/%H)" ${previous_tag}..${current_tag})
-
-          # Save commit messages to an output file
-          echo "$commit_messages" > commits.txt
+          # Generate commit messages
+          if [ -n "$previous_tag" ]; then
+            # If previous tag exists, get commits between tags
+            commit_messages=$(git log --pretty=format:"- [%s](https://github.com/${{ github.repository }}/commit/%H)" ${previous_tag}..${current_tag})
+          else
+            # If no previous tag exists, get all commits up to current tag
+            commit_messages=$(git log --pretty=format:"- [%s](https://github.com/${{ github.repository }}/commit/%H)" ${current_tag})
+          fi
+          
+          # Add release title
+          echo "# Release $current_tag" > commits.txt
+          echo "" >> commits.txt
+          
+          # Save commit messages
+          if [ -n "$commit_messages" ]; then
+            echo "## Changes" >> commits.txt
+            echo "$commit_messages" >> commits.txt
+          else
+            echo "First release" >> commits.txt
+          fi
+          
           echo "Commit messages since last release:" 
           cat commits.txt
-          echo commit_messages_path=$(pwd)/commits.txt >> $GITHUB_ENV
+          echo "commit_messages_path=$(pwd)/commits.txt" >> $GITHUB_ENV
         shell: bash
-      - uses: actions/download-artifact@v3
-        with:
-          name: target
-          path: target
-      - working-directory: target
-        run: |
-          ls -al target && ls -R target/
-          rm -rf ChYing-amd64-installer.exe
-          rm -rf ChYing.pkg
-          mv ChYing.app.zip ChYing-darwin.app.zip
-      - run: ls -al target && ls -R target/ && file target/
-      - uses: actions/upload-artifact@v3
-        with:
-          name: target-release
-          path: target/*
 
-      # release assets
-      - name: Create release
-        id: create_release
+      - name: Install Wails
+        run: |
+          # 回到 GITHUB_WORKSPACE 的父目录
+          cd ..
+          # wails 仓库与项目目录同级
+          git clone https://github.com/wailsapp/wails.git
+          cd wails
+          git checkout v3-alpha
+          cd v3/cmd/wails3
+          go install
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          # 使用 wails3 task build 构建当前平台的二进制文件
+          # macOS 需要额外打包成 .app
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            wails3 task darwin:package
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            wails3 task windows:build
+          else
+            wails3 task linux:build
+          fi
+
+      - name: Prepare Release Files
+        id: prepare
+        shell: bash
+        run: |
+          mkdir release
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp bin/*.exe release/
+            echo "ARTIFACT_PATH=release/*.exe" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=windows" >> $GITHUB_ENV
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            cp -r bin/*.app release/
+            cd release && zip -r ChYing.zip *.app && cd ..
+            echo "ARTIFACT_PATH=release/ChYing.zip" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=macos" >> $GITHUB_ENV
+          else
+            cp bin/* release/
+            echo "ARTIFACT_PATH=release/*" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=linux" >> $GITHUB_ENV
+          fi
+
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: target/*
+          files: ${{ env.ARTIFACT_PATH }}
           body_path: ${{ env.commit_messages_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}

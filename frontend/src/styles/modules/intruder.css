@@ -1,0 +1,554 @@
+/* Intruder 模块样式 */
+
+/* 主题变量 */
+:root {
+  --intruder-bg-primary: #ffffff;
+  --intruder-bg-secondary: #f3f4f6;
+  --intruder-bg-secondary-hover: #e5e7eb;
+  --intruder-bg-tabs: #f3f4f6;
+  --intruder-bg-tab-active: #ffffff;
+  --intruder-bg-tab-hover: rgba(255, 255, 255, 0.5);
+  --intruder-bg-tertiary: #f3f4f6;
+  
+  --intruder-text-primary: #1f2937;
+  --intruder-text-secondary: #6b7280;
+  --intruder-text-muted: #9ca3af;
+  
+  --intruder-border: #e5e7eb;
+  
+  --intruder-btn-primary: #4f46e5;
+  --intruder-btn-primary-hover: #4338ca;
+  --intruder-btn-secondary: #f3f4f6;
+  --intruder-btn-secondary-hover: #e5e7eb;
+}
+
+/* 暗色主题变量 */
+:root.dark {
+  --intruder-bg-primary: #1e1e36;
+  --intruder-bg-secondary: #282838;
+  --intruder-bg-secondary-hover: #363646;
+  --intruder-bg-tabs: #282838;
+  --intruder-bg-tab-active: #1e1e2e;
+  --intruder-bg-tab-hover: rgba(30, 30, 46, 0.5);
+  --intruder-bg-tertiary: #1e1e2e;
+  
+  --intruder-text-primary: #f3f4f6;
+  --intruder-text-secondary: #9ca3af;
+  --intruder-text-muted: #6b7280;
+  
+  --intruder-border: #4b5563;
+  
+  --intruder-btn-primary: #6366f1;
+  --intruder-btn-primary-hover: #4f46e5;
+  --intruder-btn-secondary: #282838;
+  --intruder-btn-secondary-hover: #363646;
+}
+
+/* 基础按钮样式已移至 components/button.css */
+
+/* 选项卡样式 - 玻璃态设计 */
+.intruder-tabs-container {
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-sm);
+  overflow-x: auto;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+  max-height: 120px; /* 允许最多显示3行标签 */
+  scrollbar-width: thin;
+  transition: max-height 0.3s ease;
+  padding: 1px 0; /* 添加上下内边距 */
+}
+
+/* 玻璃态光泽效果 */
+.intruder-tabs-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.intruder-tabs-container::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.intruder-tabs-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.intruder-tabs-container::-webkit-scrollbar-thumb {
+  background-color: var(--intruder-text-muted);
+  border-radius: 4px;
+}
+
+.intruder-tab {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  padding: 0.2rem 0.5rem 0.2rem 0.75rem; /* 减小上下内边距 */
+  border-radius: var(--glass-radius-sm) var(--glass-radius-sm) 0 0;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  overflow: hidden;
+  margin-top: 0px; /* 移除顶部外边距，由父元素的my-0.5控制 */
+  margin-right: 1px;
+  margin-bottom: 0px;
+  animation: intruder-tab-appear 0.3s ease-out;
+  will-change: transform, opacity, background-color;
+  transform-origin: center bottom;
+}
+
+/* 玻璃态光泽效果 */
+.intruder-tab::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.intruder-tab::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background-color: transparent;
+  transform: scaleX(0.2);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.intruder-tab:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.intruder-tab:hover::before {
+  transform: scaleX(0.8);
+  opacity: 0.6;
+  background-color: var(--intruder-btn-primary);
+}
+
+.intruder-tab-active {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-md);
+  transform: translateY(-2px);
+  z-index: 2;
+  animation: intruder-tab-active 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.intruder-tab-active::before {
+  transform: scaleX(1);
+  opacity: 0.9;
+  background-color: var(--intruder-btn-primary);
+  height: 2px;
+  animation: intruder-indicator-appear 0.25s ease-out forwards;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.intruder-tab-name {
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  margin-left: 0.25rem;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.intruder-tab-active .intruder-tab-name {
+  font-weight: 600;
+  color: var(--intruder-text-primary);
+  transform: none;
+  transform-origin: left center;
+  text-shadow: none;
+}
+
+.dark .intruder-tab-active .intruder-tab-name {
+  font-weight: 700;
+}
+
+.intruder-tab:not(.intruder-tab-active) .intruder-tab-name {
+  color: var(--intruder-text-secondary);
+}
+
+.intruder-tab-close {
+  margin-left: 0.25rem;
+  color: var(--intruder-text-muted);
+  opacity: 0;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intruder-tab:hover .intruder-tab-close {
+  opacity: 1;
+}
+
+.intruder-tab-close:hover {
+  color: var(--intruder-text-primary);
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.2);
+}
+
+.intruder-tab-active .intruder-tab-close {
+  opacity: 0.8;
+}
+
+/* 运行状态指示器 */
+.intruder-running-indicator {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+  margin-left: 6px;
+  animation: pulse 1.5s infinite;
+}
+
+/* 拖拽相关样式 */
+.intruder-tab-dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+  animation: intruder-float 0.5s ease-in-out infinite alternate;
+  transform: scale(1.05) translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+  z-index: 100;
+  border: 2px dashed var(--intruder-btn-primary) !important;
+  background-color: var(--intruder-bg-tab-active) !important;
+}
+
+.intruder-tab-dragover {
+  position: relative;
+  animation: highlight-pulse 1s infinite;
+  z-index: 5;
+}
+
+.intruder-tab-dragover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  bottom: 0;
+  width: 8px;
+  background-color: var(--intruder-btn-primary);
+  border-radius: 9999px;
+  z-index: 10;
+  animation: width-pulse 1.5s infinite;
+}
+
+.intruder-tab-dragover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(79, 70, 229, 0.12);
+  z-index: -1;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+}
+
+@keyframes intruder-float {
+  0% {
+    transform: scale(1.05) translateY(-3px);
+  }
+  100% {
+    transform: scale(1.05) translateY(-6px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes highlight-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes width-pulse {
+  0% {
+    width: 4px;
+    opacity: 0.7;
+  }
+  50% {
+    width: 8px;
+    opacity: 1;
+  }
+  100% {
+    width: 4px;
+    opacity: 0.7;
+  }
+}
+
+/* 动画效果 */
+@keyframes intruder-tab-appear {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes intruder-tab-active {
+  0% {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+  100% {
+    transform: translateY(-0.5px);
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.03), 0 1px 0 var(--intruder-bg-tab-active);
+  }
+}
+
+@keyframes intruder-indicator-appear {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* 标签页颜色指示器样式 */
+.intruder-tab .color-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  border-radius: 2px 0 0 2px;
+}
+
+.intruder-tab:hover .color-indicator {
+  width: 4px;
+  opacity: 0.8;
+}
+
+.intruder-tab-active .color-indicator {
+  width: 5px;
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 控制栏样式 */
+.intruder-control-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--intruder-bg-primary);
+  border-bottom: 1px solid var(--intruder-border);
+}
+
+/* 美化按钮样式 */
+.intruder-btn-add-position {
+  background-color: var(--intruder-btn-primary);
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.intruder-btn-add-position::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+}
+
+.intruder-btn-add-position:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+  background-color: var(--intruder-btn-primary-hover);
+}
+
+.intruder-btn-add-position:hover::before {
+  left: 100%;
+}
+
+.intruder-btn-add-position:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.2);
+}
+
+.intruder-btn-add-position i {
+  margin-right: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.intruder-btn-clear-all {
+  background-color: var(--intruder-bg-secondary);
+  color: var(--intruder-text-secondary);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: 1px solid var(--intruder-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.intruder-btn-clear-all::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.05), transparent);
+  transition: left 0.7s ease;
+}
+
+.intruder-btn-clear-all:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--intruder-bg-secondary-hover);
+  color: var(--intruder-text-primary);
+}
+
+.intruder-btn-clear-all:hover::before {
+  left: 100%;
+}
+
+.intruder-btn-clear-all:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.intruder-btn-clear-all i {
+  margin-right: 0.25rem;
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
+/* 左右面板分隔线样式 - 可拖动效果 */
+.intruder-resizable-panels {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  height: 100%;
+  min-height: 200px;
+  width: 100%;
+}
+
+/* 注意: 分隔线样式已移至 src/styles/modules/panel-divider.css */
+/* 使用 .intruder-panel-divider 类名，共享相同样式效果 */
+
+/* 拖动中的全局效果 */
+body.dragging {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.dragging * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+/* 左侧和右侧面板样式 */
+.intruder-panel-left, 
+.intruder-panel-right {
+  position: relative;
+  overflow: auto;
+  transition: width 0.15s ease;
+  min-width: 20%;
+  max-width: 80%;
+  height: 100%;
+}
+
+/* 为了调试 - 给面板添加边框 */
+.debug .intruder-panel-left {
+  border: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+.debug .intruder-panel-right {
+  border: 1px solid rgba(0, 0, 255, 0.2);
+}
+
+.debug .intruder-panel-divider {
+  border: 1px solid rgba(255, 255, 0, 0.5);
+}
+
+/* 修复进度条样式 */
+.bg-intruder-btn-primary {
+  background-color: var(--intruder-btn-primary);
+}
+
+/* 空状态样式 */
+/* 空状态样式已移至 components/states.css，使用 .empty-state 类 */ 

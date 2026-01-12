@@ -1,0 +1,200 @@
+/* 设置模块样式 */
+
+/* 字体相关设置卡片样式 - 玻璃态设计 */
+.font-option-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none; /* 移除单一边框 */
+  border-radius: var(--glass-radius-lg);
+  /* 多层边界系统 */
+  box-shadow:
+    /* 外层轮廓 */
+    inset 0 0 0 1px var(--glass-border-light),
+    /* 内层凹陷感 */
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    /* 主要阴影 */
+    var(--glass-shadow-medium),
+    /* 边缘模糊增强 */
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  padding: 1rem;
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.font-option-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.font-option-card:hover {
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-md);
+  transform: translateY(-2px);
+}
+
+.font-option-card.selected {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  box-shadow: var(--glass-shadow-lg);
+}
+
+/* 字体预览样式 - 玻璃态设计 */
+.font-preview {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: var(--glass-radius-md);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.font-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 字体选择样式 - 玻璃态设计 */
+.font-family-selector {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: var(--glass-radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  outline: none;
+  transition: all var(--transition-fast) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.font-family-selector::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.font-family-selector:focus {
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-focus);
+  transform: translateY(-1px);
+}
+
+.dark .font-family-selector {
+  background-color: var(--color-bg-card);
+  border-color: var(--color-border-light);
+}
+
+/* 字体样式选项 */
+.font-style-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .font-style-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 自定义上传字体提示 */
+.font-upload-hint {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* 字体尺寸标尺 */
+.font-size-ruler {
+  width: 100%;
+  position: relative;
+  height: 2rem;
+  margin: 1.5rem 0;
+}
+
+.font-size-ruler:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-border);
+}
+
+.font-size-ruler-mark {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 0.5rem;
+  background-color: var(--color-border);
+}
+
+.font-size-ruler-mark-text {
+  position: absolute;
+  bottom: -1.5rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* 字体选择样本 */
+.font-sample {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+}
+
+.font-sample-heading {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.font-sample-text {
+  margin-bottom: 0.5rem;
+}
+
+.font-sample-code {
+  font-family: var(--font-family-mono);
+  background-color: var(--color-bg-card);
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  font-size: 0.875rem;
+} 

@@ -1,0 +1,4 @@
+/phpmyadmin/index.php    {tag="<title>phpMyAdmin"}    {status=200}       {root_only}    {fingprints="php"}
+/phpMyAdmin/index.php    {tag="<title>phpMyAdmin"}    {status=200}       {root_only}    {fingprints="php"}
+/_phpmyadmin/index.php   {tag="<title>phpMyAdmin"}    {status=200}       {root_only}    {fingprints="php"}
+/pma/index.php           {tag="<title>phpMyAdmin"}    {status=200}       {root_only}    {fingprints="php"}

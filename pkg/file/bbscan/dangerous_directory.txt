@@ -1,2 +1,0 @@
-# https://2015.zeronights.org/assets/files/35-Egorov.pdf  webdav -> xxe
-/webdav  {status=200}

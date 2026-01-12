@@ -1,0 +1,578 @@
+/**
+ * 编辑器面板组件样式
+ * 为请求/响应编辑器提供统一的视觉效果和交互体验
+ */
+
+/* ===== CSS变量定义 ===== */
+:root {
+  /* 编辑器容器变量 */
+  --editor-container-bg: var(--glass-bg-primary);
+  --editor-container-border: var(--glass-border);
+  --editor-container-radius: var(--glass-radius-md);
+  --editor-container-shadow: var(--glass-shadow-light);
+  
+  /* 编辑器面板变量 */
+  --editor-panel-bg: var(--glass-bg-secondary);
+  --editor-panel-border: var(--glass-border-light);
+  --editor-panel-header-bg: var(--glass-bg-light);
+  
+  /* 编辑器视图变量 */
+  --editor-view-bg: var(--glass-bg-tertiary);
+  --editor-view-border: var(--glass-border-light);
+  --editor-view-text: var(--color-text-primary);
+  --editor-view-font: var(--font-mono);
+  
+  /* 编辑器工具栏变量 */
+  --editor-toolbar-bg: var(--glass-bg-light);
+  --editor-toolbar-border: var(--glass-border-light);
+  --editor-toolbar-height: 2.5rem;
+  
+  /* 编辑器状态变量 */
+  --editor-readonly-bg: var(--glass-bg-light);
+  --editor-readonly-text: var(--color-text-secondary);
+  --editor-editable-bg: var(--glass-bg-primary);
+  --editor-editable-text: var(--color-text-primary);
+}
+
+/* 深色模式变量 */
+.dark {
+  --editor-view-bg: rgba(15, 23, 42, 0.8);
+  --editor-readonly-bg: rgba(30, 41, 59, 0.6);
+}
+
+/* ===== 请求响应容器 ===== */
+.request-response-container {
+  display: flex;
+  height: 100%;
+  background: var(--editor-container-bg);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: 1px solid var(--editor-container-border);
+  border-radius: var(--editor-container-radius);
+  box-shadow: var(--editor-container-shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== 编辑器面板基础样式 ===== */
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--editor-panel-bg);
+  border-right: 1px solid var(--editor-panel-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.editor-panel:last-child {
+  border-right: none;
+}
+
+/* ===== 编辑器头部 ===== */
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--editor-panel-header-bg);
+  border-bottom: 1px solid var(--editor-panel-border);
+  min-height: var(--editor-toolbar-height);
+}
+
+.editor-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.editor-title-icon {
+  color: var(--color-primary);
+  font-size: 1rem;
+}
+
+/* ===== 编辑器工具栏 ===== */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--editor-toolbar-bg);
+  border-bottom: 1px solid var(--editor-toolbar-border);
+  min-height: var(--editor-toolbar-height);
+}
+
+.editor-view-selector {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--radius-md);
+  padding: 0.125rem;
+}
+
+.editor-view-button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.editor-view-button:hover {
+  background: var(--glass-bg-medium);
+  color: var(--color-text-primary);
+}
+
+.editor-view-button.active {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 编辑器操作按钮 ===== */
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.editor-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg-light);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 0.875rem;
+}
+
+.editor-action-button:hover {
+  background: var(--glass-bg-medium);
+  color: var(--color-text-primary);
+  border-color: var(--glass-border);
+}
+
+.editor-action-button.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* ===== 编辑器视图区域 ===== */
+.editor-view {
+  flex: 1;
+  background: var(--editor-view-bg);
+  color: var(--editor-view-text);
+  font-family: var(--editor-view-font);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow: auto;
+  position: relative;
+}
+
+.editor-view.readonly {
+  background: var(--editor-readonly-bg);
+  color: var(--editor-readonly-text);
+}
+
+.editor-view.editable {
+  background: var(--editor-editable-bg);
+  color: var(--editor-editable-text);
+}
+
+/* ===== 编辑器内容 ===== */
+.editor-content {
+  padding: 1rem;
+  min-height: 100%;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.editor-content.word-wrap {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.editor-content.no-wrap {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* ===== 编辑器文本区域 ===== */
+.editor-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  resize: none;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.editor-textarea.word-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* ===== 编辑器状态指示器 ===== */
+.editor-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--glass-bg-light);
+  border-top: 1px solid var(--glass-border-light);
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+.editor-status-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.editor-status-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.editor-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.editor-status-icon {
+  font-size: 0.875rem;
+}
+
+/* ===== 编辑器加载状态 ===== */
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--glass-bg-light);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.editor-loading-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--glass-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+/* ===== 编辑器空状态 ===== */
+.editor-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--glass-bg-light);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: 2rem;
+}
+
+.editor-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.editor-empty-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* ===== 编辑器语法高亮 ===== */
+.editor-syntax-highlight {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.editor-syntax-highlight .keyword {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.editor-syntax-highlight .string {
+  color: var(--color-success);
+}
+
+.editor-syntax-highlight .number {
+  color: var(--color-warning);
+}
+
+.editor-syntax-highlight .comment {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* ===== 编辑器搜索框 ===== */
+.editor-search {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  background: var(--glass-bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.25rem 0.5rem;
+  box-shadow: var(--glass-shadow-medium);
+  z-index: 10;
+}
+
+.editor-search-input {
+  width: 150px;
+  padding: 0.25rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+}
+
+.editor-search-button {
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.editor-search-button:hover {
+  color: var(--color-text-primary);
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  .request-response-container {
+    flex-direction: column;
+  }
+  
+  .editor-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--editor-panel-border);
+  }
+  
+  .editor-panel:last-child {
+    border-bottom: none;
+  }
+  
+  .editor-header {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .editor-toolbar {
+    padding: 0.375rem 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .editor-view-selector {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .editor-actions {
+    order: 1;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .editor-content {
+    padding: 0.75rem;
+  }
+  
+  .editor-textarea {
+    padding: 0.75rem;
+  }
+  
+  .editor-view-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+  }
+  
+  .editor-search {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-bottom: 0.5rem;
+  }
+  
+  .editor-search-input {
+    width: 120px;
+  }
+}
+
+/* ===== 可访问性增强 ===== */
+.editor-view-button:focus,
+.editor-action-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.editor-textarea:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .editor-view-button.active {
+    background: var(--color-primary);
+    color: white;
+    border: 2px solid var(--color-primary);
+  }
+  
+  .editor-container-border,
+  .editor-panel-border {
+    border-width: 2px;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .editor-view-button,
+  .editor-action-button {
+    transition: none;
+  }
+  
+  .editor-loading-spinner {
+    animation: none;
+  }
+}
+
+/* ===== 深色模式特殊适配 ===== */
+.dark .editor-syntax-highlight .keyword {
+  color: #60a5fa;
+}
+
+.dark .editor-syntax-highlight .string {
+  color: #34d399;
+}
+
+.dark .editor-syntax-highlight .number {
+  color: #fbbf24;
+}
+
+.dark .editor-syntax-highlight .comment {
+  color: var(--color-text-tertiary);
+}
+
+/* ===== 滚动条样式 ===== */
+.editor-view::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.editor-view::-webkit-scrollbar-track {
+  background: var(--glass-bg-light);
+  border-radius: 4px;
+}
+
+.editor-view::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+
+.editor-view::-webkit-scrollbar-thumb:hover {
+  background: var(--glass-border-strong);
+}
+
+.editor-view::-webkit-scrollbar-corner {
+  background: var(--glass-bg-light);
+}
+
+/* ===== 动画定义 ===== */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== 编辑器特殊功能样式 ===== */
+.editor-line-numbers {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3rem;
+  background: var(--glass-bg-medium);
+  border-right: 1px solid var(--glass-border-light);
+  padding: 1rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  user-select: none;
+  overflow: hidden;
+}
+
+.editor-with-line-numbers .editor-content {
+  padding-left: 4rem;
+}
+
+.editor-with-line-numbers .editor-textarea {
+  padding-left: 4rem;
+}
+
+/* ===== 编辑器分割线样式 ===== */
+.editor-divider {
+  width: 1px;
+  background: var(--glass-border);
+  cursor: col-resize;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.editor-divider:hover {
+  background: var(--color-primary);
+  width: 2px;
+}
+
+.editor-divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2px;
+  right: -2px;
+  bottom: 0;
+  cursor: col-resize;
+}

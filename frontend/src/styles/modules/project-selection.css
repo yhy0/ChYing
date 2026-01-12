@@ -1,0 +1,3156 @@
+/*
+  项目选择页面样式 - 液态玻璃设计版本
+  File: /frontend/src/styles/modules/project-selection.css
+
+  使用全局 --glass-* 变量系统，与应用其他部分保持一致
+*/
+
+/* === 深色模式特殊样式 - 使用全局玻璃变量 === */
+.dark .quote-card-compact::before,
+.dark .quote-card::before {
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2), transparent);
+}
+
+.dark .mode-option-compact:hover,
+.dark .action-option-compact:hover,
+.dark .project-item-compact:hover {
+  box-shadow: var(--glass-shadow-medium), 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.dark .mode-option-compact.active,
+.dark .action-option-compact.active,
+.dark .project-item-compact.selected {
+  box-shadow: var(--glass-shadow-medium), 0 0 20px rgba(59, 130, 246, 0.25);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(99, 102, 241, 0.12) 100%);
+}
+
+.dark .config-section-inline,
+.dark .action-section,
+.dark .details-container,
+.dark .left-panel {
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+/* 深色模式 - 剑形图标样式 */
+.dark .action-sword-icon {
+  color: rgba(147, 197, 253, 0.8);
+}
+
+.dark .action-option-compact:hover .action-sword-icon,
+.dark .action-option-compact.active .action-sword-icon {
+  color: rgba(147, 197, 253, 1);
+  filter: drop-shadow(0 0 4px rgba(147, 197, 253, 0.5));
+}
+
+.dark .project-sword-icon {
+  color: rgba(147, 197, 253, 0.6);
+}
+
+.dark .project-item-compact:hover .project-sword-icon,
+.dark .project-item-compact.selected .project-sword-icon {
+  color: rgba(147, 197, 253, 1);
+  filter: drop-shadow(0 0 3px rgba(147, 197, 253, 0.4));
+}
+
+/* === 主容器布局 - 液态玻璃背景 === */
+.project-selection-container {
+  height: 100vh;
+  background: var(--color-bg-primary);
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
+  transition: var(--glass-transition-normal);
+  /* 禁用 Wails 窗口拖动，允许文字选择 */
+  --wails-draggable: no-drag;
+}
+
+/* ============================================
+   背景装饰 - 承影剑光效果 (全面优化版)
+   "将旦昧爽之交，日夕昏明之际，北面而察之，淡淡焉若有物存"
+   ============================================ */
+
+/* 底层剑光容器 - 在内容后面 */
+.background-decoration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* 顶层剑光容器 - 穿透内容层，更有层次感 */
+.background-decoration-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* ============================================
+   基础剑光样式
+   ============================================ */
+
+/* 垂直剑光 - 细长型 */
+.sword-light {
+  position: absolute;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.25) 10%,
+    rgba(99, 102, 241, 0.6) 30%,
+    rgba(147, 197, 253, 0.8) 50%,
+    rgba(99, 102, 241, 0.6) 70%,
+    rgba(59, 130, 246, 0.25) 90%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  opacity: 0;
+  animation: sword-flash 8s ease-in-out infinite;
+}
+
+/* 宽剑光 - 更宽的剑影 */
+.sword-light-wide {
+  position: absolute;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.2) 15%,
+    rgba(147, 197, 253, 0.5) 40%,
+    rgba(191, 219, 254, 0.7) 50%,
+    rgba(147, 197, 253, 0.5) 60%,
+    rgba(99, 102, 241, 0.2) 85%,
+    transparent 100%
+  );
+  filter: blur(1.5px);
+  opacity: 0;
+  animation: sword-flash-slow 12s ease-in-out infinite;
+}
+
+/* ============================================
+   剑形光效 - 完整的剑形状
+   ============================================ */
+
+/* 承影剑 - 完整剑形 */
+.sword-blade {
+  position: absolute;
+  width: 8px;
+  height: 180px;
+  opacity: 0;
+  animation: sword-blade-flash 10s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(147, 197, 253, 0.5));
+}
+
+/* 剑身 - 使用 clip-path 创建剑形 */
+.sword-blade::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 85%;
+  background: linear-gradient(
+    180deg,
+    rgba(224, 242, 254, 0.95) 0%,
+    rgba(191, 219, 254, 0.85) 20%,
+    rgba(147, 197, 253, 0.7) 50%,
+    rgba(99, 102, 241, 0.5) 80%,
+    rgba(79, 70, 229, 0.3) 100%
+  );
+  clip-path: polygon(
+    50% 0%,           /* 剑尖 */
+    100% 3%,          /* 右上 */
+    100% 95%,         /* 右下 */
+    70% 100%,         /* 剑格右 */
+    30% 100%,         /* 剑格左 */
+    0% 95%,           /* 左下 */
+    0% 3%             /* 左上 */
+  );
+}
+
+/* 剑身中线 - 剑脊 */
+.sword-blade::after {
+  content: '';
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 80%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(224, 242, 254, 0.4) 70%,
+    transparent 100%
+  );
+}
+
+/* 古剑形态 - 更宽更古典的剑形 */
+.sword-ancient {
+  position: absolute;
+  width: 14px;
+  height: 220px;
+  opacity: 0;
+  animation: sword-ancient-flash 12s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.4));
+}
+
+/* 古剑剑身 */
+.sword-ancient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 88%;
+  background: linear-gradient(
+    180deg,
+    rgba(221, 214, 254, 0.9) 0%,
+    rgba(196, 181, 253, 0.8) 15%,
+    rgba(167, 139, 250, 0.65) 40%,
+    rgba(139, 92, 246, 0.5) 70%,
+    rgba(109, 40, 217, 0.35) 100%
+  );
+  clip-path: polygon(
+    50% 0%,           /* 剑尖 */
+    85% 2%,           /* 右上斜 */
+    100% 8%,          /* 右肩 */
+    95% 90%,          /* 右下收 */
+    70% 100%,         /* 剑格右 */
+    30% 100%,         /* 剑格左 */
+    5% 90%,           /* 左下收 */
+    0% 8%,            /* 左肩 */
+    15% 2%            /* 左上斜 */
+  );
+}
+
+/* 古剑剑脊 */
+.sword-ancient::after {
+  content: '';
+  position: absolute;
+  top: 1%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 85%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.7) 20%,
+    rgba(221, 214, 254, 0.5) 60%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+}
+
+/* 飞剑形态 - 细长飘逸 */
+.sword-flying {
+  position: absolute;
+  width: 5px;
+  height: 160px;
+  opacity: 0;
+  animation: sword-flying-flash 8s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6));
+}
+
+/* 飞剑剑身 */
+.sword-flying::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 90%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(224, 242, 254, 0.9) 10%,
+    rgba(147, 197, 253, 0.75) 40%,
+    rgba(59, 130, 246, 0.55) 75%,
+    rgba(37, 99, 235, 0.3) 100%
+  );
+  clip-path: polygon(
+    50% 0%,           /* 剑尖 */
+    100% 5%,          /* 右上 */
+    90% 92%,          /* 右下 */
+    50% 100%,         /* 底部中心 */
+    10% 92%,          /* 左下 */
+    0% 5%             /* 左上 */
+  );
+}
+
+/* 飞剑光芒 */
+.sword-flying::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 88%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8) 30%,
+    rgba(191, 219, 254, 0.5) 70%,
+    transparent 100%
+  );
+}
+
+/* 剑气残影 - 剑挥过后的残影 */
+.sword-afterimage {
+  position: absolute;
+  width: 60px;
+  height: 4px;
+  opacity: 0;
+  animation: sword-afterimage-flash 7s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.2) 10%,
+    rgba(191, 219, 254, 0.6) 30%,
+    rgba(224, 242, 254, 0.9) 50%,
+    rgba(191, 219, 254, 0.6) 70%,
+    rgba(147, 197, 253, 0.2) 90%,
+    transparent 100%
+  );
+  filter: blur(1px);
+  clip-path: polygon(
+    0% 50%,
+    5% 0%,
+    95% 0%,
+    100% 50%,
+    95% 100%,
+    5% 100%
+  );
+}
+
+/* 斜向剑光 - 45度角 */
+.sword-diagonal {
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.2) 10%,
+    rgba(167, 139, 250, 0.5) 30%,
+    rgba(196, 181, 253, 0.7) 50%,
+    rgba(167, 139, 250, 0.5) 70%,
+    rgba(139, 92, 246, 0.2) 90%,
+    transparent 100%
+  );
+  filter: blur(1px);
+  opacity: 0;
+  animation: sword-diagonal-flash 9s ease-in-out infinite;
+}
+
+/* 水平剑光 - 横向剑痕 */
+.sword-horizontal {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.2) 10%,
+    rgba(99, 102, 241, 0.5) 30%,
+    rgba(147, 197, 253, 0.7) 50%,
+    rgba(99, 102, 241, 0.5) 70%,
+    rgba(59, 130, 246, 0.2) 90%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  opacity: 0;
+  animation: sword-horizontal-flash 10s ease-in-out infinite;
+}
+
+/* 交叉剑光 - X形剑痕 */
+.sword-cross {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  opacity: 0;
+  animation: sword-cross-flash 11s ease-in-out infinite;
+}
+
+.sword-cross::before,
+.sword-cross::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.3) 20%,
+    rgba(191, 219, 254, 0.6) 50%,
+    rgba(147, 197, 253, 0.3) 80%,
+    transparent 100%
+  );
+  filter: blur(1px);
+}
+
+.sword-cross::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.sword-cross::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 斜剑光 - 短促的剑痕 */
+.sword-slash {
+  position: absolute;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.35) 20%,
+    rgba(191, 219, 254, 0.7) 50%,
+    rgba(147, 197, 253, 0.35) 80%,
+    transparent 100%
+  );
+  filter: blur(1px);
+  opacity: 0;
+  animation: slash-flash 6s ease-in-out infinite;
+}
+
+/* 剑尖光点 - 闪烁的光点 */
+.sword-spark {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(191, 219, 254, 0.7) 40%,
+    rgba(99, 102, 241, 0.4) 70%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  opacity: 0;
+  animation: spark-twinkle 4s ease-in-out infinite;
+}
+
+/* 剑气光晕 - 环绕剑光的淡淡光芒 */
+.sword-glow {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(147, 197, 253, 0.3) 0%,
+    rgba(99, 102, 241, 0.18) 40%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  opacity: 0;
+  animation: glow-pulse 10s ease-in-out infinite;
+}
+
+/* 剑气流动 - 沿剑身移动的光点 */
+.sword-flow {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  filter: blur(1px);
+  opacity: 0;
+  animation: sword-flow-move 3s ease-in-out infinite;
+}
+
+/* 剑锋闪烁 - 剑尖的强烈闪光 */
+.sword-tip-flash {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(224, 242, 254, 0.8) 30%,
+    rgba(147, 197, 253, 0.4) 60%,
+    transparent 100%
+  );
+  filter: blur(2px);
+  opacity: 0;
+  animation: tip-flash 5s ease-in-out infinite;
+}
+
+/* 顶层剑光 - 穿透内容，透明度更低 */
+.sword-light-top {
+  position: absolute;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.15) 20%,
+    rgba(147, 197, 253, 0.35) 50%,
+    rgba(99, 102, 241, 0.15) 80%,
+    transparent 100%
+  );
+  filter: blur(1px);
+  opacity: 0;
+  animation: sword-flash 8s ease-in-out infinite;
+}
+
+.sword-diagonal-top {
+  position: absolute;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.12) 20%,
+    rgba(167, 139, 250, 0.3) 50%,
+    rgba(139, 92, 246, 0.12) 80%,
+    transparent 100%
+  );
+  filter: blur(1px);
+  opacity: 0;
+  animation: sword-diagonal-flash 9s ease-in-out infinite;
+}
+
+/* ============================================
+   动画定义
+   ============================================ */
+
+/* 垂直剑光闪烁动画 */
+@keyframes sword-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(100%) scaleY(0.3);
+  }
+  15% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.8;
+    transform: translateY(0%) scaleY(1);
+  }
+  35% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-20%) scaleY(1.1);
+  }
+  65% {
+    opacity: 0.7;
+  }
+  75% {
+    opacity: 0.3;
+    transform: translateY(-50%) scaleY(0.8);
+  }
+  85% {
+    opacity: 0;
+  }
+}
+
+/* 慢速剑光动画 */
+@keyframes sword-flash-slow {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(80%) scaleY(0.4);
+  }
+  20% {
+    opacity: 0.6;
+    transform: translateY(20%) scaleY(0.9);
+  }
+  40% {
+    opacity: 0.9;
+    transform: translateY(-10%) scaleY(1);
+  }
+  60% {
+    opacity: 0.7;
+    transform: translateY(-30%) scaleY(1.05);
+  }
+  80% {
+    opacity: 0.2;
+    transform: translateY(-60%) scaleY(0.7);
+  }
+}
+
+/* 斜向剑光动画 */
+@keyframes sword-diagonal-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: rotate(var(--sword-angle, 45deg)) translateY(100%) scaleY(0.3);
+  }
+  20% {
+    opacity: 0.7;
+    transform: rotate(var(--sword-angle, 45deg)) translateY(20%) scaleY(0.9);
+  }
+  40% {
+    opacity: 0.9;
+    transform: rotate(var(--sword-angle, 45deg)) translateY(-10%) scaleY(1);
+  }
+  60% {
+    opacity: 0.6;
+    transform: rotate(var(--sword-angle, 45deg)) translateY(-40%) scaleY(1.05);
+  }
+  80% {
+    opacity: 0.2;
+    transform: rotate(var(--sword-angle, 45deg)) translateY(-80%) scaleY(0.7);
+  }
+}
+
+/* 水平剑光动画 */
+@keyframes sword-horizontal-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: translateX(-100%) scaleX(0.3);
+  }
+  20% {
+    opacity: 0.6;
+    transform: translateX(-20%) scaleX(0.9);
+  }
+  40% {
+    opacity: 0.8;
+    transform: translateX(10%) scaleX(1);
+  }
+  60% {
+    opacity: 0.5;
+    transform: translateX(40%) scaleX(1.05);
+  }
+  80% {
+    opacity: 0.2;
+    transform: translateX(80%) scaleX(0.7);
+  }
+}
+
+/* 交叉剑光动画 */
+@keyframes sword-cross-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  25% {
+    opacity: 0.6;
+    transform: scale(1) rotate(5deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(-5deg);
+  }
+  75% {
+    opacity: 0.4;
+    transform: scale(0.9) rotate(3deg);
+  }
+}
+
+/* 斜剑光动画 */
+@keyframes slash-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: rotate(var(--slash-angle, -30deg)) translateX(-100%) scaleX(0.5);
+  }
+  20% {
+    opacity: 0.7;
+    transform: rotate(var(--slash-angle, -30deg)) translateX(0%) scaleX(1);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.5;
+    transform: rotate(var(--slash-angle, -30deg)) translateX(50%) scaleX(1.1);
+  }
+  80% {
+    opacity: 0;
+    transform: rotate(var(--slash-angle, -30deg)) translateX(100%) scaleX(0.5);
+  }
+}
+
+/* 光点闪烁动画 */
+@keyframes spark-twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  25% {
+    opacity: 0.9;
+    transform: scale(1.3);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 光晕脉动动画 */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+  70% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+}
+
+/* 剑气流动动画 */
+@keyframes sword-flow-move {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 0.8;
+    transform: translateY(-50px) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-120px) scale(1.2);
+  }
+  80% {
+    opacity: 0.6;
+    transform: translateY(-180px) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-220px) scale(0.3);
+  }
+}
+
+/* 剑锋闪烁动画 */
+@keyframes tip-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  15% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  35% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  65% {
+    opacity: 0;
+  }
+}
+
+/* 剑形光效动画 - 承影剑 */
+@keyframes sword-blade-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: rotate(var(--sword-angle, 15deg)) translateY(50px) scale(0.8);
+  }
+  10% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+    transform: rotate(var(--sword-angle, 15deg)) translateY(0) scale(1);
+  }
+  35% {
+    opacity: 0.9;
+    transform: rotate(var(--sword-angle, 15deg)) translateY(-10px) scale(1.02);
+  }
+  50% {
+    opacity: 0.75;
+    transform: rotate(var(--sword-angle, 15deg)) translateY(-20px) scale(1);
+  }
+  70% {
+    opacity: 0.4;
+    transform: rotate(var(--sword-angle, 15deg)) translateY(-40px) scale(0.95);
+  }
+  85% {
+    opacity: 0;
+  }
+}
+
+/* 古剑动画 - 更缓慢庄重 */
+@keyframes sword-ancient-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: rotate(var(--sword-angle, -10deg)) translateY(80px) scale(0.7);
+  }
+  15% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.6;
+    transform: rotate(var(--sword-angle, -10deg)) translateY(20px) scale(0.95);
+  }
+  40% {
+    opacity: 0.85;
+    transform: rotate(var(--sword-angle, -10deg)) translateY(0) scale(1);
+  }
+  55% {
+    opacity: 0.7;
+    transform: rotate(var(--sword-angle, -10deg)) translateY(-15px) scale(1.02);
+  }
+  75% {
+    opacity: 0.3;
+    transform: rotate(var(--sword-angle, -10deg)) translateY(-50px) scale(0.9);
+  }
+  90% {
+    opacity: 0;
+  }
+}
+
+/* 飞剑动画 - 轻盈飘逸 */
+@keyframes sword-flying-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: rotate(var(--sword-angle, 25deg)) translateY(100px) translateX(20px) scale(0.6);
+  }
+  10% {
+    opacity: 0.5;
+    transform: rotate(var(--sword-angle, 25deg)) translateY(50px) translateX(10px) scale(0.85);
+  }
+  25% {
+    opacity: 0.9;
+    transform: rotate(var(--sword-angle, 25deg)) translateY(0) translateX(0) scale(1);
+  }
+  40% {
+    opacity: 0.95;
+    transform: rotate(var(--sword-angle, 25deg)) translateY(-30px) translateX(-10px) scale(1.05);
+  }
+  60% {
+    opacity: 0.6;
+    transform: rotate(var(--sword-angle, 25deg)) translateY(-70px) translateX(-20px) scale(0.95);
+  }
+  80% {
+    opacity: 0.2;
+    transform: rotate(var(--sword-angle, 25deg)) translateY(-120px) translateX(-30px) scale(0.7);
+  }
+  90% {
+    opacity: 0;
+  }
+}
+
+/* 剑气残影动画 */
+@keyframes sword-afterimage-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: rotate(var(--slash-angle, -25deg)) scaleX(0.3) translateX(-50px);
+  }
+  15% {
+    opacity: 0.8;
+    transform: rotate(var(--slash-angle, -25deg)) scaleX(1) translateX(0);
+  }
+  30% {
+    opacity: 0.95;
+    transform: rotate(var(--slash-angle, -25deg)) scaleX(1.2) translateX(20px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: rotate(var(--slash-angle, -25deg)) scaleX(1.5) translateX(50px);
+  }
+  70% {
+    opacity: 0.2;
+    transform: rotate(var(--slash-angle, -25deg)) scaleX(1.8) translateX(80px);
+  }
+  85% {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   底层剑光位置配置
+   ============================================ */
+
+/* 垂直剑光 */
+.sword-light-1 {
+  height: 220px;
+  top: 8%;
+  left: 5%;
+  --sword-angle: 12deg;
+  transform: rotate(12deg);
+  animation-delay: 0s;
+  animation-duration: 7s;
+}
+
+.sword-light-2 {
+  height: 180px;
+  top: 35%;
+  right: 8%;
+  --sword-angle: -18deg;
+  transform: rotate(-18deg);
+  animation-delay: 2.5s;
+  animation-duration: 9s;
+}
+
+.sword-light-3 {
+  height: 150px;
+  bottom: 25%;
+  left: 45%;
+  --sword-angle: 5deg;
+  transform: rotate(5deg);
+  animation-delay: 5s;
+  animation-duration: 8s;
+}
+
+.sword-light-4 {
+  height: 200px;
+  bottom: 10%;
+  left: 15%;
+  --sword-angle: -8deg;
+  transform: rotate(-8deg);
+  animation-delay: 1.5s;
+  animation-duration: 10s;
+}
+
+.sword-light-5 {
+  height: 160px;
+  top: 15%;
+  right: 20%;
+  --sword-angle: 22deg;
+  transform: rotate(22deg);
+  animation-delay: 4s;
+  animation-duration: 8.5s;
+}
+
+.sword-light-6 {
+  height: 130px;
+  top: 55%;
+  left: 30%;
+  --sword-angle: -3deg;
+  transform: rotate(-3deg);
+  animation-delay: 6.5s;
+  animation-duration: 7.5s;
+}
+
+/* 宽剑光 */
+.sword-light-wide-1 {
+  height: 280px;
+  top: 3%;
+  right: 5%;
+  --sword-angle: -12deg;
+  transform: rotate(-12deg);
+  animation-delay: 3s;
+}
+
+.sword-light-wide-2 {
+  height: 200px;
+  bottom: 8%;
+  left: 55%;
+  --sword-angle: 15deg;
+  transform: rotate(15deg);
+  animation-delay: 7s;
+}
+
+/* 斜向剑光 - 45度角 */
+.sword-diagonal-1 {
+  height: 180px;
+  top: 20%;
+  left: 25%;
+  --sword-angle: 45deg;
+  transform: rotate(45deg);
+  animation-delay: 1s;
+  animation-duration: 8s;
+}
+
+.sword-diagonal-2 {
+  height: 150px;
+  top: 50%;
+  right: 15%;
+  --sword-angle: -45deg;
+  transform: rotate(-45deg);
+  animation-delay: 4s;
+  animation-duration: 9s;
+}
+
+.sword-diagonal-3 {
+  height: 200px;
+  bottom: 20%;
+  left: 60%;
+  --sword-angle: 30deg;
+  transform: rotate(30deg);
+  animation-delay: 6s;
+  animation-duration: 10s;
+}
+
+.sword-diagonal-4 {
+  height: 170px;
+  top: 10%;
+  right: 35%;
+  --sword-angle: -60deg;
+  transform: rotate(-60deg);
+  animation-delay: 2s;
+  animation-duration: 8.5s;
+}
+
+/* 水平剑光 */
+.sword-horizontal-1 {
+  width: 200px;
+  top: 30%;
+  left: 10%;
+  animation-delay: 2s;
+  animation-duration: 9s;
+}
+
+.sword-horizontal-2 {
+  width: 150px;
+  top: 65%;
+  right: 25%;
+  animation-delay: 5s;
+  animation-duration: 11s;
+}
+
+.sword-horizontal-3 {
+  width: 180px;
+  bottom: 35%;
+  left: 35%;
+  animation-delay: 8s;
+  animation-duration: 10s;
+}
+
+/* 交叉剑光 */
+.sword-cross-1 {
+  top: 25%;
+  left: 70%;
+  animation-delay: 3s;
+}
+
+.sword-cross-2 {
+  bottom: 30%;
+  left: 20%;
+  width: 100px;
+  height: 100px;
+  animation-delay: 7s;
+}
+
+/* 斜剑光 */
+.sword-slash-1 {
+  top: 22%;
+  left: 12%;
+  --slash-angle: -35deg;
+  transform: rotate(-35deg);
+  animation-delay: 1s;
+}
+
+.sword-slash-2 {
+  top: 48%;
+  right: 18%;
+  --slash-angle: 40deg;
+  transform: rotate(40deg);
+  animation-delay: 4.5s;
+}
+
+.sword-slash-3 {
+  bottom: 32%;
+  left: 38%;
+  --slash-angle: -20deg;
+  transform: rotate(-20deg);
+  animation-delay: 2.5s;
+  animation-duration: 7s;
+}
+
+.sword-slash-4 {
+  top: 70%;
+  right: 30%;
+  --slash-angle: 55deg;
+  transform: rotate(55deg);
+  animation-delay: 6s;
+  animation-duration: 8s;
+}
+
+/* 光点 */
+.sword-spark-1 {
+  top: 12%;
+  left: 8%;
+  animation-delay: 0.5s;
+}
+
+.sword-spark-2 {
+  top: 38%;
+  right: 12%;
+  animation-delay: 2s;
+}
+
+.sword-spark-3 {
+  bottom: 22%;
+  left: 52%;
+  animation-delay: 3.5s;
+}
+
+.sword-spark-4 {
+  top: 65%;
+  left: 22%;
+  animation-delay: 5s;
+}
+
+.sword-spark-5 {
+  top: 28%;
+  right: 28%;
+  animation-delay: 1.5s;
+  animation-duration: 5s;
+}
+
+.sword-spark-6 {
+  bottom: 40%;
+  right: 40%;
+  animation-delay: 4s;
+  animation-duration: 4.5s;
+}
+
+.sword-spark-7 {
+  top: 50%;
+  left: 65%;
+  animation-delay: 6.5s;
+  animation-duration: 5.5s;
+}
+
+/* 光晕 */
+.sword-glow-1 {
+  top: 10%;
+  left: 4%;
+  animation-delay: 0.5s;
+}
+
+.sword-glow-2 {
+  top: 38%;
+  right: 6%;
+  animation-delay: 3s;
+}
+
+.sword-glow-3 {
+  bottom: 25%;
+  left: 45%;
+  animation-delay: 5.5s;
+}
+
+.sword-glow-4 {
+  bottom: 10%;
+  left: 15%;
+  animation-delay: 2s;
+  width: 90px;
+  height: 90px;
+}
+
+.sword-glow-5 {
+  top: 15%;
+  right: 18%;
+  animation-delay: 4.5s;
+  width: 80px;
+  height: 80px;
+}
+
+.sword-glow-6 {
+  top: 55%;
+  left: 28%;
+  animation-delay: 7s;
+  width: 70px;
+  height: 70px;
+}
+
+/* 剑气流动 */
+.sword-flow-1 {
+  top: 60%;
+  left: 6%;
+  animation-delay: 0s;
+}
+
+.sword-flow-2 {
+  top: 70%;
+  right: 10%;
+  animation-delay: 1.5s;
+}
+
+.sword-flow-3 {
+  bottom: 20%;
+  left: 48%;
+  animation-delay: 3s;
+}
+
+/* 剑锋闪烁 */
+.sword-tip-flash-1 {
+  top: 8%;
+  left: 5%;
+  animation-delay: 0.5s;
+}
+
+.sword-tip-flash-2 {
+  top: 35%;
+  right: 8%;
+  animation-delay: 3s;
+}
+
+.sword-tip-flash-3 {
+  bottom: 25%;
+  left: 45%;
+  animation-delay: 5.5s;
+}
+
+/* ============================================
+   剑形光效位置配置
+   ============================================ */
+
+/* 承影剑 - 位置配置 */
+.sword-blade-1 {
+  top: 5%;
+  left: 8%;
+  --sword-angle: 18deg;
+  animation-delay: 0s;
+  animation-duration: 9s;
+}
+
+.sword-blade-2 {
+  top: 30%;
+  right: 12%;
+  --sword-angle: -22deg;
+  animation-delay: 3s;
+  animation-duration: 11s;
+}
+
+.sword-blade-3 {
+  bottom: 20%;
+  left: 40%;
+  --sword-angle: 8deg;
+  animation-delay: 6s;
+  animation-duration: 10s;
+}
+
+.sword-blade-4 {
+  top: 55%;
+  left: 18%;
+  --sword-angle: -12deg;
+  animation-delay: 4.5s;
+  animation-duration: 12s;
+}
+
+/* 古剑 - 位置配置 */
+.sword-ancient-1 {
+  top: 10%;
+  right: 25%;
+  --sword-angle: -8deg;
+  animation-delay: 1.5s;
+  animation-duration: 13s;
+}
+
+.sword-ancient-2 {
+  bottom: 15%;
+  left: 60%;
+  --sword-angle: 15deg;
+  animation-delay: 5s;
+  animation-duration: 14s;
+}
+
+.sword-ancient-3 {
+  top: 40%;
+  left: 5%;
+  --sword-angle: -18deg;
+  animation-delay: 8s;
+  animation-duration: 12s;
+}
+
+/* 飞剑 - 位置配置 */
+.sword-flying-1 {
+  top: 15%;
+  left: 55%;
+  --sword-angle: 30deg;
+  animation-delay: 0.5s;
+  animation-duration: 7s;
+}
+
+.sword-flying-2 {
+  top: 45%;
+  right: 8%;
+  --sword-angle: -35deg;
+  animation-delay: 2.5s;
+  animation-duration: 8s;
+}
+
+.sword-flying-3 {
+  bottom: 30%;
+  left: 25%;
+  --sword-angle: 22deg;
+  animation-delay: 5s;
+  animation-duration: 9s;
+}
+
+.sword-flying-4 {
+  top: 70%;
+  right: 35%;
+  --sword-angle: -28deg;
+  animation-delay: 7s;
+  animation-duration: 7.5s;
+}
+
+.sword-flying-5 {
+  top: 25%;
+  left: 75%;
+  --sword-angle: 40deg;
+  animation-delay: 3.5s;
+  animation-duration: 8.5s;
+}
+
+/* 剑气残影 - 位置配置 */
+.sword-afterimage-1 {
+  top: 20%;
+  left: 15%;
+  --slash-angle: -30deg;
+  animation-delay: 1s;
+  animation-duration: 6s;
+}
+
+.sword-afterimage-2 {
+  top: 50%;
+  right: 20%;
+  --slash-angle: 25deg;
+  animation-delay: 3.5s;
+  animation-duration: 7s;
+}
+
+.sword-afterimage-3 {
+  bottom: 25%;
+  left: 50%;
+  --slash-angle: -15deg;
+  animation-delay: 6s;
+  animation-duration: 8s;
+}
+
+.sword-afterimage-4 {
+  top: 35%;
+  left: 65%;
+  --slash-angle: 35deg;
+  animation-delay: 2s;
+  animation-duration: 6.5s;
+}
+
+.sword-afterimage-5 {
+  bottom: 40%;
+  right: 30%;
+  --slash-angle: -40deg;
+  animation-delay: 4.5s;
+  animation-duration: 7.5s;
+}
+
+/* ============================================
+   顶层剑光位置配置 (穿透内容层)
+   ============================================ */
+
+.sword-light-top-1 {
+  height: 160px;
+  top: 15%;
+  left: 35%;
+  --sword-angle: 8deg;
+  transform: rotate(8deg);
+  animation-delay: 1.5s;
+  animation-duration: 9s;
+}
+
+.sword-light-top-2 {
+  height: 140px;
+  top: 45%;
+  right: 30%;
+  --sword-angle: -15deg;
+  transform: rotate(-15deg);
+  animation-delay: 4.5s;
+  animation-duration: 8s;
+}
+
+.sword-light-top-3 {
+  height: 120px;
+  bottom: 35%;
+  left: 65%;
+  --sword-angle: 20deg;
+  transform: rotate(20deg);
+  animation-delay: 7s;
+  animation-duration: 10s;
+}
+
+.sword-diagonal-top-1 {
+  height: 130px;
+  top: 30%;
+  left: 50%;
+  --sword-angle: 50deg;
+  transform: rotate(50deg);
+  animation-delay: 2.5s;
+  animation-duration: 9s;
+}
+
+.sword-diagonal-top-2 {
+  height: 110px;
+  top: 60%;
+  right: 45%;
+  --sword-angle: -40deg;
+  transform: rotate(-40deg);
+  animation-delay: 5.5s;
+  animation-duration: 8.5s;
+}
+
+/* ============================================
+   深色模式增强
+   ============================================ */
+
+.dark .sword-light {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.25) 10%,
+    rgba(99, 102, 241, 0.6) 30%,
+    rgba(191, 219, 254, 0.85) 50%,
+    rgba(99, 102, 241, 0.6) 70%,
+    rgba(147, 197, 253, 0.25) 90%,
+    transparent 100%
+  );
+  filter: blur(0.5px) drop-shadow(0 0 3px rgba(147, 197, 253, 0.5));
+}
+
+.dark .sword-light-wide {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.25) 15%,
+    rgba(191, 219, 254, 0.6) 40%,
+    rgba(224, 242, 254, 0.8) 50%,
+    rgba(191, 219, 254, 0.6) 60%,
+    rgba(147, 197, 253, 0.25) 85%,
+    transparent 100%
+  );
+  filter: blur(1.5px) drop-shadow(0 0 5px rgba(191, 219, 254, 0.4));
+}
+
+.dark .sword-diagonal {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(167, 139, 250, 0.25) 10%,
+    rgba(196, 181, 253, 0.6) 30%,
+    rgba(221, 214, 254, 0.8) 50%,
+    rgba(196, 181, 253, 0.6) 70%,
+    rgba(167, 139, 250, 0.25) 90%,
+    transparent 100%
+  );
+  filter: blur(1px) drop-shadow(0 0 4px rgba(167, 139, 250, 0.5));
+}
+
+.dark .sword-horizontal {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.25) 10%,
+    rgba(99, 102, 241, 0.6) 30%,
+    rgba(191, 219, 254, 0.8) 50%,
+    rgba(99, 102, 241, 0.6) 70%,
+    rgba(147, 197, 253, 0.25) 90%,
+    transparent 100%
+  );
+  filter: blur(0.5px) drop-shadow(0 0 3px rgba(147, 197, 253, 0.5));
+}
+
+.dark .sword-cross::before,
+.dark .sword-cross::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(191, 219, 254, 0.4) 20%,
+    rgba(224, 242, 254, 0.75) 50%,
+    rgba(191, 219, 254, 0.4) 80%,
+    transparent 100%
+  );
+  filter: blur(1px) drop-shadow(0 0 4px rgba(191, 219, 254, 0.4));
+}
+
+.dark .sword-slash {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(191, 219, 254, 0.45) 20%,
+    rgba(224, 242, 254, 0.8) 50%,
+    rgba(191, 219, 254, 0.45) 80%,
+    transparent 100%
+  );
+  filter: blur(1px) drop-shadow(0 0 3px rgba(191, 219, 254, 0.5));
+}
+
+.dark .sword-spark {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(224, 242, 254, 0.8) 40%,
+    rgba(147, 197, 253, 0.5) 70%,
+    transparent 100%
+  );
+  filter: blur(0.5px) drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+}
+
+.dark .sword-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(191, 219, 254, 0.35) 0%,
+    rgba(99, 102, 241, 0.22) 40%,
+    transparent 70%
+  );
+  filter: blur(20px) drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));
+}
+
+.dark .sword-flow {
+  background: rgba(255, 255, 255, 1);
+  filter: blur(1px) drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+.dark .sword-tip-flash {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(224, 242, 254, 0.9) 30%,
+    rgba(147, 197, 253, 0.5) 60%,
+    transparent 100%
+  );
+  filter: blur(2px) drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
+}
+
+.dark .sword-light-top {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.18) 20%,
+    rgba(147, 197, 253, 0.4) 50%,
+    rgba(99, 102, 241, 0.18) 80%,
+    transparent 100%
+  );
+  filter: blur(1px) drop-shadow(0 0 3px rgba(147, 197, 253, 0.3));
+}
+
+.dark .sword-diagonal-top {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.15) 20%,
+    rgba(167, 139, 250, 0.35) 50%,
+    rgba(139, 92, 246, 0.15) 80%,
+    transparent 100%
+  );
+  filter: blur(1px) drop-shadow(0 0 3px rgba(167, 139, 250, 0.3));
+}
+
+/* 深色模式 - 剑形光效增强 */
+.dark .sword-blade {
+  filter: drop-shadow(0 0 12px rgba(147, 197, 253, 0.7));
+}
+
+.dark .sword-blade::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(224, 242, 254, 0.9) 15%,
+    rgba(191, 219, 254, 0.75) 40%,
+    rgba(147, 197, 253, 0.55) 70%,
+    rgba(99, 102, 241, 0.35) 100%
+  );
+}
+
+.dark .sword-blade::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8) 25%,
+    rgba(224, 242, 254, 0.5) 60%,
+    transparent 100%
+  );
+}
+
+.dark .sword-ancient {
+  filter: drop-shadow(0 0 15px rgba(167, 139, 250, 0.6));
+}
+
+.dark .sword-ancient::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(221, 214, 254, 0.85) 12%,
+    rgba(196, 181, 253, 0.7) 35%,
+    rgba(167, 139, 250, 0.5) 65%,
+    rgba(139, 92, 246, 0.3) 100%
+  );
+}
+
+.dark .sword-ancient::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.85) 15%,
+    rgba(221, 214, 254, 0.6) 50%,
+    transparent 100%
+  );
+}
+
+.dark .sword-flying {
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8));
+}
+
+.dark .sword-flying::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(224, 242, 254, 0.95) 8%,
+    rgba(191, 219, 254, 0.8) 35%,
+    rgba(147, 197, 253, 0.6) 65%,
+    rgba(59, 130, 246, 0.35) 100%
+  );
+}
+
+.dark .sword-flying::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 25%,
+    rgba(224, 242, 254, 0.6) 60%,
+    transparent 100%
+  );
+}
+
+.dark .sword-afterimage {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(191, 219, 254, 0.3) 10%,
+    rgba(224, 242, 254, 0.7) 30%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(224, 242, 254, 0.7) 70%,
+    rgba(191, 219, 254, 0.3) 90%,
+    transparent 100%
+  );
+  filter: blur(1px) drop-shadow(0 0 6px rgba(191, 219, 254, 0.5));
+}
+
+/* ============================================
+   减少动画偏好支持
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .sword-light,
+  .sword-light-wide,
+  .sword-diagonal,
+  .sword-horizontal,
+  .sword-cross,
+  .sword-slash,
+  .sword-spark,
+  .sword-glow,
+  .sword-flow,
+  .sword-tip-flash,
+  .sword-light-top,
+  .sword-diagonal-top,
+  .sword-blade,
+  .sword-ancient,
+  .sword-flying,
+  .sword-afterimage {
+    animation: none !important;
+    opacity: 0.3 !important;
+  }
+}
+
+/* 主内容包装器 */
+.main-content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 2rem); /* 减去容器的 padding */
+}
+
+/* === 紧凑页面头部样式 === */
+.compact-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.brand-container {
+  margin-bottom: 0;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 48px rgba(59, 130, 246, 0.5);
+  }
+}
+
+.brand-title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.brand-subtitle {
+  font-size: 1.125rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 引用卡片 - 液态玻璃设计 */
+.quote-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: var(--glass-transition-normal);
+}
+
+.quote-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, #6366f1, transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.quote-icon {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.quote-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0 0 1rem 0;
+  font-style: italic;
+}
+
+.quote-author {
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+  text-align: right;
+  font-weight: 500;
+}
+
+/* === 紧凑引言卡片 - 液态玻璃设计 === */
+.quote-card-compact {
+  max-width: 850px;
+  margin: 1rem auto 0;
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: var(--glass-transition-normal);
+}
+
+.quote-card-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, #6366f1, transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.quote-card-compact .quote-icon {
+  color: var(--color-primary);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.quote-card-compact .quote-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0 0 0.5rem 0;
+  font-style: italic;
+}
+
+.quote-card-compact .quote-author {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  text-align: right;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* === 左右布局容器 === */
+.layout-container {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+/* 左侧面板 - 液态玻璃设计 */
+.left-panel {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  /* 与右侧面板高度对齐 */
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+  /* 禁用 Wails 窗口拖动，允许文字选择 */
+  --wails-draggable: no-drag;
+}
+
+/* 左侧面板光泽效果 */
+.left-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* 液态玻璃设计 */
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1.5rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 350px); /* 动态计算最小高度 */
+  /* 禁用 Wails 窗口拖动，允许文字选择 */
+  --wails-draggable: no-drag;
+}
+
+/* 右侧面板光泽效果 */
+.right-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.panel-header {
+  margin-bottom: 0.5rem;
+}
+
+.panel-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.panel-header p {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* === 紧凑模式选择器 - 液态玻璃设计 === */
+.mode-selector-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mode-option-compact {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-subtle);
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+  cursor: pointer;
+  transition: var(--glass-transition-normal);
+}
+
+/* 模式选项悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.mode-option-compact:hover {
+  border-color: var(--color-primary);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-light), 0 0 10px rgba(99, 102, 241, 0.1);
+}
+
+/* 模式选项激活状态 */
+.mode-option-compact.active {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+  box-shadow: var(--glass-shadow-medium), 0 0 15px rgba(99, 102, 241, 0.15);
+}
+
+.mode-icon-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 1rem;
+  font-size: 1rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.mode-icon-compact.local {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.mode-icon-compact.remote {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+}
+
+.mode-icon-compact.hybrid {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.mode-info-compact {
+  flex: 1;
+}
+
+.mode-info-compact h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.mode-info-compact p {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mode-radio {
+  margin-left: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* === 一行配置区域样式 - 液态玻璃设计 === */
+.config-section-inline {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 配置区域光泽效果 */
+.config-section-inline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.config-inline-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.config-info {
+  flex: 1;
+}
+
+.config-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.config-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.config-details {
+  color: var(--color-text-secondary);
+}
+
+.config-actions-inline {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* 配置按钮 - 液态玻璃设计 */
+.config-btn-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: var(--glass-radius-md);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--glass-transition-normal);
+}
+
+.config-btn-inline.primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.config-btn-inline.primary:hover {
+  background: var(--color-primary-dark);
+  box-shadow: var(--glass-shadow-light), 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+.config-btn-inline.secondary {
+  background: var(--glass-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--glass-border-light);
+}
+
+.config-btn-inline.secondary:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--color-primary);
+}
+
+.config-btn-inline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* === 操作区域样式 === */
+.action-section {
+  /* 液态玻璃设计 */
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 液态玻璃光泽效果 */
+.action-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.action-selector-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-option-compact {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  /* 液态玻璃设计 */
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  cursor: pointer;
+  transition: var(--glass-transition-normal);
+  position: relative;
+}
+
+/* 稳定的悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.action-option-compact:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  box-shadow:
+    var(--glass-shadow-medium),
+    0 0 15px rgba(99, 102, 241, 0.1);
+}
+
+.action-option-compact.active {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+}
+
+.action-icon-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.1));
+  color: var(--color-primary);
+  border-radius: 10px;
+  margin-right: 1rem;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* 剑形图标样式 - 项目操作 */
+.action-sword-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary);
+  margin-right: 1rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.action-sword-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.action-option-compact:hover .action-sword-icon,
+.action-option-compact.active .action-sword-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* 剑形图标样式 - 项目列表 */
+.project-sword-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.project-sword-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.project-item-compact:hover .project-sword-icon,
+.project-item-compact.selected .project-sword-icon {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.action-info-compact {
+  flex: 1;
+}
+
+.action-info-compact h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.action-info-compact p {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.action-radio {
+  margin-left: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* === 详情容器样式 === */
+.details-container {
+  /* 液态玻璃设计 */
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  margin-top: 1.5rem;
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 液态玻璃光泽效果 */
+.details-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.details-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* === 紧凑项目列表样式 === */
+.project-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.project-card-compact {
+  /* 升级为液态玻璃设计 */
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none; /* 移除生硬边框 */
+  border-radius: var(--glass-radius-lg);
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  padding: 1rem;
+  cursor: pointer;
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 液态玻璃光泽效果 */
+.project-card-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* 稳定的悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.project-card-compact:hover {
+  transform: translateY(-2px);
+  background: var(--glass-bg-hover);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border),
+    inset 0 1px 3px rgba(0, 0, 0, 0.08),
+    var(--glass-shadow-strong),
+    0 0 0 1px rgba(148, 163, 184, 0.4),
+    0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.project-card-compact.selected {
+  background: var(--glass-bg-primary);
+  box-shadow:
+    inset 0 0 0 2px var(--color-primary),
+    inset 0 1px 3px rgba(0, 0, 0, 0.08),
+    var(--glass-shadow-strong),
+    0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.project-icon-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  border-radius: 50%;
+  font-size: 0.875rem;
+}
+
+.project-meta-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.loading-state-compact,
+.empty-state-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.loading-state-compact i,
+.empty-state-compact i {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+.empty-state-compact h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state-compact p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* === 超紧凑项目列表样式 === */
+.project-list-ultra-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: calc(100vh - 400px); /* 动态计算高度，减去头部和底部空间 */
+  min-height: 300px; /* 最小高度 */
+  overflow-y: auto;
+  /* 优化滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+
+/* Webkit 滚动条样式 */
+.project-list-ultra-compact::-webkit-scrollbar {
+  width: 6px;
+}
+
+.project-list-ultra-compact::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-list-ultra-compact::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.project-list-ultra-compact::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+.project-item-compact {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0.75rem;
+  min-height: 4rem; /* 确保每行有足够的高度 */
+  /* 升级为液态玻璃设计 */
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: none;
+  border-radius: var(--glass-radius-md);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    var(--glass-shadow-subtle);
+  cursor: pointer;
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 液态玻璃光泽效果 */
+.project-item-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 稳定的悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.project-item-compact:hover {
+  background: var(--glass-bg-primary);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border),
+    var(--glass-shadow-medium),
+    0 0 15px rgba(99, 102, 241, 0.15);
+}
+
+.project-item-compact.selected {
+  background: var(--glass-bg-card);
+  box-shadow:
+    inset 0 0 0 2px var(--color-primary),
+    var(--glass-shadow-medium),
+    0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.project-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.1));
+  color: var(--color-primary);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.project-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.375rem; /* 增加项目名称和元数据之间的间距 */
+}
+
+.project-item-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.4; /* 增加行高，确保文字不被截断 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.3; /* 确保元数据行高合适 */
+}
+
+.project-source {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+.project-source.local {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.project-source.remote {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--color-primary);
+}
+
+.project-requests {
+  @apply text-xs text-gray-500 dark:text-gray-400;
+}
+
+.project-size {
+  @apply text-xs text-blue-500 dark:text-blue-400 font-medium;
+}
+
+/* === 项目操作按钮 === */
+.project-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.project-item-compact:hover .project-item-actions {
+  opacity: 1;
+}
+
+/* 选中的项目始终显示删除按钮 */
+.project-item-compact.selected .project-item-actions {
+  opacity: 1;
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--glass-radius-sm);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #dc2626;
+}
+
+.delete-btn:active {
+  transform: scale(0.95);
+}
+
+.project-item-selector {
+  margin-left: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* === 新项目输入紧凑样式 === */
+.input-card-compact {
+  /* 液态玻璃设计 */
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  padding: 1rem;
+  transition: var(--glass-transition-normal);
+}
+
+.project-name-input-compact {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  background: var(--glass-bg-card);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: var(--glass-transition-fast);
+}
+
+.project-name-input-compact:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.project-name-input-compact::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* === 临时项目紧凑样式 === */
+.temp-info-card-compact {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--glass-radius-md);
+  transition: var(--glass-transition-normal);
+}
+
+/* === 底部操作紧凑样式 === */
+.bottom-actions-compact {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.next-button-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--glass-transition-normal);
+  box-shadow: var(--glass-shadow-medium);
+}
+
+.next-button-compact.button-ready {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  box-shadow:
+    var(--glass-shadow-medium),
+    0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+/* 稳定的悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.next-button-compact.button-ready:hover {
+  box-shadow:
+    var(--glass-shadow-strong),
+    0 0 25px rgba(99, 102, 241, 0.4);
+}
+
+.next-button-compact:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* === 过渡动画样式 === */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+
+
+
+
+.radio-button {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--glass-border);
+  border-radius: 50%;
+  background: var(--glass-bg-secondary);
+  position: relative;
+  transition: var(--glass-transition-fast);
+}
+
+.radio-button.checked {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.radio-button.checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* === 删除确认对话框 === */
+.delete-confirm-dialog {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-lg);
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--glass-shadow-strong);
+  animation: dialog-appear 0.2s ease-out;
+}
+
+@keyframes dialog-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dialog-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dialog-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.dialog-icon.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.dialog-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dialog-content {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.dialog-content p {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+}
+
+.dialog-content .warning-text {
+  color: #ef4444;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.dialog-actions button {
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--glass-radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dialog-actions .cancel-btn {
+  background: var(--glass-bg-secondary);
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-secondary);
+}
+
+.dialog-actions .cancel-btn:hover:not(:disabled) {
+  background: var(--glass-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.dialog-actions .confirm-btn.danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: none;
+  color: white;
+}
+
+.dialog-actions .confirm-btn.danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.dialog-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* === 响应式设计 === */
+@media (max-width: 1024px) {
+  .layout-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .left-panel {
+    order: 1;
+  }
+
+  .right-panel {
+    order: 2;
+  }
+
+  .details-container {
+    order: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .project-selection-container {
+    padding: 0.75rem;
+  }
+
+  .main-content-wrapper {
+    max-width: 100%;
+  }
+
+  .brand-title {
+    font-size: 1.75rem;
+  }
+
+  .layout-container {
+    gap: 1rem;
+  }
+
+  .left-panel,
+  .config-section,
+  .action-section,
+  .details-container {
+    padding: 1rem;
+  }
+
+  .mode-option-compact,
+  .action-option-compact {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .mode-icon-compact,
+  .action-icon-compact {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .mode-radio,
+  .action-radio {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+
+  .project-list-ultra-compact {
+    max-height: 280px; /* 在移动设备上也增加高度 */
+  }
+
+  .config-actions-inline {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .temp-info-card-compact {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* --- 加载动画样式 --- */
+.loading-container {
+  /* 液态玻璃设计 */
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: none;
+  border-radius: var(--glass-radius-lg);
+  padding: 2rem;
+  text-align: center;
+  /* 多层边界系统 */
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  min-width: 400px;
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 液态玻璃光泽效果 */
+.loading-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* 深色模式下的加载容器 */
+.dark .loading-container {
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border),
+    var(--glass-shadow-strong);
+}
+
+.loading-title {
+  margin-bottom: 2rem;
+}
+
+.loading-title h3 {
+  color: var(--color-text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.loading-title p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.progress-container {
+  margin-bottom: 2rem;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-glow {
+  position: absolute;
+  top: 0;
+  width: 20px;
+  height: 100%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  border-radius: 4px;
+  transform: translateX(-10px);
+  transition: left 0.3s ease;
+}
+
+.progress-info {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.progress-percentage {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.step-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.step-icon {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.step-text {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.loading-decoration {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.decoration-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  animation: loading-dots 1.5s ease-in-out infinite;
+}
+
+.decoration-dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.decoration-dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes loading-dots {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40% { transform: scale(1.2); opacity: 1; }
+}

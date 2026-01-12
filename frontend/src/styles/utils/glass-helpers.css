@@ -1,0 +1,29 @@
+/* 
+ * 可选的玻璃效果辅助类
+ * 开发者可以选择性使用，不影响现有组件
+ */
+
+/* 白天模式适配的玻璃效果 - 可选使用 */
+.glass-adaptive {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+}
+
+/* 白天模式下自动切换 */
+:not(.dark) .glass-adaptive {
+  background: rgba(248, 250, 252, 0.85);
+  border-color: rgba(148, 163, 184, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 文本对比度辅助类 */
+.text-on-glass {
+  color: var(--color-text-secondary);
+}
+
+:not(.dark) .text-on-glass {
+  color: #1e293b;
+}

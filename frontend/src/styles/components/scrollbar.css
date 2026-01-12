@@ -1,0 +1,54 @@
+/* 滚动条样式 - 玻璃态设计 */
+
+/* 滚动条美化 */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--glass-bg-tertiary);
+  border-radius: var(--glass-radius-sm);
+  border: 1px solid var(--glass-border-light);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--glass-bg-primary), var(--glass-bg-secondary));
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-radius: var(--glass-radius-sm);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--glass-bg-hover), var(--glass-bg-primary));
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-md);
+}
+
+.scrollbar-thin::-webkit-scrollbar-corner {
+  background: var(--glass-bg-tertiary);
+  border-radius: var(--glass-radius-sm);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--glass-bg-tertiary);
+  border-color: var(--glass-border-light);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--glass-bg-primary), var(--glass-bg-secondary));
+  border-color: var(--glass-border);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--glass-bg-hover), var(--glass-bg-primary));
+  border-color: var(--glass-border-strong);
+}

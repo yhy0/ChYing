@@ -1,0 +1,449 @@
+/* 
+ * 侧边栏液态玻璃设计样式
+ * 基于现有的液态玻璃设计系统
+ */
+
+/* 主侧边栏容器 - 液态玻璃设计 */
+.glass-sidebar {
+  width: 4rem; /* 64px */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  position: relative;
+  
+  /* 液态玻璃背景 */
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  
+  /* 多层边界系统 */
+  border-right: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-light);
+  
+  /* 过渡动画 */
+  transition: var(--glass-transition-normal);
+  
+  /* 防止内容溢出 */
+  overflow: hidden;
+}
+
+/* 简化的液态玻璃光泽效果 */
+.glass-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 25%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 75%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* 品牌标志区域 */
+.glass-sidebar-brand {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.glass-sidebar-brand-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--glass-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 液态玻璃背景 */
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  
+  /* 多层边界和阴影 */
+  border: 1px solid var(--glass-border-light);
+  box-shadow: var(--glass-shadow-subtle);
+  
+  /* 过渡动画 */
+  transition: var(--glass-transition-normal);
+  
+  /* 防止内容溢出 */
+  overflow: hidden;
+  position: relative;
+}
+
+/* 品牌图标悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.glass-sidebar-brand-icon:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-light),
+    0 0 12px rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 品牌图标光泽效果 */
+.glass-sidebar-brand-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  pointer-events: none;
+}
+
+/* 品牌 Logo 样式 */
+.glass-sidebar-brand-logo {
+  width: 1.75rem;
+  height: 1.75rem;
+  object-fit: contain;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* 品牌 Logo 悬停效果 */
+.glass-sidebar-brand-icon:hover .glass-sidebar-brand-logo {
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* 导航模块容器 */
+.glass-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0 0.5rem;
+  position: relative;
+}
+
+/* 液态选中背景 - 会滑动到当前选中项 */
+.glass-sidebar-nav::before {
+  content: '';
+  position: absolute;
+  width: 2.5rem;
+  height: 2.5rem;
+  /* 白天模式优化：更明显的背景 */
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(139, 92, 246, 0.12) 50%,
+    rgba(59, 130, 246, 0.15) 100%);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: var(--glass-radius-md);
+  box-shadow:
+    var(--glass-shadow-medium),
+    0 0 20px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+/* 导航模块项 */
+.glass-sidebar-module {
+  position: relative;
+  padding: 0.5rem;
+  border-radius: var(--glass-radius-md);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 模块悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.glass-sidebar-module:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.15);
+}
+
+/* 点击时的反馈 */
+.glass-sidebar-module:active {
+  transform: scale(0.95);
+  transition: all 0.1s ease;
+}
+
+/* 过渡状态时禁用交互 */
+.glass-sidebar-module.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* 过渡状态时的导航容器 */
+.glass-sidebar-nav.transitioning::before {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 液态背景滑动位置控制 - 增强动画效果 */
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(1).active)::before {
+  opacity: 1;
+  top: 0;
+  transform: scale(1);
+}
+
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(2).active)::before {
+  opacity: 1;
+  top: calc(1 * (2.5rem + 1rem));
+  transform: scale(1);
+}
+
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(3).active)::before {
+  opacity: 1;
+  top: calc(2 * (2.5rem + 1rem));
+  transform: scale(1);
+}
+
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(4).active)::before {
+  opacity: 1;
+  top: calc(3 * (2.5rem + 1rem));
+  transform: scale(1);
+}
+
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(5).active)::before {
+  opacity: 1;
+  top: calc(4 * (2.5rem + 1rem));
+  transform: scale(1);
+}
+
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(6).active)::before {
+  opacity: 1;
+  top: calc(5 * (2.5rem + 1rem));
+  transform: scale(1);
+}
+
+.glass-sidebar-nav:has(.glass-sidebar-module:nth-child(7).active)::before {
+  opacity: 1;
+  top: calc(6 * (2.5rem + 1rem));
+  transform: scale(1);
+}
+
+/* 模块图标 */
+.glass-sidebar-module-icon {
+  font-size: 1.25rem;
+  color: var(--color-text-secondary);
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  z-index: 2;
+}
+
+/* 悬停时图标颜色 */
+.glass-sidebar-module:hover .glass-sidebar-module-icon {
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+/* 活动模块图标颜色 - 白天模式优化 */
+.glass-sidebar-module.active .glass-sidebar-module-icon {
+  color: var(--color-primary);
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
+}
+
+/* 活动指示器 - 简化版 */
+.glass-sidebar-indicator {
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.25rem;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dark));
+  border-radius: 0 var(--glass-radius-sm) var(--glass-radius-sm) 0;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* 活动指示器显示 */
+.glass-sidebar-module.active .glass-sidebar-indicator {
+  opacity: 1;
+}
+
+/* 工具提示容器 */
+.glass-sidebar-tooltip {
+  position: absolute;
+  left: calc(100% + 0.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--glass-transition-fast);
+  pointer-events: none;
+}
+
+/* 悬停时显示工具提示 */
+.glass-sidebar-module:hover .glass-sidebar-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(4px);
+}
+
+/* 工具提示内容 */
+.glass-sidebar-tooltip-content {
+  background: var(--glass-bg-popup);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  padding: 0.5rem 0.75rem;
+  box-shadow: var(--glass-shadow-medium);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 工具提示光泽效果 */
+.glass-sidebar-tooltip-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+/* 工具提示标题 */
+.glass-sidebar-tooltip-title {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* 工具提示描述 */
+.glass-sidebar-tooltip-description {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin: 0.125rem 0 0 0;
+}
+
+/* 工具提示箭头 */
+.glass-sidebar-tooltip-arrow {
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--glass-bg-popup);
+  border-left: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+/* 简化的动画定义 */
+
+/* 微妙的脉冲动画 */
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow:
+      var(--glass-shadow-medium),
+      0 0 20px rgba(99, 102, 241, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    box-shadow:
+      var(--glass-shadow-medium),
+      0 0 30px rgba(99, 102, 241, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* 为活动的液态背景添加脉冲 */
+.glass-sidebar-nav:has(.glass-sidebar-module.active)::before {
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+.glass-sidebar-module.active {
+  animation: moduleActivate 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+             glassSpread 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+             liquidTransition 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 深色模式适配 */
+.dark .glass-sidebar::before {
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+
+/* 深色模式下的液态背景 */
+.dark .glass-sidebar-nav::before {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.25) 0%,
+    rgba(139, 92, 246, 0.22) 50%,
+    rgba(59, 130, 246, 0.25) 100%);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow:
+    var(--glass-shadow-medium),
+    0 0 25px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 深色模式下的模块悬停 */
+.dark .glass-sidebar-module:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* 深色模式下的活动图标 */
+.dark .glass-sidebar-module.active .glass-sidebar-module-icon {
+  color: white;
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.6));
+}
+
+.dark .glass-sidebar-brand-icon::before,
+.dark .glass-sidebar-tooltip-content::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.dark .glass-sidebar-module.active::before {
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), transparent);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .glass-sidebar {
+    width: 3.5rem;
+    padding: 0.75rem 0;
+  }
+  
+  .glass-sidebar-brand {
+    margin-bottom: 1rem;
+  }
+  
+  .glass-sidebar-brand-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .glass-sidebar-nav {
+    gap: 0.75rem;
+  }
+  
+  .glass-sidebar-module {
+    padding: 0.375rem;
+  }
+  
+  .glass-sidebar-module-icon {
+    font-size: 1.125rem;
+  }
+}

@@ -1,0 +1,194 @@
+/* === 1. 基础样式 (按依赖顺序导入) === */
+/* 字体加载必须最先导入 */
+@import './fonts.css';
+
+/* 变量必须在字体之后导入 */
+@import './variables.css';
+
+/* 字体排版 */
+@import './components/typography.css';
+
+/* 通用工具类 */
+@import './components/utilities.css';
+
+/* 白天模式修复 - 仅修复关键可见性问题 */
+@import './themes/light-mode-fixes.css';
+
+/* 可选的玻璃效果辅助工具 */
+@import './utils/glass-helpers.css';
+
+/* === 2. 布局和基础组件 === */
+@import './components/layout.css';
+@import './components/sidebar.css';
+@import './components/card.css';
+@import './components/scrollbar.css';
+@import './components/filter.css';
+@import './components/statistics.css';
+@import './components/detail-summary.css';
+
+/* === 3. 表单和交互组件 === */
+@import './components/button.css';
+@import './components/form.css';
+@import './components/search.css';
+
+/* === 4. 状态和反馈组件 === */
+@import './components/states.css';
+@import './components/notification.css';
+@import './components/status-code.css';
+@import './components/badge.css';
+@import './components/tooltip.css';
+
+/* === 5. 通用动画 === */
+@import './components/animations.css';
+
+/* === 6. 表格和数据展示组件 === */
+@import './modules/http-traffic-table.css';
+@import './components/compact-table.css';
+@import './components/table.css';
+@import './components/method-tag.css';
+
+/* === 7. UI组件 === */
+@import './components/contextmenu.css';
+@import './components/tabs.css';
+@import './components/tab-group.css';
+@import './components/dialog.css';
+@import './components/panel-divider.css';
+@import './components/view-tabs.css';
+@import './components/editor.css';
+@import './components/editor-panel.css';
+@import './components/color-picker.css';
+
+/* === 8. 模块特定样式 === */
+@import './modules/proxy.css';
+@import './modules/proxy-dsl-search.css';
+@import './modules/proxy-match-replace.css';
+@import './modules/repeater.css';
+@import './modules/intruder.css';
+@import './modules/decoder.css';
+@import './modules/project.css';
+@import './modules/project-selection.css';
+@import './modules/settings.css';
+@import './modules/scanLog.css';
+@import './modules/vulnerability.css';
+@import './modules/plugins.css';
+
+
+/* === 9. 全局基础样式 - 玻璃态设计 === */
+html, body {
+  font-family: var(--font-family-current, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif);
+  font-size: var(--font-size-base, 14px);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* 动态玻璃态背景 - 浅色模式 - 优化对比度 */
+html::before, body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at top right, rgba(168, 85, 247, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+    linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); /* 稍微调暗基础背景 */
+  background-attachment: fixed;
+  filter: blur(40px);
+}
+
+html::after, body::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 50%);
+  animation: gradient-animation 60s linear infinite;
+}
+
+/* 背景渐变动画 - 优化性能，使用更长周期减少CPU占用 */
+@keyframes gradient-animation {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+}
+
+/* 深色模式背景 */
+.dark html::before,
+.dark body::before {
+  background: 
+    radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at top right, rgba(168, 85, 247, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
+    linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  filter: blur(60px);
+}
+
+.dark html::after,
+.dark body::after {
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* 拖拽时的光标样式 */
+.cursor-ns-resize,
+.cursor-ns-resize * {
+  cursor: ns-resize !important;
+} 

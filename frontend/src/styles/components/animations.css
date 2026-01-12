@@ -1,0 +1,397 @@
+/* 通用动画关键帧
+   ==========================================================================
+   这个文件包含应用中所有通用的动画关键帧定义
+   这些动画可以在不同组件中重复使用
+   ========================================================================== */
+
+/* 旋转动画 - 用于加载中状态 */
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 简化的旋转动画 */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 脉冲动画 - 用于提示和强调 */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* 目标元素脉冲动画 - 用于高亮目标 */
+@keyframes pulse-target {
+  0% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  }
+}
+
+/* 边框脉冲动画 - 用于拖拽交互 */
+@keyframes pulse-border {
+  0% {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3);
+  }
+  100% {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3);
+  }
+}
+
+/* 淡入淡出动画 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* 缩放动画 */
+@keyframes scale-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* 上滑入场动画 */
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 下滑入场动画 */
+@keyframes slide-down {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 左右晃动动画 - 用于错误提示 */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/* 弹跳动画 - 用于引起注意 */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+/* 浮动动画 - 用于按钮悬浮效果 */
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* 通知弹出动画 */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* ========== 加载器动画 ========== */
+
+/* 点状加载器弹跳动画 */
+@keyframes bounce-loader {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* 脉冲加载器动画 - 重新定义以避免冲突 */
+@keyframes pulse-loader {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* ========== 加载器组件样式 ========== */
+
+/* 旋转加载器 */
+.spinner {
+  border: 2px solid rgba(156, 163, 175, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--color-primary);
+  animation: spin 0.8s linear infinite;
+}
+
+.dark .spinner {
+  border-color: rgba(55, 65, 81, 0.5);
+  border-top-color: var(--color-primary);
+}
+
+/* 点状加载器 */
+.dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  animation: bounce-loader 1.4s ease-in-out infinite both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+.dot:nth-child(3) { animation-delay: 0s; }
+
+.dark .dot {
+  background-color: var(--color-primary);
+}
+
+/* 脉冲加载器 */
+.pulse-loader {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  animation: pulse-loader 1.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.dark .pulse-loader {
+  background-color: var(--color-primary);
+}
+
+/* ========== 通用淡入动画 ========== */
+
+/* 标准淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 淡入动画类 */
+.fade-in {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.fade-in-slow {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.fade-in-fast {
+  animation: fadeIn 0.1s ease-out;
+}
+
+/* ========== 标签页动画 ========== */
+
+/* 标签页出现动画 */
+@keyframes tab-appear {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 标签页激活动画 */
+@keyframes tab-active {
+  0% {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+  100% {
+    transform: translateY(-0.5px);
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.03), 0 1px 0 var(--color-bg-primary);
+  }
+}
+
+/* 标签底部指示器动画 */
+@keyframes indicator-appear {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+}
+
+/* 高亮脉冲动画 */
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+/* 宽度脉冲动画 */
+@keyframes width-pulse {
+  0%, 100% {
+    width: 4px;
+  }
+  50% {
+    width: 8px;
+  }
+}
+
+/* 标签页浮动动画 */
+@keyframes tab-float {
+  from {
+    transform: scale(1.05) translateY(-3px);
+  }
+  to {
+    transform: scale(1.05) translateY(-6px);
+  }
+}
+
+/* 错误图标脉冲动画 */
+@keyframes pulse-error {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ========== 无障碍：减少动画偏好 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .spinner,
+  .dot,
+  .pulse-loader {
+    animation: none !important;
+  }
+}

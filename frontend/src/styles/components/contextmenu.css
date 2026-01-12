@@ -1,0 +1,240 @@
+/* 统一上下文菜单样式 */
+
+/* ========== 颜色选择器样式 ========== */
+
+/* 颜色选择器容器 */
+.color-picker {
+  @apply flex flex-wrap gap-2;
+}
+
+/* 颜色选项 */
+.color-option {
+  @apply transition-all duration-150 ease-in-out;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.color-option:hover {
+  @apply transform scale-105 shadow-md;
+}
+
+/* 暗色主题优化 */
+.dark .color-option {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.dark .color-option:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* ========== 上下文菜单基础样式 ========== */
+
+:root {
+  --menu-bg: #ffffff;
+  --menu-bg-hover: #f9fafb;
+  --menu-bg-active: #f3f4f6;
+  --menu-text: #1f2937;
+  --menu-text-secondary: #6b7280;
+  --menu-text-muted: #9ca3af;
+  --menu-border: #e5e7eb;
+  --menu-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15), 0 2px 6px -1px rgba(0, 0, 0, 0.1);
+  --menu-item-radius: 0.25rem;
+}
+
+.dark {
+  --menu-bg: #1e1e36;
+  --menu-bg-hover: #323248;
+  --menu-bg-active: #282838;
+  --menu-text: #f3f4f6;
+  --menu-text-secondary: #9ca3af;
+  --menu-text-muted: #6b7280;
+  --menu-border: #4b5563;
+  --menu-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.35), 0 2px 6px -1px rgba(0, 0, 0, 0.25);
+}
+
+/* 上下文菜单基础样式 - 玻璃态设计 */
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  background: var(--glass-bg-popup);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--glass-radius-md);
+  box-shadow: var(--glass-shadow-lg);
+  width: 220px;
+  overflow: hidden;
+  transform-origin: top left;
+  transform: translate(-50%, 0);
+  animation: menu-appear 0.15s ease-out;
+}
+
+/* 玻璃态光泽效果 */
+.context-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  pointer-events: none;
+}
+
+@keyframes menu-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* 菜单部分 */
+.context-menu-section {
+  padding: 0.5rem 0;
+}
+
+/* 菜单头部 */
+.context-menu-header {
+  padding: 0.25rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--menu-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 菜单项 */
+.context-menu-item {
+  padding: 0.375rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--menu-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.context-menu-item i {
+  font-size: 1rem;
+  color: var(--menu-text-secondary);
+  transition: color 0.15s ease;
+}
+
+.context-menu-item:hover {
+  background: var(--glass-bg-hover);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-radius: var(--glass-radius-sm);
+}
+
+.context-menu-item:hover i {
+  color: var(--menu-text);
+}
+
+.context-menu-item:active {
+  background-color: var(--menu-bg-active);
+}
+
+.context-menu-item.active {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+  font-weight: 500;
+}
+
+.context-menu-item.active i {
+  color: var(--color-primary);
+}
+
+/* 菜单分隔线 */
+.context-menu-divider {
+  height: 1px;
+  background-color: var(--menu-border);
+  margin: 0.25rem 0;
+}
+
+/* 菜单项右侧附加内容 */
+.context-menu-item-suffix {
+  margin-left: auto;
+  color: var(--menu-text-muted);
+  font-size: 0.7rem;
+}
+
+/* 颜色样本 */
+.color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s ease;
+}
+
+.context-menu-item:hover .color-swatch {
+  transform: scale(1.2);
+}
+
+/* 禁用菜单项 */
+.context-menu-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 危险操作菜单项 */
+.context-menu-item.danger {
+  color: var(--color-error);
+}
+
+.context-menu-item.danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.context-menu-item.danger i {
+  color: var(--color-error);
+}
+
+/* 创建项样式 */
+.context-menu-item.create-item {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.context-menu-item.create-item i {
+  color: var(--color-primary);
+}
+
+.context-menu-item.create-item:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+}
+
+/* 带图标的菜单项前图标 */
+.context-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  font-size: 0.875rem;
+}
+
+/* 分组指示器 */
+.group-menu-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.dark .group-menu-indicator {
+  border-color: rgba(255, 255, 255, 0.1);
+} 

@@ -1,0 +1,326 @@
+/* panel-divider.css 分隔线样式已创建 */
+
+/* 面板分隔线通用样式 - 玻璃态设计 */
+
+/* 主题变量 */
+:root {
+  --panel-divider-width: 8px;
+  --panel-divider-color: var(--glass-border);
+  --panel-divider-hover-bg: rgba(79, 70, 229, 0.15);
+  --panel-divider-hover-color: #6366f1;
+  --panel-divider-shadow: rgba(79, 70, 229, 0.4);
+  --panel-divider-active-color: #6366f1;
+  --panel-divider-dot-color: #6366f1;
+}
+
+/* 暗色主题变量 */
+.dark {
+  --panel-divider-color: var(--glass-border);
+  --panel-divider-hover-bg: rgba(99, 102, 241, 0.25);
+  --panel-divider-hover-color: #818cf8;
+  --panel-divider-shadow: rgba(99, 102, 241, 0.5);
+  --panel-divider-active-color: #818cf8;
+  --panel-divider-dot-color: #818cf8;
+}
+
+/* 兼容intruder模块的类名 */
+.intruder-panel-divider {
+  width: var(--panel-divider-width);
+  margin: 0 -2px;
+  background-color: transparent;
+  position: relative;
+  cursor: col-resize !important;
+  transition: background-color 0.2s;
+  z-index: 100;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.intruder-panel-divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 1px);
+  width: 2px;
+  background-color: var(--panel-divider-color);
+  transition: all 0.2s ease;
+}
+
+.intruder-panel-divider:hover,
+.intruder-panel-divider:active {
+  background-color: var(--panel-divider-hover-bg);
+}
+
+.intruder-panel-divider:hover::before,
+.intruder-panel-divider:active::before {
+  width: 3px;
+  background-color: var(--panel-divider-hover-color);
+  box-shadow: 0 0 8px var(--panel-divider-shadow);
+}
+
+.intruder-panel-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 60px;
+  border-radius: 6px;
+  background-color: var(--panel-divider-hover-bg);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.intruder-panel-divider:hover::after,
+.intruder-panel-divider:active::after {
+  opacity: 1;
+  background-image: radial-gradient(
+    circle at center,
+    var(--panel-divider-dot-color) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 6px 6px;
+  background-position: center;
+}
+
+body.dragging .intruder-panel-divider {
+  background-color: var(--panel-divider-hover-bg);
+}
+
+body.dragging .intruder-panel-divider::before {
+  width: 4px;
+  background-color: var(--panel-divider-active-color);
+  box-shadow: 0 0 12px var(--panel-divider-shadow);
+}
+
+body.dragging .intruder-panel-divider::after {
+  opacity: 1;
+  background-color: var(--panel-divider-hover-bg);
+  height: 100px;
+  width: 16px;
+}
+
+/* 通用面板分隔线，保持与intruder兼容 */
+.panel-divider {
+  width: var(--panel-divider-width);
+  margin: 0 -2px;
+  background-color: transparent;
+  position: relative;
+  cursor: col-resize !important;
+  transition: background-color 0.2s;
+  z-index: 100;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.panel-divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 1px);
+  width: 2px;
+  background-color: var(--panel-divider-color);
+  transition: all 0.2s ease;
+}
+
+.panel-divider:hover,
+.panel-divider:active {
+  background-color: var(--panel-divider-hover-bg);
+}
+
+.panel-divider:hover::before,
+.panel-divider:active::before {
+  width: 3px;
+  background-color: var(--panel-divider-hover-color);
+  box-shadow: 0 0 8px var(--panel-divider-shadow);
+}
+
+.panel-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 60px;
+  border-radius: 6px;
+  background-color: var(--panel-divider-hover-bg);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.panel-divider:hover::after,
+.panel-divider:active::after {
+  opacity: 1;
+  background-image: radial-gradient(
+    circle at center,
+    var(--panel-divider-dot-color) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 6px 6px;
+  background-position: center;
+}
+
+body.dragging .panel-divider {
+  background-color: var(--panel-divider-hover-bg);
+}
+
+body.dragging .panel-divider::before {
+  width: 4px;
+  background-color: var(--panel-divider-active-color);
+  box-shadow: 0 0 12px var(--panel-divider-shadow);
+}
+
+body.dragging .panel-divider::after {
+  opacity: 1;
+  background-color: var(--panel-divider-hover-bg);
+  height: 100px;
+  width: 16px;
+}
+
+/* 水平分隔线样式 */
+.panel-divider-horizontal {
+  height: var(--panel-divider-width);
+  margin: -2px 0;
+  background-color: transparent;
+  position: relative;
+  cursor: row-resize !important;
+  transition: background-color 0.2s;
+  z-index: 100;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.panel-divider-horizontal::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 1px);
+  height: 2px;
+  background-color: var(--panel-divider-color);
+  transition: all 0.2s ease;
+}
+
+.panel-divider-horizontal:hover,
+.panel-divider-horizontal:active {
+  background-color: var(--panel-divider-hover-bg);
+}
+
+.panel-divider-horizontal:hover::before,
+.panel-divider-horizontal:active::before {
+  height: 3px;
+  background-color: var(--panel-divider-hover-color);
+  box-shadow: 0 0 8px var(--panel-divider-shadow);
+}
+
+.panel-divider-horizontal::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 12px;
+  width: 60px;
+  border-radius: 6px;
+  background-color: var(--panel-divider-hover-bg);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.panel-divider-horizontal:hover::after,
+.panel-divider-horizontal:active::after {
+  opacity: 1;
+  background-image: radial-gradient(
+    circle at center,
+    var(--panel-divider-dot-color) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 6px 6px;
+  background-position: center;
+}
+
+body.dragging .panel-divider-horizontal {
+  background-color: var(--panel-divider-hover-bg);
+}
+
+body.dragging .panel-divider-horizontal::before {
+  height: 4px;
+  background-color: var(--panel-divider-active-color);
+  box-shadow: 0 0 12px var(--panel-divider-shadow);
+}
+
+body.dragging .panel-divider-horizontal::after {
+  opacity: 1;
+  background-color: var(--panel-divider-hover-bg);
+  width: 100px;
+  height: 16px;
+}
+
+/* 模态框打开时禁用分割线交互 */
+body.overflow-hidden .panel-divider,
+body.overflow-hidden .panel-divider-horizontal,
+body.overflow-hidden .intruder-panel-divider {
+  pointer-events: none !important;
+  cursor: default !important;
+  user-select: none !important;
+  z-index: 1 !important; /* 大幅降低z-index，确保模态框和蒙层在上层 */
+}
+
+body.overflow-hidden .panel-divider::before,
+body.overflow-hidden .panel-divider-horizontal::before,
+body.overflow-hidden .intruder-panel-divider::before {
+  opacity: 0.3;
+}
+
+body.overflow-hidden .panel-divider::after,
+body.overflow-hidden .panel-divider-horizontal::after,
+body.overflow-hidden .intruder-panel-divider::after {
+  display: none;
+}
+
+/* 通用面板分隔器别名 - 确保与其他分隔器行为一致 */
+.resize-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+/* 水平面板分隔器 */
+.panel-divider-horizontal {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-divider-bg);
+  cursor: ns-resize;
+  position: relative;
+  z-index: 10;
+  transition: background-color var(--transition-normal) ease;
+  border-top: 1px solid var(--color-divider-border);
+  border-bottom: 1px solid var(--color-divider-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.panel-divider-horizontal:hover {
+  background-color: var(--color-divider-bg-hover);
+}
+
+.panel-divider-horizontal .resize-line {
+  background-color: var(--color-divider-handle);
+  transition: background-color var(--transition-normal) ease;
+}
+
+.panel-divider-horizontal:hover .resize-line {
+  background-color: var(--color-divider-handle-hover);
+}

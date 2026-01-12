@@ -1,0 +1,555 @@
+/**
+ * 插件系统统一样式
+ * 为所有插件模块提供一致的视觉效果和交互体验
+ */
+
+/* ===== CSS变量定义 ===== */
+:root {
+  /* 插件容器变量 */
+  --plugin-container-bg: var(--glass-bg-primary);
+  --plugin-container-border: var(--glass-border);
+  --plugin-container-radius: var(--glass-radius-lg);
+  --plugin-container-shadow: var(--glass-shadow-medium);
+  
+  /* 插件区域变量 */
+  --plugin-section-bg: var(--glass-bg-secondary);
+  --plugin-section-border: var(--glass-border-light);
+  --plugin-section-padding: 1rem;
+  
+  /* 插件表格变量 */
+  --plugin-table-bg: var(--glass-bg-tertiary);
+  --plugin-table-border: var(--glass-border-light);
+  --plugin-table-header-bg: var(--glass-bg-medium);
+  
+  /* 状态码显示变量 */
+  --status-code-bg: var(--glass-bg-light);
+  --status-code-border: var(--glass-border-light);
+  --status-code-radius: var(--radius-sm);
+  --status-separator-color: var(--color-text-secondary);
+  
+  /* 过滤提示变量 */
+  --filter-hint-bg: rgba(59, 130, 246, 0.1);
+  --filter-hint-border: rgba(59, 130, 246, 0.2);
+  --filter-hint-text: var(--color-primary);
+  
+  /* 结果面板变量 */
+  --results-panel-bg: var(--glass-bg-primary);
+  --results-panel-border: var(--glass-border);
+  --results-detail-bg: var(--glass-bg-secondary);
+}
+
+/* 深色模式变量 */
+.dark {
+  --filter-hint-bg: rgba(59, 130, 246, 0.15);
+  --filter-hint-border: rgba(59, 130, 246, 0.3);
+}
+
+/* ===== 插件容器样式 ===== */
+.plugin-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--plugin-container-border);
+  border-radius: var(--plugin-container-radius);
+  box-shadow: var(--plugin-container-shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== 插件区域样式 ===== */
+.plugin-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--plugin-section-bg);
+  border-bottom: 1px solid var(--plugin-section-border);
+  padding: var(--plugin-section-padding);
+  position: relative;
+  overflow: hidden;
+}
+
+.plugin-section:last-child {
+  border-bottom: none;
+}
+
+/* ===== 区域标题样式 ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--glass-border-light);
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ===== 插件表格包装器 ===== */
+.plugin-table-wrapper {
+  flex: 1;
+  background: var(--plugin-table-bg);
+  border: 1px solid var(--plugin-table-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== 状态码显示样式 ===== */
+.status-codes-display {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.status-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 1.5rem;
+  padding: 0 0.375rem;
+  background: var(--status-code-bg);
+  border: 1px solid var(--status-code-border);
+  border-radius: var(--status-code-radius);
+  font-weight: 500;
+  font-size: 0.75rem;
+  transition: var(--transition-fast);
+}
+
+.status-separator {
+  color: var(--status-separator-color);
+  font-weight: 400;
+  margin: 0 0.125rem;
+}
+
+/* 状态码颜色 */
+.status-2xx {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--color-success);
+}
+
+.status-3xx {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--color-warning);
+}
+
+.status-4xx {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-error);
+}
+
+.status-5xx {
+  background: rgba(147, 51, 234, 0.1);
+  border-color: rgba(147, 51, 234, 0.3);
+  color: #9333ea;
+}
+
+/* ===== 过滤提示样式 ===== */
+.filter-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--filter-hint-bg);
+  border: 1px solid var(--filter-hint-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.filter-hint i {
+  color: var(--filter-hint-text);
+  font-size: 1rem;
+}
+
+.hint-text {
+  color: var(--filter-hint-text);
+  font-weight: 500;
+}
+
+/* ===== 结果区域样式 ===== */
+.plugin-results-section {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background: var(--results-panel-bg);
+  border-top: 1px solid var(--results-panel-border);
+}
+
+.plugin-results-list-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--plugin-section-bg);
+  border-right: 1px solid var(--plugin-section-border);
+  overflow: hidden;
+}
+
+.plugin-results-detail-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--results-detail-bg);
+  overflow: hidden;
+}
+
+/* ===== 结果操作区域 ===== */
+.results-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 200px;
+  padding: 0.375rem 0.75rem 0.375rem 2rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-bg-light);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  transition: var(--transition-fast);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.5rem;
+  color: var(--color-text-tertiary);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* ===== 详情面板内容 ===== */
+.plugin-detail-panel-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.plugin-detail-view-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--glass-border-light);
+  background: var(--glass-bg-light);
+}
+
+.plugin-request-response-wrapper {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== 对话框样式 ===== */
+.rule-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.rule-dialog {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: var(--glass-shadow-strong);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-config-dialog {
+  max-width: 700px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--glass-border-light);
+  background: var(--glass-bg-light);
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.dialog-close:hover {
+  background: var(--glass-bg-medium);
+  color: var(--color-text-primary);
+}
+
+.dialog-body {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--glass-border-light);
+  background: var(--glass-bg-light);
+}
+
+/* ===== 表单样式 ===== */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-bg-light);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  transition: var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 400 !important;
+  margin-bottom: 0 !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto !important;
+  margin: 0;
+}
+
+/* ===== 代码片段样式 ===== */
+.code-snippet {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--glass-bg-medium);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border-light);
+  color: var(--color-text-primary);
+}
+
+.removed-value {
+  font-style: italic;
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+}
+
+/* ===== 操作列样式 ===== */
+.actions-column {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg-light);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 0.875rem;
+}
+
+.btn-icon:hover {
+  background: var(--glass-bg-medium);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.edit-button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.delete-button:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  .plugin-container {
+    border-radius: 0;
+    height: 100vh;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .header-actions {
+    justify-content: space-between;
+  }
+  
+  .search-input {
+    width: 150px;
+  }
+  
+  .rule-dialog {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .dialog-header,
+  .dialog-body,
+  .dialog-footer {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .search-input {
+    width: 120px;
+  }
+  
+  .btn {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
+  }
+}
+
+/* ===== 深色模式适配 ===== */
+.dark .rule-dialog-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .rule-dialog {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+}
+
+.dark .dialog-header {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .dialog-body {
+  background: var(--color-bg-primary);
+}
+
+.dark .dialog-footer {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .search-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.dark .form-group input::placeholder,
+.dark .form-group textarea::placeholder {
+  color: var(--color-text-tertiary);
+}

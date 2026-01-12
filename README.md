@@ -1,137 +1,148 @@
-## 承影
+# 承影（ChYing）：三年磨一剑，一个安全人的开源梦
 
-<p align="center">
-将旦昧爽之交，日夕昏明之际，北面而察之，淡淡焉若有物存，莫识其状。其所触也，窃窃然有声，经物而物不疾也。
-  <br/>
-  <br/>
-  <a href="https://github.com/yhy0/ChYing/blob/main/LICENSE">
-    <img alt="Release" src="https://img.shields.io/github/license/yhy0/ChYing"/>
-  </a>
-  <a href="https://github.com/yhy0/ChYing">
-    <img alt="Release" src="https://img.shields.io/badge/release-v1.1-brightgreen"/>
-  </a>
-  <a href="https://github.com/yhy0/ChYing">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/yhy0/ChYing?color=9cf"/>
-  </a>
-  <a href="https://github.com/yhy0/ChYing">
-    <img alt="GitHub forks" src="https://img.shields.io/github/forks/yhy0/ChYing"/>
-  </a>
-  <a href="https://github.com/yhy0/ChYing">
-    <img alt="GitHub all release" src="https://img.shields.io/github/downloads/yhy0/ChYing/total?color=blueviolet"/>
-  </a>
-</p>
-<div align="center">
-<strong>
-<samp>
-  
-[简体中文](./README.md) · [English](./README-en.md)
-  
-</samp>
-</strong>
-</div>
+> 写在前面
+>
+> 2023 年 4 月，我在 GitHub 上创建了一个叫 "承影" 的项目。
+>
+> 承影，取自古代名剑，《列子·汤问篇》中记载："二曰承影，将旦昧爽之交，日夕昏明之际，北面而察之，淡淡焉若有物存，莫识其状。其所触也，窃窃然有声，经物而物不疾也" 意为在光影交错之际才能隐约看见的神剑。
+>
+> 我希望这个工具也能如此——在渗透测试的明暗之间，成为安全人手中的利器。
 
-https://github.com/yhy0/ChYing/assets/31311038/54cc1130-fb95-4a8f-b90e-3479e9c5a2c7
+## 缘起：一个安全人的产品梦
 
-<video controls="controls" loop="loop" autoplay="autoplay"> 
-    <source src="images/ChYing.mp4" type="video/mp4">
-</video>
+我是一个网络安全爱好者，热衷于开发实用、有趣的小工具。
 
-## 构建项目
+一直以来，我有一个梦想：打造一款像 Xray、BurpSuite 这样被广泛使用的安全产品。
 
-https://wails.io/zh-Hans/docs/gettingstarted/installation/
+在承影之前，我还做过另一个开源项目——[Jie](https://github.com/yhy0/Jie)，一个综合性的 Web 安全评估工具，支持主被动扫描、漏洞检测、信息收集等功能，目前收获了 600+ Star。
 
-安装 **wails** 
+但 Jie 更偏向自动化扫描，是"跑起来就不用管"的那种工具。我还缺一个交互式的渗透测试平台——能抓包、能改包、能重放、能爆破，像 Burp Suite 那样，但更轻量、更现代、更"我的"。
 
-然后 `wails build`
+于是，承影诞生了。
 
-## 已有功能
+而且，我把 Jie 的扫描能力也集成了进来。承影 + Jie，一个负责交互，一个负责自动化，互为补充。
 
-### 目录扫描
+## 三年：断断续续的深夜
 
-提取 [dirsearch](https://github.com/maurosoria/dirsearch) 的字典规则进行扫描，目前只会进行一层目录扫描，后期考虑根据找到的目录，进行多层目录遍历
+从 2023 年到现在，这个项目经历了太多：
 
-[bbscan](https://github.com/lijiejie/bbscan) 规则扫描
+第一版（2023）：用 Wails + Vue 搭了个架子，实现了基础的代理、目录扫描、JWT 解析。界面很简陋，但能用。开源后收获了 400+ Star，说实话有点意外。
 
-### Swagger 测试
+沉寂期（2023-2024）：工作忙了，项目停更。但心里一直惦记着，总觉得还差点什么。
 
-对 `swagger api` 进行未授权、ssrf、注入等测试
+重构期（2024-2025）：创建了私有仓库，137 次提交，无数个熬夜的深夜，大刀阔斧地重构。
 
-### 403 bypass
+这里要说一个转折点：LLM 的出现。
 
-Swagger 会自动进行 403 bypass
+说实话，我的前端水平很有限，也没有时间系统学习。之前的界面之所以简陋，就是因为我只能写出那种程度的代码。
 
-https://github.com/devploit/dontgo403
+但 Cursor 等 AI 编程工具出来后，一切都变了。我不再需要纠结"这个动画效果怎么实现"、"这个布局用 flex 还是 grid"——我只需要描述我想要什么，AI 帮我实现。
 
-https://infosecwriteups.com/403-bypass-lyncdiscover-microsoft-com-db2778458c33
+AI 是个人能力的放大器。 它不会替你思考产品该怎么设计，但它能帮你把想法变成代码。对于我这种"有想法但技术有短板"的人来说，这简直是破局的关键。
 
-### JWT
+于是，那个在我脑海里构思了很久的"现代化 UI"，终于能够落地了。
 
-- JWT token 解析，[jwt.io](https://jwt.io/) 样式显示
-- JWT 秘钥爆破
+现在：它长这样了
 
-### NucleiY
+![image-20260112204045831](./images/image-20260112204045831.png)
 
-基于 nuclei 实现的重点漏洞扫描, 使用前往 https://github.com/yhy0/nucleiY 查看说明
+![image-20260112204151347](./images/image-20260112204151347.png)
 
-### BurpSuite
+核心功能
 
-使用 [go-mitmproxy](https://github.com/lqqyt2423/go-mitmproxy) 项目实现 BurpSuite 的 功能
+HTTP 代理 & 流量分析
+- 实时捕获 HTTP/HTTPS 流量
+- 智能过滤（按方法、主机、状态码、路径）
+- 右键菜单一键发送到 Repeater/Intruder/扫描器
 
-[证书安装](https://github.com/lqqyt2423/go-mitmproxy#usage):
+Repeater（重放器）
+- 手动修改请求，反复测试
+- 支持多标签页，对比测试更方便
 
-启动后HTTP代理地址默认设置为9080端口
+Intruder（入侵者）
+- 自动化攻击测试
+- 支持多种 Payload 类型
+- 结果实时展示
 
-第一次启动后需要安装证书来解析HTTPS流量。 证书会在第一次启动命令后自动生成，保存在~/.mitmproxy/mitmproxy-ca-cert.pem. 安装步骤可以在 Python mitmproxy 文档中找到：[关于证书](https://docs.mitmproxy.org/stable/concepts-certificates/)。
+Decoder（编解码）
+- URL/Base64/Hex/Unicode 一键转换
+- MD5/SHA 哈希计算
+- 支持链式编解码
 
--   [x] Proxy 模块
--   [x] Repeater 模块
--   [x] Intruder 模块
-
-
-### 字典可配置
-
-用到的各种字典文件, 第一次运行会将内置字典释放到用户目录的`.config/ChYing`目录下，后续每次运行都会先读取一遍
-
-### 编码、解码
-Unicode 、URL、Hex、Base64 编/解码
-
-MD5 加密
-### 其它
-- 杀软识别
-https://github.com/gh0stkey/avList/blob/master/avlist.js
+插件模块
+- JWT 解析与密钥爆破
+- Swagger API 测试（未授权访问、注入检测）
+- 403 Bypass
 - Shiro 解密
 
-## 问题
-前端不会，全靠 ChatGPT 
+集成 Jie 扫描器
+- 被动流量扫描
+- 主动漏洞检测（XSS、SQL 注入、SSRF、命令执行等）
+- Nuclei POC 支持
 
-- 现在各个 tabs 页面，不点进去不会激活，导致 BurpSuite 用之前必须点击一遍每个页面
-- Intruder 模块
-  - Attack 显示不能切换别的 Intruder tab页，不然结果就不显示了，前端数据绑定问题，太菜了，还没想好怎么写
+技术栈
 
-## License
+- 后端：Go（高性能、跨平台）
+- 前端：Vue 3 + TypeScript
+- 框架：Wails v3（Go + Web 的完美结合）
+- 数据库：SQLite（轻量本地存储）
+- 扫描引擎：Jie
 
-This code is distributed under the [AGPL-3.0 license](https://github.com/yhy0/ChYing/blob/main/LICENSE). See [LICENSE](https://github.com/yhy0/ChYing/blob/main/LICENSE) in this directory.
+UI：液态玻璃设计
 
-## 鸣谢
+这次重构最大的变化是 UI。借助 AI 的帮助，我终于实现了心中的设计：
 
-感谢 [JetBrains](https://www.jetbrains.com/) 提供的一系列好用的 IDE 和对本项目的支持。
+- 液态玻璃风格（Glassmorphism）：半透明、模糊背景、柔和阴影
+- 深色/浅色主题：护眼，也好看
+- 响应式布局：各种分辨率都能用
+- 流畅动画：每个交互都有反馈
 
-![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)
+我不是专业设计师，但我希望每天打开这个工具时，心情是愉悦的。
 
-https://github.com/lijiejie/bbscan
+## 为什么现在开源？
 
-https://github.com/maurosoria/dirsearch
+这个项目在我的私有仓库里躺了快两年。
 
-https://github.com/devploit/dontgo403
+一直没开源，总觉得"还不够好"——功能没完善、Bug 没修完、UI 还能更好……再加上工作重心转移，渗透测试做得少了，Burp 也很久没打开。
 
-https://github.com/lqqyt2423/go-mitmproxy
+但最近想通了：完美是开源的敌人。
 
-https://github.com/gh0stkey/avList/
+与其让它继续躺在硬盘里，不如放出来。也许有人会觉得它有用，也许有人会帮忙改进，也许它能激发别人做类似的事情。
 
-https://wails.io/
+更重要的是，我想给这三年的付出留下一点痕迹。代码会过时，技术会迭代，但这份"想做点什么"的心意，希望能被记住。
 
-https://www.naiveui.com/
+写给同行
 
-## Star History
+如果你也是安全从业者，我想说：
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yhy0/ChYing&type=Date)](https://star-history.com/#yhy0/ChYing&Date)
+这个工具不是要取代 Burp Suite。Burp 依然是最专业、最全面的渗透测试工具。
+
+但如果你：
+- 想要一个启动更快的轻量级工具
+- 想要一个界面更现代的选择
+- 想要一个可以自己改的开源方案
+- 或者只是想看看一个安全人是怎么折腾自己的工具的
+
+那么，承影也许值得你试试。
+
+最后
+
+三年，137 次提交，无数个深夜。
+
+从一个简陋的原型，到现在这个样子。
+
+它不完美，还有很多要改进的地方。但它是我的，是我一行一行敲出来的。
+
+现在，它也可以是你的了。
+
+---
+承影 GitHub: https://github.com/yhy0/ChYing
+
+Jie GitHub: https://github.com/yhy0/Jie
+
+Star 一下？ 这是对一个独立开发者最好的鼓励。
+
+---
+承影，愿你在光影之间，找到属于自己的锋芒。
+
+---

@@ -1,5 +1,11 @@
-build/bin
-node_modules
-frontend/dist
+bin
+frontend/node_modules
+frontend/dist/assets
+frontend/dist/index.html
+frontend/bindings/
 .idea
 logs
+.task
+.vscode
+*.syso
+.DS_Store

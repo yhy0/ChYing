@@ -1,0 +1,27 @@
+/* 
+ * 白天模式关键修复
+ * 仅修复最影响用户体验的可见性问题
+ * 保持现有设计系统完全不变
+ */
+
+/* 修复白色渐变分隔线在白天模式下完全不可见的问题 */
+:not(.dark) *::after {
+  background-image: linear-gradient(90deg, 
+    transparent, 
+    rgba(148, 163, 184, 0.4), 
+    transparent) !important;
+}
+
+/* 仅针对确实存在问题的元素进行最小化修复 */
+:not(.dark) .http-traffic-table th {
+  color: var(--color-text-primary, #1e293b) !important;
+}
+
+/* 修复表格选中行在白天模式下几乎不可见的问题 */
+:not(.dark) .http-traffic-table tr.selected {
+  background: rgba(79, 70, 229, 0.08) !important;
+}
+
+:not(.dark) .http-traffic-table tr.selected:hover {
+  background: rgba(79, 70, 229, 0.12) !important;
+}

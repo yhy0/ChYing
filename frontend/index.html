@@ -1,14 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>承影</title>
-    <link href="./src/style.css" rel="stylesheet">
-</head>
-<body>
-<div id="app"></div>
-<script src="./src/main.js" type="module"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BurpLite - Security Testing Tool</title>
+    <script>
+      // Apply theme before page loads to avoid flash of wrong theme
+      (function() {
+        // Check saved theme preference
+        let savedTheme = localStorage.getItem('theme');
+        
+        let darkMode = false;
+        
+        // Determine if dark mode should be used
+        if (savedTheme === 'dark') {
+          darkMode = true;
+        } else if (savedTheme === 'light') {
+          darkMode = false;
+        } else {
+          // Check system preference if no theme is set
+          darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        
+        // Apply dark class if needed
+        if (darkMode) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
-

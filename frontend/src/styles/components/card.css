@@ -1,0 +1,189 @@
+/* 卡片组件样式 - 液态玻璃设计 */
+
+/* 通用卡片组件 - 多层边界系统 */
+.card {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border-radius: var(--glass-radius-lg);
+  padding: 1rem 1.25rem;
+  border: none; /* 移除单一边框 */
+  /* 多层边界系统 */
+  box-shadow:
+    /* 外层轮廓 */
+    inset 0 0 0 1px var(--glass-border-light),
+    /* 内层凹陷感 */
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    /* 主要阴影 */
+    var(--glass-shadow-medium),
+    /* 边缘模糊增强 */
+    0 0 0 0.5px rgba(203, 213, 225, 0.3);
+  transition: var(--glass-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 优化的方向性光泽效果 */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* 边缘模糊辅助效果 */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 0%,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%);
+  filter: blur(0.5px);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* 卡片内部元素圆角适配 */
+.card > *:first-child {
+  border-radius: var(--glass-radius-md) var(--glass-radius-md) var(--radius-sm) var(--radius-sm);
+}
+
+.card > *:last-child {
+  border-radius: var(--radius-sm) var(--radius-sm) var(--glass-radius-md) var(--glass-radius-md);
+}
+
+.card > *:only-child {
+  border-radius: var(--glass-radius-md);
+}
+
+/* 卡片头部样式 */
+.card-header {
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-radius: var(--glass-radius-md) var(--glass-radius-md) 0 0;
+  margin: -1rem -1.25rem 1rem -1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--glass-border-light);
+}
+
+/* 卡片内容区域 */
+.card-content {
+  background: transparent;
+}
+
+/* 卡片底部 */
+.card-footer {
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-subtle);
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+  border-radius: 0 0 var(--glass-radius-md) var(--glass-radius-md);
+  margin: 1rem -1.25rem -1rem -1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--glass-border-light);
+}
+
+/* 卡片悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.card-hover:hover {
+  transform: translateY(-2px);
+  background: var(--glass-bg-hover);
+  /* 增强的多层边界悬停效果 */
+  box-shadow:
+    /* 增强的外层轮廓 */
+    inset 0 0 0 1px var(--glass-border),
+    /* 更深的内层凹陷 */
+    inset 0 1px 3px rgba(0, 0, 0, 0.08),
+    /* 强化的主要阴影 */
+    var(--glass-shadow-strong),
+    /* 增强的边缘模糊 */
+    0 0 0 1px rgba(148, 163, 184, 0.4),
+    /* 外发光效果 */
+    0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* 深色模式适配 */
+.dark .card::before {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 25%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 100%);
+}
+
+/* ========== 设置卡片样式 ========== */
+
+/* 设置页面主容器 */
+.settings-container {
+  background: var(--color-bg-primary);
+  border-radius: var(--glass-radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--glass-shadow-subtle);
+  border: 1px solid var(--glass-border-light);
+}
+
+/* 设置区块卡片 */
+.settings-section {
+  padding: 1rem;
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-lg);
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-subtle);
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+  transition: all 0.2s ease;
+}
+
+.settings-section:hover {
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-subtle);
+}
+
+/* 设置区块标题 */
+.settings-section-title {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+}
+
+/* 设置项网格 */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .settings-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 设置项 */
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-item label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}

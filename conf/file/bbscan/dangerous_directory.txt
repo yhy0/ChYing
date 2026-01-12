@@ -1,0 +1,10 @@
+# https://2015.zeronights.org/assets/files/35-Egorov.pdf  webdav -> xxe
+/webdav             {status=200}
+/nacos              {status=200}        {type="html"}     {tag="nacos"}     {root_only}
+/Dockerfile         {status=200}        {tag="docker"}
+/oauth/idp/.well-known/openid-configuration    {status=200}          {root_only}
+# 有两种情况
+/jmreport/testConnection            {status=405}        {type="html"}     {tag="type=Method Not Allowed"}     {root_only}
+/jmreport/testConnection            {status=200}        {type="application/json"}     {tag="不支持GET请求方法"}     {root_only}
+
+/webservice/        {status=200}        {type="html"}     {tag="Available SOAP services:"}

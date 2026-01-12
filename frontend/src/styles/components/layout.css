@@ -1,0 +1,271 @@
+/* 布局样式 */
+
+/* 常用布局容器 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.container-fluid {
+  width: 100%;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+/* 通用区域头部样式 - 液态玻璃设计 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-bottom: 1px solid var(--glass-border-light);
+  flex-shrink: 0;
+  min-height: 44px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* 嵌套在卡片中的头部 - 自适应圆角 */
+.card .section-header {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  margin: -1rem -1.25rem 0 -1.25rem;
+  padding: 0.75rem 1.25rem;
+}
+
+/* 独立的头部 - 完整圆角 */
+.section-header:not(.card .section-header) {
+  border-radius: var(--glass-radius-sm);
+}
+
+/* 液态玻璃光泽效果 */
+.section-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 30%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 70%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.header-actions,
+.results-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 常用弹性布局 */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 深色模式适配 */
+.dark .section-header {
+  background: var(--glass-bg-secondary);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.dark .section-header::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.dark .section-header h3 {
+  color: var(--color-text-primary);
+}
+
+/* 插件模块通用布局样式 */
+.plugin-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.plugin-section {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.plugin-results-section {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.plugin-results-list-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--color-border);
+}
+
+.plugin-results-detail-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.plugin-detail-panel-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.plugin-detail-view-controls {
+  display: flex;
+  padding: 0.3125rem 0.625rem;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  gap: 0.3125rem;
+}
+
+.plugin-request-response-wrapper {
+  flex-grow: 1;
+  overflow: hidden;
+  border: none;
+}
+
+.plugin-request-response-wrapper > :deep(.request-response-container) {
+  border: none !important;
+  border-radius: 0;
+}
+
+/* 表格包装器样式 */
+.plugin-table-wrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-left: 10px;
+}
+
+/* 移除值样式 */
+.removed-value {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* 侧边栏样式 - 液态玻璃设计 */
+.sidebar {
+  width: 320px;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border-right: 1px solid var(--glass-border);
+  border-radius: 0 var(--glass-radius-md) var(--glass-radius-md) 0;
+  overflow-y: auto;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* 侧边栏液态边缘效果 */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 25%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.3) 75%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.sidebar-panel {
+  border-bottom: 1px solid var(--glass-border-light);
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-radius: var(--glass-radius-sm);
+  margin: 0.5rem;
+  border: 1px solid var(--glass-border-light);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 侧边栏面板悬停效果 */
+.sidebar-panel:hover {
+  background: var(--glass-bg-secondary);
+  border-color: var(--glass-border);
+  transform: translateX(2px);
+  box-shadow: var(--glass-shadow-light);
+}
+
+/* 侧边栏面板光泽效果 */
+.sidebar-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 主要内容区域 */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 深色模式适配 */
+.dark .sidebar {
+  background: var(--glass-bg-secondary);
+  border-color: var(--glass-border);
+}
+
+.dark .sidebar::before {
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+}
+
+.dark .sidebar-panel {
+  border-color: var(--glass-border);
+  background: var(--glass-bg-tertiary);
+}

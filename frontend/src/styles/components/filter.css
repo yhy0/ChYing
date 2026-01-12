@@ -1,0 +1,281 @@
+/* 通用过滤器组件样式 - 玻璃态设计 */
+
+/* 过滤器容器 */
+.filter-container {
+  padding: var(--spacing-lg);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  overflow-y: auto;
+  position: relative;
+}
+
+/* 玻璃态光泽效果 */
+.filter-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 过滤器头部 - 玻璃态设计 */
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.filter-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.filter-header h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 过滤器操作区域 */
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* 激活过滤器计数器 - 玻璃态设计 */
+.active-count {
+  font-size: var(--text-xs);
+  padding: 4px 10px;
+  background: linear-gradient(135deg, var(--color-primary), rgba(79, 70, 229, 0.8));
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: var(--color-primary-text);
+  border-radius: var(--glass-radius-sm);
+  border: 1px solid var(--glass-border-strong);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--glass-shadow-sm);
+  animation: pulse-subtle 2s infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* 过滤器按钮 */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--border-radius);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border-color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+/* 过滤器输入框 - 玻璃态设计 */
+.filter-input {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-sm);
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  transition: all 0.2s ease;
+  box-shadow: var(--glass-shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.filter-input::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-focus);
+  transform: translateY(-2px);
+}
+
+.filter-input::placeholder {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* 复选框组 */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.checkbox-list {
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* 复选框项 */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.checkbox-item:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border);
+  transform: translateX(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 选中状态的复选框项 */
+.checkbox-item:has(.check-indicator) {
+  background: rgba(var(--color-primary-rgb), 0.08);
+  border-color: rgba(var(--color-primary-rgb), 0.2);
+  box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.15);
+}
+
+.checkbox-item:has(.check-indicator) .option-icon {
+  color: var(--color-primary);
+}
+
+.checkbox-item:has(.check-indicator) .option-label {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* 复选框内容 */
+.checkbox-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+/* 选项图标 */
+.option-icon {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* 选项标签 */
+.option-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+/* 选中指示器 */
+.check-indicator {
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* 等级徽章过滤器 */
+.level-badge-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  color: white;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* 日期范围过滤器 */
+.date-range {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.date-input {
+  font-size: var(--text-xs);
+}
+
+.date-separator {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* 深色模式适配 */
+.dark .filter-input {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.dark .filter-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.3);
+} 

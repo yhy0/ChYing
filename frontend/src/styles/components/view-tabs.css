@@ -1,0 +1,171 @@
+/* 请求/响应视图标签样式 */
+
+/* 标签容器 - 玻璃态设计 */
+.view-tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--glass-radius-sm);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
+  margin-right: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.view-tabs-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.dark .view-tabs-container {
+  background: var(--glass-bg-secondary);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.dark .view-tabs-container::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* 标签按钮 - 玻璃态设计 */
+.view-tab-button {
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--glass-radius-sm);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  color: var(--color-text-secondary, #6b7280);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-tab-button:hover {
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-color: var(--glass-border-light);
+}
+
+.dark .view-tab-button {
+  color: var(--color-text-secondary-dark, #9ca3af);
+}
+
+/* 选中标签样式 - 玻璃态设计 */
+.view-tab-button.active {
+  color: var(--color-primary, #6366f1);
+  font-weight: 600;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.dark .view-tab-button.active {
+  color: var(--color-primary-light, #818cf8);
+  background: var(--glass-bg-primary);
+  border-color: var(--glass-border);
+}
+
+/* 标签背景滑块 */
+.view-tab-slider {
+  position: absolute;
+  height: calc(100% - 4px);
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .view-tab-slider {
+  background-color: var(--color-bg-tertiary-dark, #1f2937);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* 标签图标 */
+.view-tab-icon {
+  display: inline-block;
+  margin-right: 3px;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+.view-tab-button:hover .view-tab-icon {
+  transform: translateY(-1px);
+}
+
+/* 标签切换动画 */
+.view-transition-enter-active,
+.view-transition-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.view-transition-enter-from,
+.view-transition-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.view-transition-enter-to,
+.view-transition-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 面板标题 */
+.panel-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  color: var(--color-text-primary, #111827);
+}
+
+.dark .panel-title {
+  color: var(--color-text-primary-dark, #f9fafb);
+}
+
+.panel-title-icon {
+  margin-right: 4px;
+  color: var(--color-primary, #6366f1);
+}
+
+/* 操作按钮 */
+.action-button {
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  color: var(--color-text-secondary, #6b7280);
+  background-color: transparent;
+}
+
+.action-button:hover {
+  color: var(--color-primary, #6366f1);
+  background-color: var(--color-bg-hover, rgba(99, 102, 241, 0.08));
+}
+
+.dark .action-button {
+  color: var(--color-text-secondary-dark, #9ca3af);
+}
+
+.dark .action-button:hover {
+  color: var(--color-primary-light, #818cf8);
+  background-color: var(--color-bg-hover-dark, rgba(99, 102, 241, 0.15));
+} 

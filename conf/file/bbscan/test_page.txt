@@ -1,0 +1,10 @@
+/test.php      {status=200}     {type="html"}      {root_only}
+/test2.php     {status=200}     {type="html"}      {root_only}
+# /test.html     {status=200}     {type="html"}      {root_only}
+# /test2.html    {status=200}     {type="html"}      {root_only}
+/test.jsp      {status=200}     {type="html"}      {root_only}
+/test.txt      {status=200}     {type="text/plain"}      {root_only}
+/test2.txt     {status=200}     {type="text/plain"}      {root_only}
+/debug.php     {status=200}     {type="html"}      {root_only}      {fingprints="php"}
+/a.php         {status=200}     {type="html"}      {root_only}      {fingprints="php"}
+/1.php         {status=200}     {type="html"}      {root_only}      {fingprints="php"}

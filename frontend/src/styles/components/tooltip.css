@@ -1,0 +1,176 @@
+/* Tooltip 样式 - 玻璃态设计 */
+
+/* ========== 基础 Tooltip 样式 ========== */
+
+/* Tooltip 容器 */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip 文本 */
+.tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1000;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-bg-primary);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  color: var(--color-text-primary);
+  text-align: center;
+  border-radius: var(--glass-radius-sm);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-strong);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s ease;
+  transform: translateY(5px);
+}
+
+/* Tooltip 显示状态 */
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== Tooltip 位置变体 ========== */
+
+/* 底部 Tooltip (默认) */
+.tooltip-bottom {
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+}
+
+.tooltip-container:hover .tooltip-bottom {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 顶部 Tooltip */
+.tooltip-top {
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.tooltip-container:hover .tooltip-top {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 左侧 Tooltip */
+.tooltip-left {
+  top: 50%;
+  right: calc(100% + 10px);
+  transform: translateY(-50%) translateX(-5px);
+}
+
+.tooltip-container:hover .tooltip-left {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* 右侧 Tooltip */
+.tooltip-right {
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%) translateX(5px);
+}
+
+.tooltip-container:hover .tooltip-right {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ========== Tooltip 箭头 ========== */
+
+/* 底部箭头 */
+.tooltip-bottom::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid var(--glass-border);
+}
+
+.tooltip-bottom::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid var(--color-bg-primary);
+}
+
+/* 顶部箭头 */
+.tooltip-top::before {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--glass-border);
+}
+
+.tooltip-top::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--color-bg-primary);
+}
+
+/* ========== Tooltip 主题变体 ========== */
+
+/* 深色 Tooltip */
+.tooltip-dark {
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 成功 Tooltip */
+.tooltip-success {
+  background: var(--color-success);
+  color: white;
+  border-color: var(--color-success);
+}
+
+/* 警告 Tooltip */
+.tooltip-warning {
+  background: var(--color-warning);
+  color: white;
+  border-color: var(--color-warning);
+}
+
+/* 错误 Tooltip */
+.tooltip-error {
+  background: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+}
+
+/* ========== 兼容性样式 ========== */
+
+/* 为了兼容现有组件，保持原有的默认位置 */
+.tooltip-text:not(.tooltip-top):not(.tooltip-left):not(.tooltip-right) {
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+}
+
+.tooltip-container:hover .tooltip-text:not(.tooltip-top):not(.tooltip-left):not(.tooltip-right) {
+  transform: translateX(-50%) translateY(0);
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerability Report - Jie</title>
+    <!-- Include Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .vuln-card.Low {
+            border-color: #6c757d;
+        }
+        .vuln-card.Medium {
+            border-color: #ffc107;
+        }
+        .vuln-card.High {
+            border-color: #fd7e14;
+        }
+        .vuln-card.Critical {
+            border-color: #dc3545;
+        }
+        .vuln-card.Low .level, .vuln-card.Low .plugin {
+            color: #6c757d;
+        }
+        .vuln-card.Medium .level, .vuln-card.Medium .plugin {
+            color: #ffc107;
+        }
+        .vuln-card.High .level, .vuln-card.High .plugin {
+            color: #fd7e14;
+        }
+        .vuln-card.Critical .level, .vuln-card.Critical .plugin {
+            color: #dc3545;
+        }
+        .list-group-item {
+            padding: 0.5rem 1rem;
+        }
+        .vuln-card h4 {
+            font-size: 1.2rem;
+        }
+        p {
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h3 class="text-center">Vulnerability Report - Jie</h3>
+    <ul class="list-group">
+        {{ range $index, $message := .VulMessages }}
+        <li class="list-group-item">
+            <div class="vuln-card mb-3 {{ $message.Level }}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="level mb-0">
+                        {{ if $message.VulnData.VulnType }} {{ $message.VulnData.VulnType }} - {{ end }}{{ $message.VulnData.Target }}
+                    </h4>
+                    <span class="toggle-switch btn btn-primary">Toggle Details</span>
+                </div>
+                <p class="level">{{ $message.Level }} <span class="badge rounded-pill bg-danger"> {{ $message.Plugin }}</span></p>
+                {{ if $message.VulnData.Ip }}<p>IP: {{ $message.VulnData.Ip }}</p>{{ end }}
+                {{ if $message.VulnData.CreateTime }}<p>Create Time: {{ $message.VulnData.CreateTime }}</p>{{ end }}
+                {{ if $message.VulnData.Payload }}<p class="level">Payload: {{ $message.VulnData.Payload }}</p>{{ end }}
+                <div class="vuln-details collapse">
+                    {{ if $message.VulnData.Method }}<p>Method: {{ $message.VulnData.Method }}</p>{{ end }}
+                    {{ if $message.VulnData.Param }}<p>Parameter: {{ $message.VulnData.Param }}</p>{{ end }}
+                    {{ if $message.VulnData.CURLCommand }}<p>CURL Command: {{ $message.VulnData.CURLCommand }}</p>{{ end }}
+                    {{ if $message.VulnData.Description }}<p>Description: {{ $message.VulnData.Description }}</p>{{ end }}
+                    <!-- Nav tabs for Request and Response -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#vuln-request{{$index}}" role="tab" aria-controls="vuln-request{{$index}}" aria-selected="true" >Request</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#vuln-response{{$index}}" role="tab" aria-controls="vuln-response{{$index}}" aria-selected="false" >Response</a>
+                        </li>
+                    </ul>
+                    <!-- Tab panes for Request and Response -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="vuln-request{{$index}}" role="tabpanel" aria-labelledby="vuln-request-tab{{$index}}">
+                            {{ if $message.VulnData.Request}}<pre class="card-text bg-light p-3 border">{{ $message.VulnData.Request}}</pre>{{ end }}
+                        </div>
+                        <div class="tab-pane fade" id="vuln-response{{$index}}" role="tabpanel" aria-labelledby="vuln-response-tab{{$index}}">
+                            {{ if $message.VulnData.Response }}<pre class="card-text bg-light p-3 border">{{ $message.VulnData.Response | html }}</pre>{{ end }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        {{ end }}
+    </ul>
+    <div class="footer mt-5 pt-3 text-center">
+        © 2023 Copyright: <a class="text-dark" href="https://github.com/yhy0/Jie" target="_blank">yhy</a>
+    </div>
+</div>
+<!-- Include Bootstrap 5 JS (Optional, if needed) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toggleSwitches = document.querySelectorAll(".toggle-switch");
+        toggleSwitches.forEach(function (toggleSwitch) {
+            toggleSwitch.addEventListener("click", function () {
+                var vulnDetails = this.closest(".vuln-card").querySelector(".vuln-details");
+                vulnDetails.classList.toggle("show");
+            });
+        });
+    });
+</script>
+</body>
+</html>

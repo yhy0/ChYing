@@ -1,0 +1,308 @@
+/* 项目模块特有样式 */
+
+/* 项目头部样式 - 玻璃态设计 */
+.project-header {
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md) var(--glass-radius-md) 0 0;
+  padding: 0.75rem 1rem;
+  box-shadow: var(--glass-shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.project-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.project-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.project-date {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  margin-top: 0.125rem;
+}
+
+/* 项目统计卡片 - 玻璃态设计 */
+.project-stat-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border-radius: var(--glass-radius-md);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-md);
+  transition: all var(--transition-duration) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.project-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.project-stat-card:hover {
+  transform: translateY(-4px);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--glass-border-strong);
+}
+
+.project-stat-label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.project-stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* 图标样式 */
+.project-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-icon-primary {
+  color: var(--color-brand);
+}
+
+.project-icon-success {
+  color: var(--color-success);
+}
+
+.project-icon-error {
+  color: var(--color-error);
+}
+
+.project-icon-warning {
+  color: var(--color-warning);
+}
+
+/* 项目导出按钮 */
+.export-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.export-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 0;
+  padding-bottom: 120%;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.3s ease;
+}
+
+.export-btn:active::after {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  transition: 0s;
+}
+
+.export-btn:hover .animate-icon {
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  80% {
+    transform: translateX(-2px);
+  }
+}
+
+/* 项目标签页 */
+.project-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-duration) ease-in-out;
+  cursor: pointer;
+}
+
+.project-tab-active {
+  color: var(--color-brand);
+  border-bottom: 2px solid var(--color-brand);
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.project-tab-inactive {
+  color: var(--color-text-secondary);
+}
+
+.project-tab-inactive:hover {
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dark .project-tab-active {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .project-tab-inactive:hover {
+  color: var(--color-text-tertiary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 进度条 */
+.progress-bar {
+  height: 0.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #e5e7eb;
+}
+
+.dark .progress-bar {
+  background-color: #374151;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--color-brand);
+  transition: width 0.7s ease-in-out;
+}
+
+/* 项目列表 */
+.project-list-item {
+  background-color: var(--color-bg-card);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-light);
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.project-list-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--color-brand-light), var(--color-brand));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -4px rgba(0, 0, 0, 0.06);
+  border-color: rgba(99, 102, 241, 0.4);
+  background: linear-gradient(
+    to bottom,
+    var(--color-bg-card) 0%,
+    var(--color-bg-primary) 100%
+  );
+}
+
+.project-list-item:hover::before {
+  opacity: 1;
+}
+
+.project-list-item-active {
+  background: linear-gradient(
+    to right,
+    rgba(99, 102, 241, 0.08),
+    rgba(99, 102, 241, 0.12)
+  );
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-left: 3px solid var(--color-brand);
+  box-shadow: 0 3px 10px -3px rgba(0, 0, 0, 0.08);
+}
+
+.project-list-item-active::before {
+  opacity: 1;
+  height: 4px;
+}
+
+.dark .project-list-item {
+  background-color: rgba(36, 36, 62, 0.7);
+  border-color: rgba(75, 85, 99, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.dark .project-list-item:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(42, 42, 66, 0.9) 0%,
+    rgba(48, 48, 76, 0.9) 100%
+  );
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.25), 0 4px 8px -4px rgba(0, 0, 0, 0.15);
+}
+
+.dark .project-list-item-active {
+  background: linear-gradient(
+    to right,
+    rgba(99, 102, 241, 0.15),
+    rgba(99, 102, 241, 0.08)
+  );
+  border-color: rgba(99, 102, 241, 0.5);
+  border-left: 3px solid var(--color-brand);
+}
+
+.project-list-stats {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.75rem;
+  background-color: rgba(243, 244, 246, 0.7);
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.dark .project-list-stats {
+  background-color: rgba(30, 30, 54, 0.6);
+} 

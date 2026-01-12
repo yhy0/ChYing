@@ -1,0 +1,73 @@
+/* 编辑器样式 */
+
+/* 代码区域使用等宽字体 */
+.cm-editor,
+.cm-content,
+.cm-line,
+.code-editor,
+.http-viewer,
+pre,
+code,
+.font-mono {
+  font-family: var(--font-family-mono) !important;
+}
+
+/* 编辑器换行样式 */
+.word-wrap .cm-content {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 40px !important;
+}
+
+.word-wrap .cm-line {
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+  padding-right: 16px !important;
+}
+
+/* 处理CodeMirror编辑器中的长行 */
+.editor-view.word-wrap .cm-scroller {
+  overflow-x: hidden !important;
+}
+
+/* 确保pre标签的换行行为一致 */
+pre.whitespace-pre-wrap {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  word-wrap: break-word !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  padding-right: 40px !important;
+}
+
+/* 强制应用换行样式 */
+.cm-editor .word-wrap .cm-content,
+.word-wrap .cm-editor .cm-content {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 40px !important;
+}
+
+.cm-editor .word-wrap .cm-line,
+.word-wrap .cm-editor .cm-line {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  padding-right: 16px !important;
+}
+
+/* 修复滚动容器 */
+.word-wrap .editor-container,
+.word-wrap .h-full.w-full.overflow-auto {
+  overflow-x: hidden !important;
+}
+
+/* 为Raw和Hex视图的容器添加边距 */
+.h-full.w-full.overflow-auto.p-4.pb-14 {
+  padding-right: 24px !important;
+} 

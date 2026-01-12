@@ -1,523 +1,228 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"github.com/buger/jsonparser"
-	uuid "github.com/satori/go.uuid"
-	"github.com/wailsapp/wails/v2/pkg/menu"
-	"github.com/wailsapp/wails/v2/pkg/menu/keys"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"github.com/yhy0/ChYing/conf"
-	"github.com/yhy0/ChYing/pkg/file"
-	"github.com/yhy0/ChYing/pkg/httpx"
-	"github.com/yhy0/ChYing/pkg/utils"
-	"github.com/yhy0/ChYing/tools/burpSuite"
-	"github.com/yhy0/ChYing/tools/decoder"
-	"github.com/yhy0/ChYing/tools/fuzz"
-	"github.com/yhy0/ChYing/tools/gadget"
-	"github.com/yhy0/ChYing/tools/nucleiY"
-	"github.com/yhy0/ChYing/tools/swagger"
-	"github.com/yhy0/ChYing/tools/twj"
-	"github.com/yhy0/logging"
-	"os"
-	"path/filepath"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/panjf2000/ants/v2"
+	wappalyzer "github.com/projectdiscovery/wappalyzergo"
+	"github.com/sasha-s/go-deadlock"
+	"github.com/yhy0/ChYing/api"
+	"github.com/yhy0/ChYing/conf"
+	"github.com/yhy0/ChYing/conf/file"
+	"github.com/yhy0/ChYing/mitmproxy"
+	JieConf "github.com/yhy0/ChYing/pkg/Jie/conf"
+	"github.com/yhy0/ChYing/pkg/Jie/pkg/mode"
+	"github.com/yhy0/ChYing/pkg/qqwry"
+	"github.com/yhy0/ChYing/pkg/utils"
+	"github.com/yhy0/logging"
 )
 
-// App struct
+/**
+   @author yhy
+   @since 2024/7/12
+   @desc App 核心结构体定义和初始化
+
+   本文件包含:
+   - App 结构体定义
+   - 类型定义 (Result, InitStep, InitProgress, InitContext, MemoryInfo, Msg)
+   - 全局变量声明
+   - init() 初始化函数
+   - Startup() 启动函数
+
+   其他方法已拆分到以下文件:
+   - app_initialization.go: 初始化相关方法
+   - app_config.go: 配置管理方法
+   - app_proxy.go: 代理和流量方法
+   - app_database.go: 数据库和历史方法
+   - app_scan.go: 扫描目标管理方法
+   - app_remote.go: 远程节点/集群方法
+   - app_window.go: 窗口管理方法
+   - app_utils.go: 工具方法
+**/
+
+// App 应用主结构体
 type App struct {
-	ctx context.Context
+	apiManager *api.APIManager // API管理器
 }
 
-// NewApp creates a new App application struct
-func NewApp() *App {
-	return &App{}
+// Result 统一返回结果结构体
+// 注意：不使用类型别名 (type Result = api.Result)，因为 Wails v3 binding 生成器
+// 在处理类型别名时会产生错误的导入引用 ($0 而不是正确的模块名)
+type Result struct {
+	Data  interface{} `json:"data"`
+	Error string      `json:"error"`
 }
 
-// Menu 应用菜单
-func (a *App) Menu() *menu.Menu {
-	return menu.NewMenuFromItems(
-		menu.SubMenu("承影", menu.NewMenuFromItems(
-			menu.Text("关于", nil, func(_ *menu.CallbackData) {
-				a.diag(conf.Description, false)
-			}),
-			menu.Text("检查更新", nil, func(_ *menu.CallbackData) {
-				resp, err := httpx.Get("https://api.github.com/repos/yhy0/ChYing/tags")
-				if err != nil {
-					a.diag("检查更新出错\n"+err.Error(), true)
-					return
-				}
+// InitStep 初始化步骤枚举
+type InitStep int
 
-				lastVersion, err := jsonparser.GetString([]byte(resp.Body), "[0]", "name")
-				if err != nil {
-					a.diag("检查更新出错\n"+err.Error(), true)
-					return
-				}
+const (
+	StepBasicInit InitStep = iota
+	StepConfigLoad
+	StepDatabaseConnect
+	StepSchemaCheck
+	StepProxyStart
+	StepProjectLoad
+	StepCompleted
+)
 
-				needUpdate := conf.Version < lastVersion
-				msg := conf.VersionNewMsg
-				btns := []string{conf.BtnConfirmText}
-				if needUpdate {
-					msg = fmt.Sprintf(conf.VersionOldMsg, lastVersion)
-					btns = []string{"确定", "取消"}
-				}
-				selection, err := a.diag(msg, false, btns...)
-				if err != nil {
-					return
-				}
-				if needUpdate && selection == conf.BtnConfirmText {
-					url := fmt.Sprintf("https://github.com/yhy0/ChYing/releases/tag/%s", lastVersion)
-					runtime.BrowserOpenURL(a.ctx, url)
-				}
-			}),
-			menu.Text(
-				"主页",
-				keys.Combo("H", keys.CmdOrCtrlKey, keys.ShiftKey),
-				func(_ *menu.CallbackData) {
-					runtime.BrowserOpenURL(a.ctx, "https://github.com/yhy0/ChYing/")
-				},
-			),
-			menu.Separator(),
-			menu.Text("退出", keys.CmdOrCtrl("Q"), func(_ *menu.CallbackData) {
-				runtime.Quit(a.ctx)
-			}),
-		)),
-
-		menu.EditMenu(),
-		menu.SubMenu("Help", menu.NewMenuFromItems(
-			menu.Text(
-				"打开配置文件夹",
-				keys.Combo("C", keys.CmdOrCtrlKey, keys.ShiftKey),
-				func(_ *menu.CallbackData) {
-					err := utils.OpenFolder(file.ChyingDir)
-					if err != nil {
-						a.diag("Failed to open folder: \n"+err.Error(), true)
-						return
-					}
-				},
-			),
-		)),
-	)
+// InitProgress 初始化进度信息
+type InitProgress struct {
+	Step        InitStep `json:"step"`
+	Progress    int      `json:"progress"`
+	Message     string   `json:"message"`
+	Description string   `json:"description"`
+	Success     bool     `json:"success"`
+	Error       string   `json:"error,omitempty"`
 }
 
-// diag ...
-func (a *App) diag(message string, error bool, buttons ...string) (string, error) {
-	if len(buttons) == 0 {
-		buttons = []string{
-			conf.BtnConfirmText,
+// InitContext 初始化上下文
+type InitContext struct {
+	ProjectType string    `json:"projectType"`
+	ProjectName string    `json:"projectName"`
+	StartTime   time.Time `json:"startTime"`
+}
+
+// MemoryInfo 内存使用信息
+type MemoryInfo struct {
+	// 总分配的内存（字节）
+	Alloc uint64 `json:"alloc"`
+	// 总分配的内存（格式化字符串）
+	AllocFormatted string `json:"allocFormatted"`
+	// 从系统分配的内存（字节）
+	Sys uint64 `json:"sys"`
+	// 从系统分配的内存（格式化字符串）
+	SysFormatted string `json:"sysFormatted"`
+	// 垃圾回收次数
+	NumGC uint32 `json:"numGC"`
+	// 协程数量
+	NumGoroutine int `json:"numGoroutine"`
+}
+
+// Msg 消息结构体
+type Msg struct {
+	Target       string         `json:"target"`
+	UUID         string         `json:"uuid"`
+	CDN          bool           `json:"cdn"`
+	IpAddress    string         `json:"ipAddress"`
+	IPMsg        string         `json:"IPMsg"`
+	Records      []string       `json:"records"`
+	Fingerprint  []string       `json:"fingerprint"`
+	PortInfo     map[int]string `json:"portInfo"`
+	SiteMap      []string       `json:"site_map"`
+	Children     []*Msg         `json:"children"`
+	APICnt       int            `json:"api_cnt"`
+	SubdomainCnt int            `json:"subdomain_cnt"`
+	ParamsCnt    int            `json:"params_cnt"`
+	InnerIpCnt   int            `json:"inner_ip_cnt"`
+	OtherCnt     int            `json:"other_cnt"`
+}
+
+// 全局变量
+var (
+	RePercentage   chan float64
+	Percentage     chan float64
+	Notify         chan []string
+	Pool           *ants.Pool // 入库协程
+	lock           sync.Mutex
+	HTTPHistoryMap sync.Map
+)
+
+// init 初始化函数
+func init() {
+	Percentage = make(chan float64, 1)
+	RePercentage = make(chan float64, 1)
+	Notify = make(chan []string, 1)
+	logging.Logger = logging.New(true, file.ChyingDir, "ChYing", true)
+	file.New()
+
+	var err error
+	Pool, err = ants.NewPool(conf.Parallelism)
+	if err != nil {
+		logging.Logger.Errorf("创建协程池失败: %v", err)
+	}
+
+	JieConf.Wappalyzer, err = wappalyzer.New()
+	if err != nil {
+		logging.Logger.Warnf("初始化 Wappalyzer 失败: %v", err)
+	}
+
+	// 使用统一配置文件系统，不再单独初始化 Jie 配置
+	conf.HotConf()
+
+	// 从统一配置中同步 Jie 扫描配置
+	conf.SyncJieConfig()
+
+	for _, suffix := range strings.Split(conf.AppConf.Mitmproxy.FilterSuffix, ", ") {
+		conf.Config.FilterSuffix = append(conf.Config.FilterSuffix, suffix)
+	}
+
+	// 读取配置文件中的配置
+	for index, v := range conf.AppConf.Mitmproxy.Exclude {
+		if v == "" {
+			continue
 		}
+
+		conf.Config.Exclude = append(conf.Config.Exclude, &conf.Scope{
+			Id:      index,
+			Enabled: true,
+			Prefix:  v,
+			Regexp:  true,
+			Type:    "exclude",
+		})
 	}
-
-	var t runtime.DialogType
-
-	if error {
-		t = runtime.ErrorDialog
-	} else {
-		t = runtime.InfoDialog
+	for index, v := range conf.AppConf.Mitmproxy.Include {
+		if v == "" {
+			continue
+		}
+		conf.Config.Include = append(conf.Config.Include, &conf.Scope{
+			Id:      index,
+			Enabled: true,
+			Prefix:  v,
+			Regexp:  true,
+			Type:    "include",
+		})
 	}
-
-	return runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Type:          t,
-		Title:         conf.Title,
-		Message:       message,
-		CancelButton:  conf.BtnCancelText,
-		DefaultButton: conf.BtnConfirmText,
-		Buttons:       buttons,
-	})
 }
 
-// startup is called when the app starts. The context is saved ,so we can call the runtime methods
-func (a *App) startup(ctx context.Context) {
-	a.ctx = ctx
-	burpSuite.Ctx = ctx
-	// 启动中间人代理
-	burpSuite.Init()
-	burpSuite.HotConf()
+// Startup 应用启动函数
+func Startup() {
+	// 设置 Jie 为被动模式
+	mode.Passive()
 
-	if utils.IsPortOccupied(burpSuite.Settings.ProxyPort) {
+	logging.Logger.Infoln("[+] ChYing 启动成功", conf.Config.FilterSuffix)
+	logging.Logger.Infoln(conf.Config.Exclude)
+	// 插件全部关闭
+	for k := range JieConf.Plugin {
+		JieConf.Plugin[k] = false
+	}
+
+	deadlock.Opts.DeadlockTimeout = 120 * time.Second
+	qqwry.Init()
+
+	// 检测端口是否被占用
+	if utils.IsPortOccupied(conf.ProxyPort) {
 		port, err := utils.GetRandomUnusedPort()
 		if err != nil {
 			logging.Logger.Errorln(err)
-			burpSuite.Settings.ProxyPort = 65530
+			conf.ProxyPort = 65530
+		} else {
+			conf.ProxyPort = port
 		}
-		burpSuite.Settings.ProxyPort = port
 	}
 
-	go burpSuite.Run(burpSuite.Settings.ProxyPort)
-
-	runtime.EventsEmit(ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
-	runtime.EventsEmit(ctx, "Exclude", burpSuite.Settings.Exclude)
-	runtime.EventsEmit(ctx, "Include", burpSuite.Settings.Include)
-	runtime.EventsEmit(ctx, "FilterSuffix", burpSuite.Settings.FilterSuffix)
-
-	// 通知前端各种数据更改
+	// 启动被动代理（异步）
 	go func() {
-		for {
-			select {
-			case percentage := <-twj.Percentage:
-				runtime.EventsEmit(ctx, "Percentage", percentage)
-			case percentage := <-fuzz.FuzzPercentage: // fuzz 的进度条
-				runtime.EventsEmit(ctx, "FuzzPercentage", percentage)
-			case _fuzz := <-fuzz.FuzzChan: // fuzz 表格数据
-				runtime.EventsEmit(ctx, "Fuzz", _fuzz)
-			case _swagger := <-swagger.SwaggerChan:
-				if _swagger.StatusCode == 403 {
-					fuzz.Bypass403(_swagger.Url, _swagger.Method)
-				}
-				runtime.EventsEmit(ctx, "swagger", _swagger)
-			// burp 相关
-			case history := <-burpSuite.HttpHistory:
-				if len(burpSuite.Settings.Exclude) > 0 {
-					if !utils.RegexpStr(burpSuite.Settings.Exclude, history.Host) {
-						if len(burpSuite.Settings.Include) > 0 && utils.RegexpStr(burpSuite.Settings.Include, history.Host) {
-							runtime.EventsEmit(ctx, "HttpHistory", history)
-						} else {
-							runtime.EventsEmit(ctx, "HttpHistory", history)
-						}
-					}
-				} else if len(burpSuite.Settings.Include) > 0 && utils.RegexpStr(burpSuite.Settings.Include, history.Host) {
-					runtime.EventsEmit(ctx, "HttpHistory", history)
-				} else {
-					runtime.EventsEmit(ctx, "HttpHistory", history)
-				}
-
-			case event := <-nucleiY.ResultEvent:
-				res := nucleiY.Result{
-					Url:      event.Matched,
-					Name:     event.Info.Name,
-					Request:  event.Request,
-					Response: event.Response,
-				}
-				runtime.EventsEmit(ctx, "nucleiYRes", res)
-			}
-		}
+		logging.Logger.Infoln("Starting Proxify server in a new goroutine...")
+		mitmproxy.Proxify() // 这个函数内部会调用阻塞的 Run()
+		// 如果 Proxify() 返回 (例如发生错误导致服务停止)，这里可以记录日志
+		logging.Logger.Errorln("Proxify server has stopped.")
 	}()
 
-	httpx.NewSession()
-}
+	// 数据更改通知
+	go EventNotification()
 
-type Message struct {
-	Msg   string `json:"msg"`
-	Error string `json:"error"`
-}
-
-func (a *App) Parser(jwt string) *twj.Jwt {
-	parseJWT, err := twj.ParseJWT(jwt)
-
-	if err != nil {
-		parseJWT = &twj.Jwt{
-			Header:       "",
-			Payload:      "",
-			Message:      err.Error(),
-			SignatureStr: "",
-		}
-		return parseJWT
-	}
-
-	return parseJWT
-}
-
-func (a *App) Verify(jwt string, secret string) (msg Message) {
-	parseJWT, err := twj.Verify(jwt, secret)
-
-	if err != nil {
-		logging.Logger.Errorln(err)
-		msg.Msg = ""
-		msg.Error = err.Error()
-		return
-	}
-	h, err := json.Marshal(parseJWT)
-
-	msg.Msg = string(h)
-	msg.Error = ""
-	return
-}
-
-func (a *App) Brute() string {
-	// 爆破前判断是否有进程在爆破，如果有停止
-	if twj.Flag {
-		twj.Stop = true
-		time.Sleep(1 * time.Second)
-		twj.Stop = false
-	}
-	return twj.GenerateSignature()
-}
-func (a *App) TwjStop() {
-	twj.Stop = true
-	time.Sleep(2 * time.Second)
-	twj.Stop = false
-}
-
-func (a *App) Proxy(proxy string) (msg Message) {
-	if proxy == "" {
-		conf.Proxy = ""
-		httpx.NewSession()
-	} else {
-		_, err := httpx.ValidateProxyURL(proxy)
-		if err != nil {
-			msg.Msg = "代理设置失败"
-			msg.Error = err.Error()
-			return
-		}
-		msg.Msg = "代理设置成功: " + proxy
-		msg.Error = ""
-		conf.Proxy = proxy
-		httpx.NewSession()
-		return
-	}
-	return
-}
-
-// Swagger 扫描
-func (a *App) Swagger(target string) {
-	if target != "" {
-		swagger.Scan(target)
-	}
-}
-
-func (a *App) Fuzz(target string, actions []string, filePath string) string {
-	if target != "" && len(actions) > 0 {
-		err := fuzz.Fuzz(target, actions, filePath)
-		if err != nil {
-			return err.Error()
-		}
-	} else {
-		return "目标和模式不能为空"
-	}
-	return ""
-}
-
-func (a *App) FuzzStop() {
-	fuzz.Stop = true
-	time.Sleep(2 * time.Second)
-	fuzz.Stop = false
-}
-
-// burp 相关
-
-// Settings 配置
-func (a *App) Settings(setting burpSuite.SettingUI) string {
-	if burpSuite.Settings.ProxyPort != setting.ProxyPort && utils.IsPortOccupied(setting.ProxyPort) {
-		return "端口被占用"
-	} else {
-		if burpSuite.Settings.ProxyPort != setting.ProxyPort {
-			err := burpSuite.Restart(setting.ProxyPort)
-			if err != "" {
-				logging.Logger.Errorln(err)
-				return err
-			}
-		}
-
-		burpSuite.Settings.ProxyPort = setting.ProxyPort
-		burpSuite.Settings.Exclude = utils.SplitStringByLines(setting.Exclude)
-		burpSuite.Settings.Include = utils.SplitStringByLines(setting.Include)
-		burpSuite.Settings.FilterSuffix = strings.Split(setting.FilterSuffix, ",")
-
-		runtime.EventsEmit(a.ctx, "ProxyPort", burpSuite.Settings.ProxyPort)
-		runtime.EventsEmit(a.ctx, "Exclude", strings.Join(burpSuite.Settings.Exclude, "\r\n"))
-		runtime.EventsEmit(a.ctx, "Include", strings.Join(burpSuite.Settings.Include, "\r\n"))
-		runtime.EventsEmit(a.ctx, "FilterSuffix", strings.Join(burpSuite.Settings.FilterSuffix, ","))
-
-		// 更改配置文件
-		exclude := ""
-		if len(burpSuite.Settings.Exclude) == 0 {
-			exclude = "  - \r\n"
-		} else {
-			for _, e := range burpSuite.Settings.Exclude {
-				exclude += fmt.Sprintf("  - %s\r\n", e)
-			}
-		}
-
-		include := ""
-		if len(burpSuite.Settings.Include) == 0 {
-			include = "  - \r\n"
-		} else {
-			for _, i := range burpSuite.Settings.Include {
-				include += fmt.Sprintf("  - %s\r\n", i)
-			}
-		}
-		filterSuffix := ""
-		if len(burpSuite.Settings.FilterSuffix) == 0 {
-			filterSuffix = "  - \r\n"
-		} else {
-			for _, i := range burpSuite.Settings.FilterSuffix {
-				filterSuffix += fmt.Sprintf("  - %s\r\n", i)
-			}
-		}
-
-		var defaultYamlByte = []byte(fmt.Sprintf("port: %d\r\nexclude:\r\n%sinclude:\r\n%s\r\nfilterSuffix:\r\n%s", burpSuite.Settings.ProxyPort, exclude, include, filterSuffix))
-
-		err := burpSuite.WriteYamlConfig(defaultYamlByte)
-		if err != nil {
-			a.diag(err.Error(), true)
-			return err.Error()
-		}
-
-		return ""
-	}
-}
-
-// GetBurpSettings 配置
-func (a *App) GetBurpSettings() *burpSuite.Setting {
-	return burpSuite.Settings
-}
-
-// Intercept 拦截包
-func (a *App) Intercept(intercept, wait bool, request string) int {
-	if intercept {
-		burpSuite.Intercept = true
-	} else {
-		burpSuite.Intercept = false
-	}
-
-	if wait && burpSuite.Sum != 0 {
-		burpSuite.InterceptBody = request
-		burpSuite.Sum -= 1
-		<-burpSuite.Done
-	}
-
-	return burpSuite.Sum
-}
-
-// GetHistoryDump 代理记录
-func (a *App) GetHistoryDump(id int) *burpSuite.HTTPBody {
-	return burpSuite.HTTPBodyMap.ReadMap(id)
-}
-
-// InterceptSend 从 Intercept 发给 Repeater\Intruder 界面处理
-func (a *App) InterceptSend(name string) {
-	runtime.EventsEmit(a.ctx, name, burpSuite.HttpBodyInter)
-	return
-}
-
-// SendToRepeater 发给 Repeater 界面处理
-func (a *App) SendToRepeater(id int) {
-	runtime.EventsEmit(a.ctx, "RepeaterBody", burpSuite.HTTPBodyMap.ReadMap(id))
-	return
-}
-
-// Raw Repeater 请求
-func (a *App) Raw(request string, target string, id string) (httpBody *burpSuite.HTTPBody) {
-	// 说明第一次
-	if id == "" {
-		id = uuid.NewV4().String()
-	}
-
-	resp, err := httpx.Raw(request, target)
-	if err != nil {
-		return
-	}
-
-	httpBody = &burpSuite.HTTPBody{
-		TargetUrl: target,
-		Request:   resp.RequestDump,
-		Response:  resp.ResponseDump,
-		UUID:      id,
-	}
-	value, ok := burpSuite.RepeaterBodyMap[id]
-	if ok {
-		_id := len(value)
-		value[_id] = httpBody
-		return
-	}
-
-	// 初始化
-	burpSuite.RepeaterBodyMap[id] = make(map[int]*burpSuite.HTTPBody)
-
-	burpSuite.RepeaterBodyMap[id][0] = httpBody
-
-	return
-}
-
-// SendToIntruder 发给 Intruder 界面处理
-func (a *App) SendToIntruder(id int) {
-	runtime.EventsEmit(a.ctx, "IntruderBody", burpSuite.HTTPBodyMap.ReadMap(id))
-	return
-}
-
-// Intruder 处理 Intruder 传来的参数
-func (a *App) Intruder(target string, req string, payloads []string, rules []string, attackType string, uuid string) {
-	for i, rule := range rules {
-		if rule == "" {
-			rules[i] = "None"
-		}
-	}
-
-	burpSuite.Intruder(target, req, payloads, rules, attackType, uuid, a.ctx)
-}
-
-// GetAttackDump Intruder attack 记录
-func (a *App) GetAttackDump(uuid string, id int) *burpSuite.HTTPBody {
-	return burpSuite.IntruderMap[uuid].ReadMap(id)
-}
-
-func (a *App) Decoder(str string, mode string) string {
-	switch mode {
-	case "DecodeUnicode":
-		return decoder.DecodeUnicode(str)
-	case "EncodeUnicode":
-		return decoder.EncodeUnicode(str)
-	case "DecodeURL":
-		return decoder.DecodeURL(str)
-	case "EncodeURL":
-		return decoder.EncodeURL(str)
-	case "DecodeBase64":
-		return decoder.DecodeBase64(str)
-	case "EncodeBase64":
-		return decoder.EncodeBase64(str)
-	case "DecodeHex":
-		return decoder.DecodeHex(str)
-	case "EncodeHex":
-		return decoder.EncodeHex(str)
-	case "MD5":
-		return decoder.Md5(str)
-	default:
-		return str
-	}
-}
-
-func (a *App) TaskList(out string) map[string]string {
-	return gadget.Tasklist(out)
-}
-
-func (a *App) ShiroDecrypt(key, data string) *gadget.Shiro {
-	if data == "" {
-		return nil
-	}
-	shiro, err := gadget.DecryptShiro(key, data)
-	if err != nil {
-		return nil
-	}
-	return shiro
-}
-
-// NucleiLoad 加载模板
-func (a *App) NucleiLoad() []nucleiY.Options {
-	nucleiY.New("")
-
-	var options []nucleiY.Options
-	for k, v := range nucleiY.Pocs {
-		var child []string
-		for _, t := range v {
-			child = append(child, t.Info.Name)
-		}
-		options = append(options, nucleiY.Options{Label: k, Children: child})
-	}
-	return options
-}
-
-// NucleiY 漏洞扫描
-func (a *App) NucleiY(target string, tag string, proxy string) string {
-	templatesTempDir := filepath.Join(file.ChyingDir, "nucleiY")
-
-	if _, err := os.Stat(templatesTempDir); err != nil {
-		// 不存在，创建
-		logging.Logger.Errorln("")
-		return "nucleiY not find, https://github.com/yhy0/nucleiY"
-	}
-
-	return nucleiY.Scan(target, tag, proxy)
+	// 移除自动内存清理，改为前端手动触发
 }

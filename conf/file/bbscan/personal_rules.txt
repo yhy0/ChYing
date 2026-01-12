@@ -1,0 +1,2 @@
+/util/exec_sh?filePath=1        {status=200}        {tag="fail:{"killed":false,"}       {root_only}
+/_next/image                    {status=400}        {tag="parameter is required"}       {root_only}

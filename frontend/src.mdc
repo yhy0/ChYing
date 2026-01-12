@@ -1,0 +1,370 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# ChYing-Inside 前端项目结构文档
+
+本文档详细记录ChYing-Inside前端项目的结构、各个模块和文件的作用，以及主要的代码逻辑和分析。
+
+## 项目概述
+
+ChYing-Inside是一个网络安全测试工具，前端使用Vue 3 + TypeScript构建，采用组件化和模块化的方式进行开发。项目主要包含代理(Proxy)、中继器(Repeater)、入侵者(Intruder)、解码器(Decoder)等功能模块。
+
+## 目录结构
+
+```
+src/
+├── assets/         # 静态资源文件
+├── components/     # 组件目录
+├── composables/    # 组合式函数
+├── i18n/           # 国际化相关
+├── store/          # 状态管理
+├── styles/         # 样式文件
+├── theme/          # 主题相关
+├── types/          # 类型定义
+├── utils/          # 工具函数
+├── views/          # 视图组件 (新增此目录说明，通常Vue项目有此结构)
+├── App.vue         # 根组件
+├── main.ts         # 入口文件
+├── theme.ts        # 主题管理
+└── style.css       # 全局样式
+```
+
+## 核心文件分析
+
+### main.ts
+
+应用程序的入口文件，负责初始化Vue应用、引入全局样式、注册插件等。
+
+```typescript
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import { i18n } from './i18n'
+import { initTheme } from './theme'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+app.use(i18n)
+app.use(pinia)
+
+initTheme()
+
+app.mount('#app')
+```
+
+主要功能：
+- 创建Vue应用实例
+- 引入样式文件
+- 注册Pinia状态管理
+- 注册国际化(i18n)插件
+- 初始化主题和字体设置
+- 挂载应用
+
+### App.vue
+
+应用程序的根组件，定义了整个应用的基础布局，包括侧边栏、头部、内容区域和底部状态栏。
+
+主要功能：
+- 基于`activeModule`状态 (来自 `store/modules.ts`) 动态切换显示不同的模块视图组件。
+- 管理通知抽屉的显示状态。
+- 可能使用ErrorBoundary组件捕获和处理模块级别的错误。
+- 可能显示应用程序状态信息。
+
+### theme.ts
+
+负责管理应用的主题相关功能，包括主题切换、字体大小和字体系列设置。
+
+主要功能：
+- 获取和设置主题模式（深色/浅色/跟随系统）
+- 获取和设置字体大小（小/中/大）
+- 获取和设置字体系列
+- 初始化主题和字体设置
+
+## 组件目录 (components/)
+
+组件目录按功能模块组织：
+
+### components/common/
+
+通用组件，被其他模块复用：
+
+- **HttpTrafficTable.vue**: HTTP流量表格组件。
+    - 一个泛型组件 (`<T extends HttpTrafficItem>`)，其核心表格渲染和交互逻辑委托给 `composables/table/useHttpTrafficTable.ts` 组合式函数。
+    - 支持通过 `customColumns` prop 自定义列的显示。
+    - 封装了行点击、右键菜单、颜色标记等交互，并通过emits与父组件通信。
+    - 被Proxy模块和Intruder模块（通过适配器模式）复用。
+- **RequestResponsePanel.vue**: 请求和响应面板。
+    - 用于显示和编辑HTTP请求和响应的详细信息（如头部、正文）。
+    - 被Proxy和Intruder等模块复用，以展示选中项的请求/响应数据。
+- **BaseTabs.vue**: 基础标签页组件 (如文档原有，具体实现未知)。
+- **ColorPicker.vue**: 颜色选择器组件 (被 `HttpTrafficTable.vue` 内部使用)。
+- **ErrorBoundary.vue**: 错误边界组件 (如文档原有，具体实现未知)。
+
+### components/layout/
+
+布局相关组件：
+
+- **Sidebar.vue**: 侧边栏导航。
+- **Header.vue**: 顶部标题栏。
+- **NotificationDrawer.vue**: 通知抽屉组件。
+
+### components/proxy/
+
+代理模块组件：
+
+- **ProxyView.vue**: 代理模块的主视图组件 (推测，通常模块的入口视图)。
+- **ProxyActionMenu.vue**: 代理操作菜单 (如文档原有)。
+- **ProxyFilter.vue**: 代理历史过滤器 (如文档原有)。
+- **panels/ProxyHistoryPanel.vue**: 代理历史面板。
+    - 负责展示代理模块的HTTP历史记录。
+    - 内部使用通用组件 `HttpTrafficTable.vue` 来显示表格数据，并使用 `RequestResponsePanel.vue` 显示选中项的请求/响应详情。
+    - 实现了可拖拽调整表格区域高度的布局功能 (目前为自定义实现，可考虑统一使用 `usePanelResize`)。
+    - 将用户在子组件上的操作（如选择、右键）通过emits传递给父组件。
+- **panels/ProxyInterceptPanel.vue**: 请求拦截面板 (如文档原有)。
+- **panels/ProxyControlBar.vue**: 代理控制栏 (如文档原有)。
+
+### components/repeater/
+
+中继器模块组件 (具体实现未知，但推测其标签页管理会使用 `composables/useTabsManagement.ts`)。
+
+### components/intruder/
+
+入侵者模块组件，包括：
+
+- **IntruderHistoryPanel.vue**: 入侵历史面板，显示入侵结果。
+    - **高度复用与适配**：通过适配器模式将 `IntruderResult[]` (入侵者结果数据) 转换为 `HttpTrafficTable.vue` 所需的 `HttpTrafficItem[]` 格式。
+    - 动态生成列：通过 `customColumns` prop 向 `HttpTrafficTable.vue` 传递动态生成的列定义，特别是用于显示不同数量的 `Payload #N` 列。
+    - 在转换后的 `HttpTrafficItem` 上附加 `_original` 引用，以便在事件处理中能取回原始的 `IntruderResult` 对象。
+    - 复用 `RequestResponsePanel.vue` 显示选中结果的请求/响应详情。
+    - 使用 `composables/usePanelResize.ts` 实现可调整的面板高度。
+- 其他 Intruder 相关组件 (如配置攻击参数的UI等)。
+
+### components/decoder/
+
+解码器模块组件 (具体实现未知)。
+
+### components/settings/
+
+设置模块组件 (具体实现未知)。
+
+### components/project/
+
+项目管理模块组件 (具体实现未知)。
+
+## 类型定义 (types/)
+
+TypeScript类型定义文件：
+
+### types/http.ts
+
+HTTP相关类型定义：
+
+- **`HttpTrafficItem`**: 核心基础接口，定义了HTTP流量（如代理历史、Intruder结果中共同的字段）的基本结构，如 `id`, `method`, `status`, `length`, `timestamp` 等。是 `useHttpTrafficTable` 泛型的主要约束。
+- **`ProxyHistoryItem`**: 扩展自 `HttpTrafficItem`，增加了 `request` 和 `response` 字段，用于存储完整的HTTP请求和响应报文。
+
+```typescript
+// 示例 HttpTrafficItem
+export interface HttpTrafficItem {
+  id: number;
+  method: string;
+  url: string; // 通常从请求中解析或直接获取
+  host: string;
+  path: string;
+  status: number;
+  length: number;
+  mimeType: string; // 通常从响应头解析
+  timestamp: string;
+  selected?: boolean;
+  color?: string;
+  timeMs?: number; // 例如 IntruderResult 中的耗时
+  [key: string]: any; // 允许其他动态属性，如 Intruder 的 payload#N
+}
+
+// 示例 ProxyHistoryItem
+export interface ProxyHistoryItem extends HttpTrafficItem {
+  request: string;
+  response: string;
+}
+```
+
+### types/intruder.ts
+
+入侵者模块类型定义：
+
+- **`IntruderResult`**: 定义了单次入侵攻击的结果，包含 `id`, `payload` (数组), `status`, `length`, `timeMs`, `timestamp`, 以及完整的 `request` 和 `response` 报文。
+- **`IntruderTab`**: 定义了入侵者模块一个攻击标签页的完整状态。
+- 其他相关类型如 `AttackType`, `PayloadPosition`, `PayloadSet` 等。
+
+```typescript
+// 示例 IntruderResult (部分核心字段)
+export interface IntruderResult {
+  id: number;
+  payload: string[];
+  status: number;
+  length: number;
+  timeMs: number;
+  timestamp: string;
+  request: string;
+  response: string;
+  selected?: boolean;
+  color?: string;
+  [key: string]: any;
+}
+```
+**适配说明**: `IntruderHistoryPanel.vue` 会将 `IntruderResult` 转换为 `HttpTrafficItem` 兼容的格式，以便 `HttpTrafficTable.vue` 可以渲染。例如，从 `IntruderResult.request` 中提取 `method`，并将 `payload` 数组的项映射为 `payload#N` 这样的动态属性。
+
+### types/repeater.ts, types/decoder.ts, types/project.ts, types/table.ts
+
+其他模块和功能的类型定义。`types/table.ts` 可能包含如 `HttpTrafficColumn` (用于定义表格列的结构) 等类型。
+
+### types/index.ts
+
+统一导出所有类型的索引文件。
+
+## 状态管理 (store/)
+
+使用Pinia (`@pinia/testing` Pinia 测试工具包) 管理应用状态。
+
+### store/modules.ts
+
+核心状态管理文件 (`useModulesStore`)，集中管理了多个主要模块（Proxy, Repeater, Intruder, Decoder）的状态和相关操作。
+
+- **状态**: 包括 `activeModule` (当前激活模块), `proxyHistory` (`ProxyHistoryItem[]`), `repeaterTabs` (`RepeaterTab[]`), `intruderTabs` (`IntruderTab[]`), `decoderTabs` (`DecoderTab[]`) 等。
+- **操作 (Actions)**:
+    - **模块间数据发送与耦合**:
+        - `sendToRepeater(proxyItem: ProxyHistoryItem)`
+        - `sendToIntruder(proxyItem: ProxyHistoryItem)`
+        - `sendRepeaterToIntruder(repeaterTab: RepeaterTab)`
+        这些函数直接在 `modulesStore` 内部处理从一个模块获取数据、转换数据（包括解析HTTP请求以提取方法、URL、头、体等），并为另一个模块创建和初始化新标签页的逻辑。这导致 `modulesStore` 与各模块的内部实现细节（如数据结构、新标签页需求）存在较强耦合。
+        **待改进**: HTTP解析逻辑应迁移到 `utils/httpUtils.ts`。模块间数据传递可考虑事件总线或更独立的模块接口以降低耦合。
+    - **标签页与分组管理中的重复模式**:
+        - 创建不同模块标签页（Decoder, Repeater, Intruder）时，存在生成ID、更新计数器、添加到列表、设置为活动状态等相似步骤。
+        - 创建分组（`createRepeaterGroup`, `createIntruderGroup`）和修改标签页所属分组（`changeTabGroup`, `changeIntruderTabGroup`）的逻辑也非常相似。
+        **待改进**: 这些重复模式可以抽象成更通用的内部辅助函数。
+- **实际复杂度**: 此文件比 `src.mdc` 初始文档中的示例代码要复杂得多，包含了大量状态和针对这些状态的操作方法。
+
+### store/project.ts
+
+使用 `useProjectStore` 管理项目级别的状态，例如 `siteMapData` (站点地图数据)，并包含其加载和更新逻辑，包括与 `localStorage` 的交互。职责分离清晰。
+
+### store/index.ts
+
+统一导出所有store和类型的索引文件。
+
+## 组合式函数 (composables/)
+
+提供可复用的逻辑单元。
+
+### composables/usePanelResize.ts
+
+通用的面板大小调整组合式函数。提供拖拽调整HTML元素高度或宽度的能力。被 `IntruderHistoryPanel.vue` 使用。
+
+### composables/usePanelState.ts
+
+面板状态管理的组合式函数 (如文档原有，具体作用需查代码)。
+
+### composables/useTabsManagement.ts
+
+**核心UI交互复用**: 一个功能非常丰富的组合式函数，用于管理标签页的通用UI交互和客户端状态。
+- 提供包括右键上下文菜单（含分组、颜色更改选项）、标签页重命名、通过拖拽进行标签页排序和分组变更等高级功能。
+- 接收标签页数组和分组数组作为输入，并提供必要的事件回调 (emits) 来通知外部（如store）更新实际数据。
+- 大大减少了各个模块视图在实现复杂标签栏功能时可能产生的重复代码。
+
+### composables/table/useHttpTrafficTable.ts
+
+**核心表格逻辑复用**: HTTP流量表格的核心组合式函数。
+- 基于 `@tanstack/vue-table` 实现。
+- **泛型设计**: `<T extends HttpTrafficItem>` 使其能够处理任何符合 `HttpTrafficItem` 结构的数据。
+- **功能全面**: 集成了 `useTableSort.ts` (表格排序，含本地持久化) 和 `useTableColumnResize.ts` (列宽调整)。
+- **高度可配置**: 支持通过 `customColumns` 选项传入自定义列定义（包括自定义渲染器 `cellRenderer`），允许 `HttpTrafficTable.vue` 灵活适应不同模块的需求（如 Intruder 的动态 Payload 列）。
+- 接收国际化翻译函数 `i18nTranslate`。
+
+### composables/table/useTableSort.ts
+
+表格排序的组合式函数，支持将排序状态保存到本地存储。
+
+### composables/table/useTableColumnResize.ts
+
+表格列宽调整的组合式函数。
+
+## 工具函数 (utils/)
+
+### utils/httpUtils.ts
+
+HTTP请求处理相关的工具函数：
+- **`extractHeadersAndBody(content: string)`**: 从完整HTTP报文中分离头部和主体。
+- `getResponseContentType(headers: string)`: 获取Content-Type。
+- `isHtmlContent()`, `sanitizeHtml()`: HTML内容处理。
+- `convertToHex()`: 文本到十六进制转换。
+- **待增强**: 应将 `store/modules.ts` 中的HTTP请求解析逻辑（如提取方法、URL）迁移至此，形成统一的HTTP解析工具集。
+
+### utils/editorUtils.ts
+
+编辑器相关的工具函数 (如文档原有)。
+
+### utils/colors.ts
+
+颜色管理相关的工具函数 (如文档原有)。
+
+### utils/formatters.ts
+
+格式化工具函数，如 `formatDateTime`, `formatSize`，被 `useHttpTrafficTable.ts` 用于格式化表格单元格数据。
+
+### utils/copy.ts
+
+提供了 `copyTextToClipboard` 函数。
+- **注意**: `utils/httpUtils.ts` 中也存在一个功能类似的 `copyToClipboard` 函数，存在重复，应考虑统一。
+
+### utils/index.ts
+
+统一导出所有工具函数的索引文件。
+
+## 国际化 (i18n/)
+
+(如文档原有)
+
+## 数据流和复用模式
+
+### 数据流
+
+1.  **HTTP流量数据获取与展示**:
+    - 后端数据 (WebSocket/API) -> Pinia store (`proxyHistory` in `useModulesStore`) -> `ProxyHistoryPanel.vue` (props) -> `HttpTrafficTable.vue` (props) -> `useHttpTrafficTable.ts` 处理并渲染。
+    - 对于 Intruder：`IntruderTab.results` (in `useModulesStore`) -> `IntruderHistoryPanel.vue` (props) -> **适配器转换为 `HttpTrafficItem[]`** -> `HttpTrafficTable.vue` (props) -> `useHttpTrafficTable.ts` 处理并渲染。
+
+2.  **用户操作**:
+    - **组件内部**: UI事件 (如点击) -> 组件方法 -> emit自定义事件 -> 父组件处理。
+    - **状态变更**: 组件emit事件 -> 父组件调用 Pinia store 的 action -> store内状态变更 -> 响应式更新UI。
+
+3.  **模块间数据传递**:
+    - 主要通过 `store/modules.ts` 中的 "sendTo..." 系列 action 实现（例如，从Proxy发送到Repeater）。
+    - **当前问题**: 这些 action 内部直接处理了数据转换和目标模块的初始化逻辑，导致了模块间的耦合。
+
+### 复用模式
+
+1.  **通用组件复用 (非常成功)**:
+    - **`HttpTrafficTable.vue`**:
+        - 作为显示HTTP流量和类似表格数据（如Intruder结果）的核心UI组件。
+        - 其成功复用的关键在于其泛型设计、对 `useHttpTrafficTable` 的依赖以及通过 `customColumns` 实现的灵活性。
+        - Intruder模块通过**适配器模式**将其特有的 `IntruderResult` 数据转换为 `HttpTrafficTable` 可接受的格式，是该组件适应性的一个亮点。
+    - **`RequestResponsePanel.vue`**: 在Proxy和Intruder模块中复用，用于显示详细的请求/响应数据。
+
+2.  **组合式函数复用 (非常成功)**:
+    - **`useHttpTrafficTable.ts`**: 封装了所有复杂的表格逻辑（排序、列宽调整、列定义、数据处理），是 `HttpTrafficTable.vue` 能够轻量化和高度复用的基石。
+    - **`useTabsManagement.ts`**: 提供了复杂但统一的标签页交互管理（右键菜单、拖拽等），避免了各模块视图重复实现这些功能。
+    - **`usePanelResize.ts`**: 提供了可复用的面板拖拽调整大小逻辑。
+    - `useTableSort.ts`, `useTableColumnResize.ts`: 支持 `useHttpTrafficTable`。
+
+3.  **类型复用**:
+    - **`HttpTrafficItem`**: 作为多处表格数据的基础接口，促进了 `useHttpTrafficTable` 的通用性。
+
+4.  **工具函数复用**:
+    - `utils/` 目录下的函数（如格式化、颜色处理）在多处被调用。
+
+5.  **待改进的复用/抽象**:
+    - **HTTP解析**: `store/modules.ts` 中的解析逻辑应统一到 `utils/httpUtils.ts`。
+    - **Store Action逻辑**: `store/modules.ts` 中标签页创建和分组管理的重复模式可以进一步抽象。
+    - **面板调整**: `ProxyHistoryPanel.vue` 可以改用 `usePanelResize.ts`。
+    - **剪贴板功能**: 统一 `copyToClipboard` 的实现。

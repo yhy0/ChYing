@@ -1,0 +1,392 @@
+/**
+ * 颜色选择器组件样式
+ * 提供统一的颜色选择界面和交互体验
+ */
+
+/* ===== CSS变量定义 ===== */
+:root {
+  /* 颜色菜单变量 */
+  --color-menu-bg: var(--glass-bg-primary);
+  --color-menu-border: var(--glass-border);
+  --color-menu-radius: var(--glass-radius-lg);
+  --color-menu-shadow: var(--glass-shadow-strong);
+  --color-menu-backdrop: var(--glass-blur-medium);
+  
+  /* 颜色选项变量 */
+  --color-option-size: 1.5rem;
+  --color-option-border: var(--glass-border-light);
+  --color-option-hover-scale: 1.1;
+  --color-option-transition: all 0.2s ease;
+  
+  /* 标签切换变量 */
+  --tab-active-bg: rgba(59, 130, 246, 0.1);
+  --tab-active-text: var(--color-primary);
+  --tab-inactive-bg: transparent;
+  --tab-inactive-text: var(--color-text-tertiary);
+  --tab-hover-bg: var(--glass-bg-light);
+  
+  /* 预设组变量 */
+  --preset-active-bg: var(--glass-bg-medium);
+  --preset-active-text: var(--color-text-primary);
+  --preset-inactive-bg: var(--glass-bg-light);
+  --preset-inactive-text: var(--color-text-secondary);
+}
+
+/* 深色模式变量 */
+.dark {
+  --tab-active-bg: rgba(59, 130, 246, 0.2);
+  --tab-hover-bg: var(--glass-bg-medium);
+}
+
+/* ===== 颜色菜单容器 ===== */
+.color-menu-container {
+  position: fixed;
+  background: var(--color-menu-bg);
+  backdrop-filter: var(--color-menu-backdrop);
+  -webkit-backdrop-filter: var(--color-menu-backdrop);
+  border: 1px solid var(--color-menu-border);
+  border-radius: var(--color-menu-radius);
+  box-shadow: var(--color-menu-shadow);
+  min-width: 200px;
+  max-width: 280px;
+  overflow: hidden;
+  z-index: 1000;
+  animation: colorMenuFadeIn 0.15s ease-out;
+}
+
+/* 菜单淡入动画 */
+@keyframes colorMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== 菜单标题栏 ===== */
+.color-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--glass-bg-light);
+  border-bottom: 1px solid var(--glass-border-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.color-menu-title {
+  color: var(--color-text-primary);
+}
+
+/* ===== 标签切换 ===== */
+.color-menu-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.color-menu-tab {
+  padding: 0.25rem 0.375rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.625rem;
+  font-weight: 500;
+  border: none;
+  background: var(--tab-inactive-bg);
+  color: var(--tab-inactive-text);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.color-menu-tab:hover {
+  background: var(--tab-hover-bg);
+  color: var(--color-text-primary);
+}
+
+.color-menu-tab.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+}
+
+/* ===== 菜单内容区域 ===== */
+.color-menu-content {
+  padding: 0.5rem;
+}
+
+/* ===== 颜色选择器网格 ===== */
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.color-option {
+  width: var(--color-option-size);
+  height: var(--color-option-size);
+  border-radius: 50%;
+  border: 2px solid var(--color-option-border);
+  cursor: pointer;
+  transition: var(--color-option-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.color-option:hover {
+  transform: scale(var(--color-option-hover-scale));
+  border-color: var(--color-text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+              0 0 0 2px rgba(59, 130, 246, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.color-option:active {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 无颜色选项特殊样式 */
+.color-option.none {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--color-text-tertiary);
+}
+
+.color-option.none:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--glass-bg-light);
+}
+
+.color-option.none i {
+  color: var(--color-text-tertiary);
+  font-size: 0.875rem;
+}
+
+/* ===== 预设组选择器 ===== */
+.preset-selector {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.preset-selector::-webkit-scrollbar {
+  height: 2px;
+}
+
+.preset-selector::-webkit-scrollbar-track {
+  background: var(--glass-bg-light);
+  border-radius: 1px;
+}
+
+.preset-selector::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 1px;
+}
+
+.preset-button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background: var(--preset-inactive-bg);
+  color: var(--preset-inactive-text);
+}
+
+.preset-button:hover {
+  background: var(--glass-bg-medium);
+  color: var(--color-text-primary);
+}
+
+.preset-button.active {
+  background: var(--preset-active-bg);
+  color: var(--preset-active-text);
+}
+
+/* ===== 历史记录区域 ===== */
+.color-history {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.color-history::-webkit-scrollbar {
+  width: 4px;
+}
+
+.color-history::-webkit-scrollbar-track {
+  background: var(--glass-bg-light);
+  border-radius: 2px;
+}
+
+.color-history::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 2px;
+}
+
+/* ===== 颜色工具提示 ===== */
+.color-option[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass-bg-primary);
+  color: var(--color-text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.625rem;
+  white-space: nowrap;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow-medium);
+  z-index: 1001;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 480px) {
+  .color-menu-container {
+    min-width: 180px;
+    max-width: 240px;
+  }
+  
+  .color-picker {
+    gap: 0.375rem;
+  }
+  
+  .color-option {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  .color-menu-header {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+  
+  .color-menu-content {
+    padding: 0.375rem;
+  }
+}
+
+/* ===== 可访问性增强 ===== */
+.color-option:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.color-menu-tab:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.preset-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .color-option {
+    border-width: 2px;
+  }
+  
+  .color-menu-container {
+    border-width: 2px;
+  }
+  
+  .color-menu-tab.active {
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .color-option {
+    transition: none;
+  }
+  
+  .color-menu-container {
+    animation: none;
+  }
+  
+  .color-option:hover::after {
+    animation: none;
+  }
+}
+
+/* ===== 深色模式特殊适配 ===== */
+.dark .color-option.none {
+  border-color: var(--color-text-tertiary);
+}
+
+.dark .color-option.none:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--glass-bg-medium);
+}
+
+.dark .color-option.none i {
+  color: var(--color-text-tertiary);
+}
+
+/* ===== 特殊颜色选项样式 ===== */
+.color-option[data-color="transparent"] {
+  background: repeating-conic-gradient(
+    #ccc 0% 25%, 
+    transparent 0% 50%
+  ) 50% / 8px 8px;
+}
+
+.dark .color-option[data-color="transparent"] {
+  background: repeating-conic-gradient(
+    #555 0% 25%, 
+    transparent 0% 50%
+  ) 50% / 8px 8px;
+}
+
+/* 颜色选项选中状态 */
+.color-option.selected {
+  border-color: var(--color-primary);
+  border-width: 3px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3),
+              0 4px 12px rgba(59, 130, 246, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+.color-option.selected::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 900;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.9),
+               0 1px 2px rgba(0, 0, 0, 0.8);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}

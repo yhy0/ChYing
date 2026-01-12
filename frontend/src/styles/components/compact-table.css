@@ -1,0 +1,1202 @@
+/* 紧凑表格样式 - 通用紧凑表格组件样式 */
+
+/* 
+ * 紧凑表格基础类，用于需要密集显示数据的表格
+ * 适用于数据量大、需要在有限空间内显示更多行的场景
+ */
+
+/* === 1. 基础紧凑表格样式 === */
+.compact-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+/* HttpTrafficTable 使用 CSS Grid，需要特殊处理 */
+.http-traffic-table.compact-table {
+  /* 覆盖基础样式，CSS Grid 不需要这些属性 */
+  border-collapse: unset !important;
+  border-spacing: unset !important;
+  table-layout: unset !important;
+}
+
+/* === 2. 通用单元格内边距、行高和垂直对齐 === */
+.compact-table th,
+.compact-table td {
+  padding: 2px 8px !important;
+  line-height: 1.3 !important;
+  vertical-align: middle !important;
+}
+
+/* === 3. 表格容器 - 液态玻璃设计 === */
+/* 强化选择器特异性，确保覆盖所有模块样式 */
+table.compact-table:not(.http-traffic-table),
+.compact-table:not(.http-traffic-table) {
+  background: var(--glass-bg-tertiary) !important;
+  backdrop-filter: var(--glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--glass-blur-light) !important;
+  border: 1px solid var(--glass-border-light) !important;
+  /* 移除容器级圆角，改为精细化圆角控制 */
+  border-radius: 0 !important;
+  /* 关键修复：移除 overflow: hidden，允许列宽调整器可见 */
+  overflow: visible !important;
+  position: relative !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* HttpTrafficTable 的特殊样式 - 不影响 CSS Grid */
+.http-traffic-table.compact-table {
+  /* 这些样式由 .http-traffic-table.virtual-table 处理 */
+  /* 不设置 border-collapse 和 border-spacing，让 CSS Grid 正常工作 */
+}
+
+/* HttpTrafficTable 虚拟行的特殊高度设置 */
+.http-traffic-table.compact-table tbody tr,
+.http-traffic-table.compact-table tbody tr.virtual-row {
+  height: 33px !important;
+  min-height: 33px !important;
+  max-height: 33px !important;
+}
+
+/* HttpTrafficTable 虚拟行单元格的特殊高度设置 */
+.http-traffic-table.compact-table tbody tr td,
+.http-traffic-table.compact-table tbody tr.virtual-row td {
+  height: 33px !important;
+  min-height: 33px !important;
+  max-height: 33px !important;
+}
+
+/* HttpTrafficTable 中的开关样式 - 复用 form.css 中的基础样式，只调整尺寸 */
+.http-traffic-table.compact-table .toggle-switch {
+  width: 2.5rem !important;
+  height: 1.25rem !important;
+  flex-shrink: 0 !important;
+  /* 确保开关在 flex 容器中正确居中 */
+  margin: auto !important;
+}
+
+/* 包含开关的单元格特殊处理 - 使用 enabled-column 类名（更可靠） */
+.http-traffic-table.compact-table td.enabled-column,
+.http-traffic-table.compact-table td[data-column="enabled"] {
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* 包含开关的单元格特殊处理 - :has() 选择器作为备用 */
+.http-traffic-table.compact-table td:has(.toggle-switch) {
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* 表格液态光泽效果 */
+table.compact-table::before,
+.compact-table::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 25%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 75%,
+    transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* === 4. 表头整体样式 - 液态玻璃设计 === */
+/* 使用最高特异性的选择器确保完全权威性 */
+table.compact-table > thead,
+.compact-table > thead,
+table.http-traffic-table.compact-table > thead {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+table.compact-table > thead > tr,
+.compact-table > thead > tr,
+table.http-traffic-table.compact-table > thead > tr {
+  background: var(--glass-bg-secondary) !important;
+  backdrop-filter: var(--glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--glass-blur-light) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  /* 移除行级圆角，改为单元格级精细控制 */
+  border-radius: 0 !important;
+  overflow: visible !important; /* 支持列宽调整器 */
+  position: relative !important;
+}
+
+/* 表头行液态光泽效果 + 细微凹陷感 */
+.compact-table > thead > tr::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 表头行的细微凹陷感 */
+.compact-table > thead > tr {
+  box-shadow:
+    var(--glass-shadow-light),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* === 5. 表头单元格 (th) 样式优化 - 和谐的垂直节奏 === */
+/* 使用最高特异性选择器确保完全控制，覆盖所有模块样式 */
+table.compact-table > thead > tr > th,
+.compact-table > thead > tr > th,
+table.http-traffic-table.compact-table > thead > tr > th,
+.http-traffic-table.compact-table > thead > tr > th {
+  font-size: 0.7rem !important;
+  padding: 2px 8px !important; /* 精细调整：最小垂直内边距 */
+  /* 移除固定高度，让内容决定高度 */
+  min-height: 20px !important; /* 最小高度保证 */
+  font-weight: 500 !important;
+  color: var(--color-text-primary) !important; /* 白天模式优化：使用主要文字颜色提高对比度 */
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  user-select: none !important;
+  border: none !important; /* 移除所有边框 */
+  background: transparent !important; /* 背景由父元素 tr 提供 */
+  border-radius: 0 !important; /* 移除单独的圆角 */
+  backdrop-filter: none !important; /* 移除单独的模糊效果 */
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important; /* 确保列宽调整器可见 */
+
+  /* 使用标准的表格单元格垂直居中方式 */
+  vertical-align: middle !important;
+  text-align: left !important;
+  /* 确保表头内容正确显示 */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+
+  transition: var(--glass-transition-fast) !important;
+  position: relative !important;
+  line-height: 1.2 !important; /* 紧凑的行高 */
+}
+
+/* 增强的列分隔线 - 避免覆盖列宽调整器 */
+.compact-table > thead > tr > th:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  right: 4px; /* 向左偏移4px，为调整器留出空间 */
+  bottom: 15%;
+  width: 1px;
+  background: var(--glass-border); /* 增强对比度 */
+  opacity: 0.8;
+  transition: var(--glass-transition-fast);
+  pointer-events: none; /* 确保不阻止鼠标事件 */
+}
+
+/* 交互反馈 - 悬停时高亮分隔线 */
+.compact-table > thead > tr > th:hover::after {
+  background: var(--glass-border-strong);
+  opacity: 1;
+  width: 2px;
+  right: 3px; /* 调整悬停时的位置 */
+}
+
+/* 相邻列的分隔线也会高亮 */
+.compact-table > thead > tr > th:hover + th::after {
+  background: var(--glass-border-strong);
+  opacity: 1;
+}
+
+/* 精细化圆角控制 - 表头左上角和右上角 */
+table.compact-table > thead > tr > th:first-child,
+.compact-table > thead > tr > th:first-child,
+table.http-traffic-table.compact-table > thead > tr > th:first-child {
+  border-top-left-radius: var(--glass-radius-md) !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+table.compact-table > thead > tr > th:last-child,
+.compact-table > thead > tr > th:last-child,
+table.http-traffic-table.compact-table > thead > tr > th:last-child {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: var(--glass-radius-md) !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* 中间的表头单元格 - 无圆角 */
+table.compact-table > thead > tr > th:not(:first-child):not(:last-child),
+.compact-table > thead > tr > th:not(:first-child):not(:last-child),
+table.http-traffic-table.compact-table > thead > tr > th:not(:first-child):not(:last-child) {
+  border-radius: 0 !important;
+}
+
+/* ========================================
+   专门的HTTP流量表格覆盖规则
+   确保彻底覆盖模块特定样式
+   ======================================== */
+
+/* 强制覆盖 http-traffic-table 的所有表头样式 */
+.http-traffic-table.compact-table th,
+table.http-traffic-table.compact-table th {
+  /* 强制移除所有可能的冲突样式 */
+  border-bottom: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* 强制移除所有伪元素光泽效果 */
+.http-traffic-table.compact-table th::before,
+table.http-traffic-table.compact-table th::before {
+  display: none !important;
+}
+
+/* 确保列分隔线正常工作 - 与通用规则保持一致 */
+.http-traffic-table.compact-table th:not(:last-child)::after,
+table.http-traffic-table.compact-table th:not(:last-child)::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 15% !important;
+  right: 4px !important; /* 与通用规则一致，为调整器留出空间 */
+  bottom: 15% !important;
+  width: 1px !important;
+  background: var(--glass-border) !important;
+  opacity: 0.8 !important;
+  transition: var(--glass-transition-fast) !important;
+  pointer-events: none !important; /* 关键：确保不阻止鼠标事件 */
+}
+
+/* ========================================
+   专门的代理表格覆盖规则
+   确保彻底覆盖模块特定样式
+   ======================================== */
+
+/* 强制覆盖 proxy-table 的所有表头样式 */
+.proxy-table.compact-table th,
+table.proxy-table.compact-table th {
+  /* 强制移除所有可能的冲突样式 */
+  border-bottom: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  padding: 2px 8px !important; /* 覆盖原有的 padding */
+}
+
+/* 强制移除所有伪元素光泽效果 */
+.proxy-table.compact-table th::before,
+table.proxy-table.compact-table th::before {
+  display: none !important;
+}
+
+/* 确保列分隔线正常工作 - 与通用规则保持一致 */
+.proxy-table.compact-table th:not(:last-child)::after,
+table.proxy-table.compact-table th:not(:last-child)::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 15% !important;
+  right: 4px !important; /* 与通用规则一致，为调整器留出空间 */
+  bottom: 15% !important;
+  width: 1px !important;
+  background: var(--glass-border) !important;
+  opacity: 0.8 !important;
+  transition: var(--glass-transition-fast) !important;
+  pointer-events: none !important; /* 关键：确保不阻止鼠标事件 */
+}
+
+/* ========================================
+   规则表格特殊处理
+   解决多类名冲突问题
+   ======================================== */
+
+/* 强制覆盖 rules-table 的所有表头样式 */
+.rules-table.compact-table th,
+table.rules-table.compact-table th,
+.rules-table.http-traffic-table.compact-table th,
+table.rules-table.http-traffic-table.compact-table th {
+  /* 强制移除所有可能的冲突样式 */
+  border-bottom: none !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  padding: 2px 8px !important; /* 覆盖原有的 padding */
+  font-size: 0.7rem !important;
+  overflow: visible !important;
+}
+
+/* 强制移除所有伪元素光泽效果 */
+.rules-table.compact-table th::before,
+table.rules-table.compact-table th::before,
+.rules-table.http-traffic-table.compact-table th::before,
+table.rules-table.http-traffic-table.compact-table th::before {
+  display: none !important;
+}
+
+/* 确保列分隔线正常工作 - 与通用规则保持一致 */
+.rules-table.compact-table th:not(:last-child)::after,
+table.rules-table.compact-table th:not(:last-child)::after,
+.rules-table.http-traffic-table.compact-table th:not(:last-child)::after,
+table.rules-table.http-traffic-table.compact-table th:not(:last-child)::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 15% !important;
+  right: 4px !important; /* 与通用规则一致，为调整器留出空间 */
+  bottom: 15% !important;
+  width: 1px !important;
+  background: var(--glass-border) !important;
+  opacity: 0.8 !important;
+  transition: var(--glass-transition-fast) !important;
+  pointer-events: none !important; /* 关键：确保不阻止鼠标事件 */
+}
+
+/* ========================================
+   标准表格样式 - 专门用于传统 <table> 元素
+   适用于：拦截、匹配替换、授权检测等界面
+   ======================================== */
+
+/* 标准表格容器 */
+.standard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 标准表格表头 */
+.standard-table thead {
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* 标准表格表头单元格 */
+.standard-table th {
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--glass-border);
+  border-right: 1px solid var(--glass-border-light);
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+/* 移除最后一列的右边框 */
+.standard-table th:last-child {
+  border-right: none;
+}
+
+/* 标准表格表体 */
+.standard-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.standard-table tbody tr:hover {
+  background: var(--glass-bg-primary);
+}
+
+/* 标准表格数据单元格 */
+.standard-table td {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--glass-border-light);
+  border-right: 1px solid var(--glass-border-light);
+  vertical-align: middle;
+}
+
+/* 移除最后一列的右边框 */
+.standard-table td:last-child {
+  border-right: none;
+}
+
+/* 移除最后一行的底边框 */
+.standard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 标准表格的列宽调整器 */
+.standard-table th .resizer {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: transparent;
+}
+
+/* 悬停时显示调整器 */
+.standard-table th:hover .resizer {
+  opacity: 1;
+}
+
+/* 调整器的视觉指示器 */
+.standard-table th .resizer::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  right: 3px;
+  width: 3px;
+  background: linear-gradient(180deg,
+    var(--color-primary) 0%,
+    rgba(var(--color-primary-rgb), 0.8) 50%,
+    var(--color-primary) 100%);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 0 4px rgba(var(--color-primary-rgb), 0.3);
+}
+
+/* 悬停和拖拽时显示指示器 */
+.standard-table th:hover .resizer::after,
+.standard-table .resizer.resizing::after {
+  opacity: 1;
+}
+
+/* ========================================
+   HttpTrafficTable 组件特殊处理
+   CSS Grid 布局的表格需要特殊样式
+   ======================================== */
+
+/* HttpTrafficTable 虚拟表格样式 - 完全独立的实现 */
+.http-traffic-table.virtual-table {
+  /* 确保Grid布局正常工作 */
+  display: grid !important;
+  width: 100%;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  overflow: hidden;
+}
+
+/* HttpTrafficTable 表头容器 */
+.http-traffic-table.virtual-table thead {
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+/* HttpTrafficTable 表头行 */
+.http-traffic-table.virtual-table thead tr {
+  display: flex !important;
+  width: 100% !important;
+}
+
+/* HttpTrafficTable 表头单元格 */
+.http-traffic-table.virtual-table th {
+  /* 不强制修改display，让Grid和内部flex正常工作 */
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important; /* 白天模式优化：使用主要文字颜色提高对比度 */
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid var(--glass-border-light) !important;
+  overflow: visible !important;
+  position: relative !important;
+  user-select: none !important;
+  /* 确保内部flex容器正常工作 */
+  padding: 0 !important; /* 让内部div控制padding */
+}
+
+/* 移除最后一列的右边框 */
+.http-traffic-table.virtual-table th:last-child {
+  border-right: none !important;
+}
+
+/* HttpTrafficTable 表头内部flex容器 */
+.http-traffic-table.virtual-table th .flex {
+  padding: 8px 12px !important;
+  min-height: 32px !important;
+  width: 100% !important;
+}
+
+/* HttpTrafficTable 的列分隔线 */
+.http-traffic-table.virtual-table th:not(:last-child)::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 15% !important;
+  right: 4px !important;
+  bottom: 15% !important;
+  width: 1px !important;
+  background: var(--glass-border) !important;
+  opacity: 0.8 !important;
+  transition: var(--glass-transition-fast) !important;
+  pointer-events: none !important;
+}
+
+/* HttpTrafficTable 的列宽调整器 */
+.http-traffic-table.virtual-table .resizer {
+  position: absolute !important;
+  top: 0 !important;
+  right: -2px !important;
+  width: 8px !important;
+  height: 100% !important;
+  cursor: col-resize !important;
+  z-index: 200 !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  background: transparent !important;
+}
+
+/* HttpTrafficTable 悬停时显示调整器 */
+.http-traffic-table.virtual-table th:hover .resizer {
+  opacity: 1 !important;
+}
+
+/* HttpTrafficTable 调整器的视觉指示器 */
+.http-traffic-table.virtual-table .resizer::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 20% !important;
+  bottom: 20% !important;
+  right: 3px !important;
+  width: 3px !important;
+  background: linear-gradient(180deg,
+    var(--color-primary) 0%,
+    rgba(var(--color-primary-rgb), 0.8) 50%,
+    var(--color-primary) 100%) !important;
+  border-radius: 2px !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  box-shadow: 0 0 4px rgba(var(--color-primary-rgb), 0.3) !important;
+}
+
+/* HttpTrafficTable 悬停和拖拽时显示指示器 */
+.http-traffic-table.virtual-table th:hover .resizer::after,
+.http-traffic-table.virtual-table .resizer.resizing::after {
+  opacity: 1 !important;
+}
+
+/* ========================================
+   列宽调整器支持
+   确保在所有紧凑表格中都能正常工作
+   ======================================== */
+
+/* 列宽调整器基础样式 */
+.compact-table .resizer,
+.compact-table th .resizer {
+  position: absolute !important;
+  top: 0 !important;
+  right: -2px !important; /* 向右偏移2px，确保在表头边界上 */
+  width: 8px !important;
+  height: 100% !important;
+  cursor: col-resize !important;
+  z-index: 200 !important; /* 提高z-index确保在分隔线之上 */
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  background: transparent !important;
+}
+
+/* 悬停时显示调整器 */
+.compact-table th:hover .resizer,
+.compact-table > thead > tr > th:hover .resizer {
+  opacity: 1 !important;
+}
+
+/* 调整器的视觉指示器 */
+.compact-table .resizer::after,
+.compact-table th .resizer::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 20% !important;
+  bottom: 20% !important;
+  right: 3px !important;
+  width: 3px !important;
+  background: linear-gradient(180deg,
+    var(--color-primary) 0%,
+    rgba(var(--color-primary-rgb), 0.8) 50%,
+    var(--color-primary) 100%) !important;
+  border-radius: 2px !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  box-shadow: 0 0 4px rgba(var(--color-primary-rgb), 0.3) !important;
+}
+
+/* 悬停和拖拽时显示指示器 */
+.compact-table th:hover .resizer::after,
+.compact-table .resizer.resizing::after {
+  opacity: 1 !important;
+}
+
+/* 拖拽状态的增强效果 */
+.compact-table .resizer.resizing {
+  opacity: 1 !important;
+}
+
+.compact-table .resizer.resizing::after {
+  background: linear-gradient(180deg,
+    var(--color-primary) 0%,
+    rgba(var(--color-primary-rgb), 1) 50%,
+    var(--color-primary) 100%) !important;
+  box-shadow:
+    0 0 8px rgba(var(--color-primary-rgb), 0.5),
+    0 0 16px rgba(var(--color-primary-rgb), 0.3) !important;
+}
+
+/* === 4. 表格内容行 (tbody tr) 特有的紧凑样式 === */
+.compact-table:not(.http-traffic-table) tbody tr {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 28px !important; /* 紧凑行高 */
+  border-bottom: 1px solid var(--color-border-light);
+  transition: all var(--transition-duration) ease;
+}
+
+/* === 5. 表格行样式 - 液态玻璃设计 === */
+.compact-table:not(.http-traffic-table) tbody tr {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.compact-table:not(.http-traffic-table) tbody tr:hover {
+  background: var(--glass-bg-primary) !important;
+  backdrop-filter: var(--glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--glass-blur-light) !important;
+  transform: translateY(-1px);
+}
+
+/* 表格单元格 */
+.compact-table td {
+  border-right: 1px solid var(--glass-border-light);
+  transition: all 0.3s ease;
+}
+
+.compact-table td:last-child {
+  border-right: none;
+}
+
+/* === 6. 表体精细化圆角控制 === */
+/* 最后一行的左下角和右下角圆角 */
+.compact-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--glass-radius-md) !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.compact-table tbody tr:last-child td:last-child {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: var(--glass-radius-md) !important;
+}
+
+/* 最后一行的中间单元格 - 无圆角 */
+.compact-table tbody tr:last-child td:not(:first-child):not(:last-child) {
+  border-radius: 0 !important;
+}
+
+/* 确保最后一行没有底边框，由容器提供 */
+.compact-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* === 5. 表格内容单元格 (tbody td) 特有的紧凑样式 === */
+.compact-table:not(.http-traffic-table) tbody tr td {
+  height: 28px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+/* === 6. 选中行样式 - 液态玻璃设计 === */
+.compact-table:not(.http-traffic-table) tbody tr.selected {
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.2) 0%,
+    rgba(99, 102, 241, 0.15) 50%,
+    rgba(99, 102, 241, 0.1) 100%) !important;
+  backdrop-filter: var(--glass-blur-medium) !important;
+  -webkit-backdrop-filter: var(--glass-blur-medium) !important;
+  box-shadow:
+    inset 3px 0 0 rgba(99, 102, 241, 0.6),
+    0 2px 8px rgba(99, 102, 241, 0.2),
+    var(--glass-shadow-light) !important;
+  transform: translateY(-2px) !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* HttpTrafficTable 选中行样式 - 不使用 transform */
+.http-traffic-table.compact-table tbody tr.selected {
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.2) 0%,
+    rgba(99, 102, 241, 0.15) 50%,
+    rgba(99, 102, 241, 0.1) 100%) !important;
+  backdrop-filter: var(--glass-blur-medium) !important;
+  -webkit-backdrop-filter: var(--glass-blur-medium) !important;
+  box-shadow:
+    inset 3px 0 0 rgba(99, 102, 241, 0.6),
+    0 2px 8px rgba(99, 102, 241, 0.2),
+    var(--glass-shadow-light) !important;
+  /* 不使用 transform，避免与虚拟滚动冲突 */
+  position: relative;
+  z-index: 2;
+}
+
+/* 选中行的液态光泽效果 */
+.compact-table:not(.http-traffic-table) tbody tr.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.6) 0%,
+    rgba(99, 102, 241, 0.4) 50%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+/* HttpTrafficTable 选中行光泽效果 */
+.http-traffic-table.compact-table tbody tr.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.6) 0%,
+    rgba(99, 102, 241, 0.4) 50%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+/* 选中行悬停效果 */
+.compact-table:not(.http-traffic-table) tbody tr.selected:hover {
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.25) 0%,
+    rgba(99, 102, 241, 0.2) 50%,
+    rgba(99, 102, 241, 0.15) 100%) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* HttpTrafficTable 选中行悬停效果 - 不使用 transform */
+.http-traffic-table.compact-table tbody tr.selected:hover {
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.25) 0%,
+    rgba(99, 102, 241, 0.2) 50%,
+    rgba(99, 102, 241, 0.15) 100%) !important;
+  /* 不使用 transform，避免与虚拟滚动冲突 */
+}
+
+/* === 7. 紧凑表格内的标签样式 === */
+.compact-table .inline-flex {
+  padding: 1px 4px !important;
+  font-size: 0.6rem !important;
+  line-height: 1.2 !important;
+  height: 16px !important;
+  min-width: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+
+/* === 8. 紧凑表格内的按钮样式 === */
+.compact-table .btn-icon {
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* === 9. 紧凑表格内的代码片段样式 === */
+.compact-table .code-snippet {
+  padding: 0 3px !important;
+  font-size: 0.7rem !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  height: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* === 10. 特定列的样式 === */
+
+/* 序号列紧凑样式 */
+.compact-table td:first-child {
+  font-size: 0.7rem !important;
+  text-align: center !important;
+  font-family: ui-monospace, monospace !important;
+}
+
+/* 时间列紧凑样式 */
+.compact-table td.time-column,
+.compact-table td:last-child {
+  font-size: 0.65rem !important;
+  font-family: ui-monospace, monospace !important;
+}
+
+/* 状态列紧凑样式 */
+.compact-table td.status-column .text-sm {
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+}
+
+/* URL列紧凑样式 - 允许适当的文本截断 */
+.compact-table td.url-column {
+  max-width: 0 !important;
+  text-overflow: ellipsis !important;
+}
+
+/* === 11. 启用列样式（开关控件居中） === */
+.compact-table td.enabled-column {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 2px !important;
+  height: 100% !important;
+}
+
+/* 通用 compact-table 的开关样式（非 HttpTrafficTable） */
+.compact-table:not(.http-traffic-table) td.enabled-column .toggle-switch {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+
+  /* 紧凑表格中的小尺寸切换开关 */
+  width: 32px !important;
+  height: 18px !important;
+  min-width: 32px !important;
+  min-height: 18px !important;
+}
+
+.compact-table:not(.http-traffic-table) td.enabled-column .toggle-slider {
+  width: 32px !important;
+  height: 18px !important;
+  border-radius: 18px !important;
+}
+
+.compact-table:not(.http-traffic-table) td.enabled-column .toggle-slider:before {
+  height: 14px !important;
+  width: 14px !important;
+  left: 2px !important;
+  bottom: 2px !important;
+}
+
+.compact-table:not(.http-traffic-table) td.enabled-column input:checked + .toggle-slider:before {
+  transform: translateX(14px) !important;
+}
+
+/* === 12. 操作列样式 === */
+.compact-table td.actions-column {
+  text-align: right !important;
+  padding-right: 8px !important;
+}
+
+.compact-table td.actions-column .btn-icon {
+  margin-left: 2px !important;
+}
+
+/* === 13. 减少可能干扰紧凑性的边框或动画效果 === */
+.compact-table:not(.http-traffic-table) tbody tr {
+  border-left-width: 1px !important;
+  transform: none !important;
+}
+
+.compact-table:not(.http-traffic-table) tr.selected td {
+  animation: none !important;
+  border-width: 1px !important;
+  box-shadow: none !important;
+}
+
+/* HttpTrafficTable 选中行单元格样式 */
+.http-traffic-table.compact-table tr.selected td {
+  animation: none !important;
+  border-width: 1px !important;
+  box-shadow: none !important;
+}
+
+/* === 14. 深色模式适配 - 玻璃态设计 === */
+.dark .compact-table th {
+  background: var(--glass-bg-secondary) !important;
+  border-color: var(--glass-border) !important;
+}
+
+.dark .compact-table th::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.dark .compact-table tbody tr:hover {
+  background: var(--glass-bg-hover) !important;
+}
+
+.dark .compact-table:not(.http-traffic-table) tbody tr.selected {
+  background: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* HttpTrafficTable 深色模式选中行样式 */
+.dark .http-traffic-table.compact-table tbody tr.selected {
+  background: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* HttpTrafficTable 深色模式开关样式 - 复用 form.css 中的深色模式样式 */
+
+/* === 15. 响应式设计 === */
+@media (max-width: 768px) {
+  .compact-table th,
+  .compact-table td {
+    padding: 1px 6px !important;
+  }
+  
+  .compact-table th {
+    font-size: 0.65rem !important;
+    height: 20px !important;
+  }
+  
+  .compact-table:not(.http-traffic-table) tbody tr {
+    max-height: 24px !important;
+  }
+
+  .compact-table:not(.http-traffic-table) tbody tr td {
+    height: 24px !important;
+  }
+}
+
+/* === 16. 混合类支持 === */
+
+/* 对于已有的 http-traffic-table 类，添加紧凑样式支持 */
+.http-traffic-table.compact-table,
+.compact-table.http-traffic-table {
+  /* 继承所有紧凑表格样式 - 样式由上面的覆盖规则处理 */
+  /* 注意：HttpTrafficTable 使用 CSS Grid，不能设置 border-collapse */
+  /* border-collapse 和 border-spacing 由 CSS Grid 自动处理 */
+}
+
+/* 对于特定表格的紧凑版本 */
+.intercept-queue-table.compact-table,
+.rules-table.compact-table,
+.results-table.compact-table {
+  /* 继承所有紧凑表格样式 */
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* === 17. 工具类 === */
+
+/* 强制紧凑样式（用于覆盖其他样式） */
+.force-compact th,
+.force-compact td {
+  padding: 2px 8px !important;
+  line-height: 1.3 !important;
+  height: auto !important;
+  max-height: 28px !important;
+}
+
+/* 超紧凑样式（更密集的显示） */
+.ultra-compact th,
+.ultra-compact td {
+  padding: 1px 6px !important;
+  line-height: 1.2 !important;
+  font-size: 0.65rem !important;
+}
+
+.ultra-compact th {
+  height: 20px !important;
+}
+
+.ultra-compact tbody tr {
+  max-height: 22px !important;
+}
+
+.ultra-compact tbody tr td {
+  height: 22px !important;
+}
+
+/* === 18. 表格禁用行样式 === */
+.compact-table tr.disabled,
+.http-traffic-table tr.disabled {
+  opacity: 0.6;
+}
+
+/* === 19. 授权检测器特有的表格列样式 === */
+
+/* 针对规则表格的特殊列宽和对齐 */
+.rules-table.compact-table .enabled-column {
+  width: 60px;
+}
+
+.rules-table.compact-table .item-column {
+  width: 100px;
+}
+
+.rules-table.compact-table .name-column {
+  width: 120px;
+}
+
+.rules-table.compact-table .match-column {
+  width: 200px;
+}
+
+.rules-table.compact-table .replace-column {
+  width: 200px;
+}
+
+.rules-table.compact-table .type-column {
+  width: 70px;
+}
+
+.rules-table.compact-table .comment-column {
+  flex: 1;
+  min-width: 150px;
+}
+
+.rules-table.compact-table .actions-column {
+  width: 120px;
+}
+
+/* 兼容性支持 - 原有的列名 */
+.rules-table.compact-table .header-column {
+  width: 120px;
+}
+
+.rules-table.compact-table .original-column,
+.rules-table.compact-table .new-column {
+  width: 180px;
+}
+
+.rules-table.compact-table .desc-column {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* 针对结果表格的特殊列宽 */
+.results-table.compact-table .time-column {
+  width: 140px;
+}
+
+.results-table.compact-table .url-column {
+  min-width: 150px;
+  max-width: 350px;
+}
+
+.results-table.compact-table .rule-column {
+  min-width: 120px;
+  max-width: 250px;
+}
+
+.results-table.compact-table .status-column {
+  width: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 2px 4px !important;
+}
+
+/* === 20. 通用表格列宽样式 === */
+.table-column-enabled {
+  width: 100px;
+}
+
+.table-column-type {
+  width: 70px;
+}
+
+.table-column-header {
+  width: 120px;
+}
+
+.table-column-original,
+.table-column-new {
+  width: 180px;
+}
+
+.table-column-desc {
+  flex: 1;
+  min-width: 150px;
+}
+
+.table-column-actions {
+  width: 80px;
+  text-align: right !important;
+}
+
+.table-column-time {
+  width: 140px;
+}
+
+.table-column-url {
+  min-width: 150px;
+  max-width: 350px;
+}
+
+.table-column-rule {
+  min-width: 120px;
+  max-width: 250px;
+}
+
+.table-column-status {
+  width: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 2px 4px !important;
+} 

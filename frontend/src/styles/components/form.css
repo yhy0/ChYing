@@ -1,0 +1,394 @@
+/* 表单组件样式 */
+
+/* 表单组基础样式 */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-sm);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 表单元素液态光泽效果 */
+.form-group input::before,
+.form-group select::before,
+.form-group textarea::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 30%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 70%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* 对话框内的表单元素 - 增强透明度和一致性 */
+.dialog .form-group input,
+.dialog .form-group select,
+.dialog .form-group textarea,
+.rule-dialog .form-group input,
+.rule-dialog .form-group select,
+.rule-dialog .form-group textarea,
+.modal .form-group input,
+.modal .form-group select,
+.modal .form-group textarea {
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-color: var(--glass-border-light);
+  box-shadow: var(--glass-shadow-subtle);
+}
+
+/* 对话框内表单元素的焦点状态 */
+.dialog .form-group input:focus,
+.dialog .form-group select:focus,
+.dialog .form-group textarea:focus,
+.rule-dialog .form-group input:focus,
+.rule-dialog .form-group select:focus,
+.rule-dialog .form-group textarea:focus,
+.modal .form-group input:focus,
+.modal .form-group select:focus,
+.modal .form-group textarea:focus {
+  background: var(--glass-bg-secondary);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow-focus);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-primary);
+  box-shadow: var(--glass-shadow-focus);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* 表单帮助文本样式 */
+.form-help {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* 过滤提示样式 - 玻璃态设计 */
+.filter-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(59, 130, 246, 0.15);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--glass-radius-sm);
+  font-size: 0.75rem;
+  color: rgb(37, 99, 235);
+  margin-bottom: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.filter-hint::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.dark .filter-hint {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: rgb(147, 197, 253);
+}
+
+.dark .filter-hint::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+.hint-text {
+  font-weight: 500;
+}
+
+/* 开关样式 - 玻璃态设计 - 强制优先级 */
+.toggle-switch {
+  position: relative !important;
+  display: inline-block !important;
+  width: 2.5rem !important;
+  height: 1.25rem !important;
+}
+
+.toggle-switch input {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.toggle-slider {
+  position: absolute !important;
+  cursor: pointer !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  /* 关闭状态：经典椭圆开关 - 灰色背景 */
+  background: var(--toggle-off-bg, #cbd5e1) !important;
+  border: 2px solid var(--toggle-off-border, #9ca3af) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 1.25rem !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.toggle-slider:before {
+  position: absolute !important;
+  content: "" !important;
+  height: 16px !important;
+  width: 16px !important;
+  left: 2px !important;
+  top: 2px !important;
+  /* 滑块按钮：白色圆形，明显轮廓 */
+  background: var(--toggle-knob-bg, #ffffff) !important;
+  border: 1px solid var(--toggle-knob-border, #d1d5db) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+input:checked + .toggle-slider {
+  /* 开启状态：经典蓝色背景 */
+  background: var(--toggle-on-bg, #3b82f6) !important;
+  border-color: var(--toggle-on-border, #2563eb) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px) !important;
+  /* 开启状态下的滑块：保持白色，增强阴影 */
+  background: var(--toggle-knob-bg, #ffffff) !important;
+  border-color: var(--toggle-knob-border-active, #e5e7eb) !important;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.25),
+    0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 深色模式适配 */
+.dark .toggle-slider {
+  /* 深色模式关闭状态：深灰色背景 */
+  background: var(--toggle-off-bg-dark, #4b5563) !important;
+  border-color: var(--toggle-off-border-dark, #6b7280) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .toggle-slider:before {
+  /* 深色模式滑块：白色按钮 */
+  background: var(--toggle-knob-bg-dark, #f9fafb) !important;
+  border-color: var(--toggle-knob-border-dark, #d1d5db) !important;
+}
+
+.dark input:checked + .toggle-slider {
+  /* 深色模式开启状态：蓝色背景 */
+  background: var(--toggle-on-bg, #3b82f6) !important;
+  border-color: var(--toggle-on-border, #2563eb) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark input:checked + .toggle-slider:before {
+  /* 深色模式开启状态滑块：纯白色 */
+  background: var(--toggle-knob-bg, #ffffff) !important;
+  border-color: var(--toggle-knob-border-active, #e5e7eb) !important;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 悬停和焦点状态 */
+.toggle-switch:hover .toggle-slider {
+  transform: scale(1.02);
+  box-shadow:
+    var(--glass-shadow-subtle),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.toggle-switch:hover input:checked + .toggle-slider {
+  box-shadow:
+    var(--glass-shadow-subtle),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.toggle-switch:focus-within .toggle-slider {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* 禁用状态 */
+.toggle-switch:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toggle-switch:has(input:disabled) .toggle-slider {
+  cursor: not-allowed;
+}
+
+/* 密码输入框容器 */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  padding-right: 2.5rem !important; /* 为按钮留出空间 */
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-text-secondary);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .password-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========== 复选框和单选框样式 ========== */
+
+/* 基础复选框样式 */
+input[type="checkbox"],
+input[type="radio"] {
+  color-scheme: light dark;
+  cursor: pointer;
+  border-radius: var(--glass-radius-sm);
+  border: 1px solid var(--glass-border);
+  background-color: var(--color-bg-primary);
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* 选中状态样式 */
+input[type="checkbox"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 深色模式适配 */
+.dark input[type="checkbox"],
+.dark input[type="radio"] {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--glass-border);
+}
+
+.dark input[type="checkbox"]:checked,
+.dark input[type="radio"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ========== 设置表单样式 ========== */
+
+/* 设置标签样式 */
+.settings-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+}
+
+/* 设置输入框样式 */
+.settings-input {
+  width: 100%;
+  border-radius: var(--glass-radius-md);
+  border: 1px solid var(--glass-border);
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--glass-shadow-subtle);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.settings-input::placeholder {
+  color: var(--color-text-tertiary);
+}

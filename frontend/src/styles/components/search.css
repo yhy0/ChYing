@@ -1,0 +1,68 @@
+/* 搜索框组件样式 - 玻璃态设计 */
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 200px;
+  padding: 0.375rem 0.75rem;
+  padding-right: 2rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-sm);
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.search-input::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-focus);
+  transform: translateY(-1px);
+}
+
+.search-icon {
+  position: absolute;
+  right: 0.5rem;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 深色模式适配 */
+.dark .search-input {
+  background: var(--glass-bg-primary);
+  border-color: var(--glass-border);
+  color: var(--color-text-primary);
+}
+
+.dark .search-input::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.dark .search-input:focus {
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-focus);
+}

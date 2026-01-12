@@ -1,0 +1,83 @@
+/* 状态码组件样式 */
+
+.status-codes-display {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-separator {
+  color: var(--color-text-tertiary);
+}
+
+.status-code {
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--glass-radius-sm);
+  font-weight: 600;
+  text-align: center;
+  min-width: 2rem;
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.status-code::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.status-2xx {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+  color: rgb(22, 163, 74);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.status-3xx {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
+  color: rgb(146, 64, 14);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.status-4xx {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+  color: rgb(185, 28, 28);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.status-5xx {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.1));
+  color: rgb(67, 56, 202);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.dark .status-2xx {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: rgb(134, 239, 172);
+}
+
+.dark .status-3xx {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: rgb(253, 224, 71);
+}
+
+.dark .status-4xx {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+}
+
+.dark .status-5xx {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: rgb(196, 181, 253);
+} 

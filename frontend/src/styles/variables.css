@@ -1,0 +1,382 @@
+/* CSS 变量定义 */
+
+/* 主题颜色变量 */
+:root {
+  /* 基础背景色 */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f3f4f8;
+  --color-bg-tertiary: #f7f8fa;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #f9fafb;
+  --color-bg-popup: #ffffff;
+  
+  /* 文本颜色 */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-text-secondary-rgb: 107, 114, 128;
+  --color-text-tertiary: #9ca3af;
+  --color-text-tertiary-rgb: 156, 163, 175;
+  
+  /* 边框颜色 */
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-hover-border: #e5e7eb;
+  
+  /* 阴影颜色 */
+  --color-shadow: rgba(0, 0, 0, 0.05);
+  --color-shadow-hover: rgba(0, 0, 0, 0.1);
+  
+  /* 分隔器颜色 */
+  --color-divider-bg: #f3f4f6;
+  --color-divider-bg-hover: #e5e7eb;
+  --color-divider-border: #e5e7eb;
+  --color-divider-handle: #9ca3af;
+  --color-divider-handle-hover: #6b7280;
+  
+  /* 品牌色 */
+  --color-primary: #4f46e5;
+  --color-primary-light: rgba(79, 70, 229, 0.1);
+  --color-primary-dark: #4338ca;
+  --color-primary-hover: #4338ca;
+  --color-primary-rgb: 79, 70, 229;
+
+  /* 状态颜色 */
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-success-rgb: 16, 185, 129;
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-warning-rgb: 245, 158, 11;
+  --color-error: #ef4444;
+  --color-error-hover: #dc2626;
+  --color-error-rgb: 239, 68, 68;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+  --color-danger-rgb: 239, 68, 68;
+  --color-info: #3b82f6;
+  --color-info-hover: #2563eb;
+  --color-info-rgb: 59, 130, 246;
+  
+  /* 漏洞等级颜色 */
+  --color-vuln-critical: #dc2626;
+  --color-vuln-critical-rgb: 220, 38, 38;
+  --color-vuln-high: #ea580c;
+  --color-vuln-high-rgb: 234, 88, 12;
+  --color-vuln-medium: #d97706;
+  --color-vuln-medium-rgb: 217, 119, 6;
+  --color-vuln-low: #65a30d;
+  --color-vuln-low-rgb: 101, 163, 13;
+  
+  /* 状态文本颜色 */
+  --color-primary-text: #ffffff;
+
+  /* 颜色变量扩展 - 用于方法和状态标签 */
+  --color-blue-400: #60a5fa;
+  --color-blue-600: #2563eb;
+  --color-green-400: #34d399;
+  --color-green-600: #059669;
+  --color-yellow-400: #fbbf24;
+  --color-yellow-600: #d97706;
+  --color-red-400: #f87171;
+  --color-red-600: #dc2626;
+  --color-purple-400: #c084fc;
+  --color-purple-600: #9333ea;
+
+  /* 过渡时间 */
+  --transition-fast: 0.15s;
+  --transition-normal: 0.2s;
+  --transition-slow: 0.3s;
+  
+  /* 间距变量 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* 文本大小变量 */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  
+  /* 字体粗细变量 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 字体家族变量 - 双字体策略 */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'Maple Mono NF CN', 'Fira Code', 'JetBrains Mono', Consolas, Monaco, 'Courier New', monospace;
+  /* 默认使用无衬线字体用于 UI */
+  --font-family-current: var(--font-family-sans);
+
+  /* 统一圆角系统 - 层次化设计 */
+  --radius-xs: 0.25rem;    /* 4px - 最小元素 */
+  --radius-sm: 0.5rem;     /* 8px - 小元素 */
+  --radius-md: 0.75rem;    /* 12px - 中等元素 */
+  --radius-lg: 1rem;       /* 16px - 大元素 */
+  --radius-xl: 1.25rem;    /* 20px - 超大元素 */
+  --radius-2xl: 1.5rem;    /* 24px - 容器级 */
+  --radius-full: 9999px;   /* 完全圆角 */
+
+  /* 液态玻璃设计变量 - 白天模式优化：增强可见性和对比度 */
+  --glass-bg-alpha-subtle: 0.65;   /* 从 0.08 提升到 0.65 */
+  --glass-bg-alpha-light: 0.75;    /* 从 0.12 提升到 0.75 */
+  --glass-bg-alpha-medium: 0.85;   /* 从 0.18 提升到 0.85 */
+  --glass-bg-alpha-strong: 0.9;    /* 从 0.25 提升到 0.9 */
+  --glass-bg-alpha-intense: 0.95;  /* 从 0.35 提升到 0.95 */
+
+  --glass-bg-primary: rgba(248, 250, 252, var(--glass-bg-alpha-medium));
+  --glass-bg-secondary: rgba(241, 245, 249, var(--glass-bg-alpha-light));
+  --glass-bg-tertiary: rgba(248, 250, 252, var(--glass-bg-alpha-subtle));
+  --glass-bg-card: rgba(248, 250, 252, var(--glass-bg-alpha-strong));
+  --glass-bg-popup: rgba(255, 255, 255, var(--glass-bg-alpha-intense));
+  --glass-bg-hover: rgba(241, 245, 249, var(--glass-bg-alpha-strong));
+
+  /* 玻璃态边框 - 白天模式优化：增强边界可见性 */
+  --glass-border-alpha-light: 0.6;   /* 从 0.2 提升到 0.6 */
+  --glass-border-alpha-medium: 0.8;  /* 从 0.35 提升到 0.8 */
+  --glass-border-alpha-strong: 0.9;  /* 从 0.5 提升到 0.9 */
+
+  /* 使用更深的灰蓝色调增强边界可见性 */
+  --glass-border: rgba(148, 163, 184, var(--glass-border-alpha-medium));        /* 更深的颜色 */
+  --glass-border-light: rgba(203, 213, 225, var(--glass-border-alpha-light));   /* 调整颜色层次 */
+  --glass-border-strong: rgba(100, 116, 139, var(--glass-border-alpha-strong)); /* 更深的强调色 */
+
+  /* 液态模糊效果 - 增强液态感 */
+  --glass-blur-subtle: blur(8px);
+  --glass-blur-light: blur(12px);
+  --glass-blur-medium: blur(20px);
+  --glass-blur-strong: blur(28px);
+  --glass-blur-intense: blur(40px);
+
+  /* 统一使用新的圆角系统 */
+  --glass-radius-xs: var(--radius-xs);
+  --glass-radius-sm: var(--radius-sm);
+  --glass-radius-md: var(--radius-md);
+  --glass-radius-lg: var(--radius-lg);
+  --glass-radius-xl: var(--radius-xl);
+  --glass-radius-2xl: var(--radius-2xl);
+
+  /* 液态玻璃阴影 - 增强边界清晰度 */
+  --glass-shadow-subtle:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 1px rgba(0, 0, 0, 0.05);
+
+  --glass-shadow-light:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 1px rgba(0, 0, 0, 0.08);
+
+  --glass-shadow-medium:
+    0 6px 16px rgba(0, 0, 0, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 0 1px rgba(0, 0, 0, 0.1);
+
+  --glass-shadow-strong:
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 16px 48px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 0 1px rgba(0, 0, 0, 0.12);
+
+  --glass-shadow-focus:
+    0 0 0 4px rgba(99, 102, 241, 0.25),
+    0 8px 32px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 0 1px rgba(0, 0, 0, 0.08);
+
+  /* 统一过渡动画系统 */
+  --glass-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-transition-bounce: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* 按钮颜色系统 - 浅色模式 */
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-text: white;
+  --btn-primary-hover-bg: var(--color-primary-hover);
+
+  --btn-secondary-bg: var(--glass-bg-secondary);
+  --btn-secondary-text: var(--color-text-primary);
+  --btn-secondary-hover-bg: var(--glass-bg-primary);
+
+  --btn-success-bg: var(--color-success);
+  --btn-success-text: white;
+  --btn-success-hover-bg: var(--color-success-hover);
+
+  --btn-danger-bg: var(--color-danger);
+  --btn-danger-text: white;
+  --btn-danger-hover-bg: var(--color-danger-hover);
+
+  --btn-warning-bg: var(--color-warning);
+  --btn-warning-text: var(--color-text-primary); /* 黄色背景配深色文字 */
+  --btn-warning-hover-bg: #d97706;
+
+  /* 兼容性别名 - 逐步迁移 */
+  --border-radius: var(--radius-md);
+  --border-radius-sm: var(--radius-sm);
+  --border-radius-md: var(--radius-md);
+  --border-radius-lg: var(--radius-lg);
+  --border-radius-full: var(--radius-full);
+
+  /* 字体大小变量 */
+  --font-size-base: 1rem;
+  --font-size-small: 0.875rem;
+  --font-size-large: 1.125rem;
+  
+  /* 字体系列 - 使用 Maple Mono NF CN 作为主字体 */
+  --font-family-sans: 'Maple Mono NF CN', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: 'Maple Mono NF CN', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-family-current: var(--font-family-sans);
+  
+  /* 全局阴影变量 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+/* 暗色主题变量 */
+.dark {
+  /* 基础背景色 */
+  --color-bg-primary: #1e1e36;
+  --color-bg-secondary: #1a1a2e;
+  --color-bg-tertiary: #25253e;
+  --color-bg-card: #2a2a42;
+  --color-bg-hover: #323248;
+  --color-bg-popup-dark: #1f2937;
+  
+  /* 文本颜色 */
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #9ca3af;
+  --color-text-tertiary: #6b7280;
+  
+  /* 边框颜色 */
+  --color-border: #4b5563;
+  --color-border-light: #374151;
+  --color-border-dark: #374151;
+  --color-hover-border-dark: #374151;
+  
+  /* 阴影颜色 */
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-shadow-hover: rgba(0, 0, 0, 0.35);
+  
+  /* 分隔器颜色 - 深色模式 */
+  --color-divider-bg: #374151;
+  --color-divider-bg-hover: #4b5563;
+  --color-divider-border: #4b5563;
+  --color-divider-handle: #6b7280;
+  --color-divider-handle-hover: #9ca3af;
+  
+  /* 品牌色暗色主题调整 */
+  --color-primary: #6366f1;
+  --color-primary-light: rgba(99, 102, 241, 0.15);
+  --color-primary-dark: #4f46e5;
+  --color-primary-hover: #4f46e5;
+  --color-primary-rgb: 99, 102, 241;
+  --color-primary-light-dark: #a5b4fc;
+
+  /* 状态颜色悬停状态 - 深色模式 */
+  --color-success-hover: #059669;
+  --color-warning-hover: #d97706;
+  --color-error-hover: #dc2626;
+  --color-danger-hover: #dc2626;
+  --color-info-hover: #2563eb;
+  
+  /* 漏洞等级颜色 - 暗色主题调整 */
+  --color-vuln-critical: #ef4444;
+  --color-vuln-high: #f97316;
+  --color-vuln-medium: #eab308;
+  --color-vuln-low: #22c55e;
+  
+  /* 颜色变量扩展 - 暗色模式 */
+  --color-hover-dark: rgba(31, 41, 55, 0.5);
+  
+  /* 暗色主题阴影变量 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 3px rgba(129, 140, 248, 0.25);
+
+  /* 暗色主题液态玻璃变量 - 优化版 */
+  --glass-bg-alpha-subtle: 0.04;
+  --glass-bg-alpha-light: 0.06;
+  --glass-bg-alpha-medium: 0.08;
+  --glass-bg-alpha-strong: 0.12;
+  --glass-bg-alpha-intense: 0.18;
+
+  --glass-bg-primary: rgba(255, 255, 255, var(--glass-bg-alpha-medium));
+  --glass-bg-secondary: rgba(255, 255, 255, var(--glass-bg-alpha-light));
+  --glass-bg-tertiary: rgba(255, 255, 255, var(--glass-bg-alpha-subtle));
+  --glass-bg-card: rgba(255, 255, 255, var(--glass-bg-alpha-strong));
+  --glass-bg-popup: rgba(15, 23, 42, 0.85);
+  --glass-bg-hover: rgba(255, 255, 255, var(--glass-bg-alpha-strong));
+
+  /* 暗色主题玻璃态边框 */
+  --glass-border-alpha-light: 0.08;
+  --glass-border-alpha-medium: 0.15;
+  --glass-border-alpha-strong: 0.25;
+
+  --glass-border: rgba(255, 255, 255, var(--glass-border-alpha-medium));
+  --glass-border-light: rgba(255, 255, 255, var(--glass-border-alpha-light));
+  --glass-border-strong: rgba(255, 255, 255, var(--glass-border-alpha-strong));
+
+  /* 暗色主题液态玻璃阴影 */
+  --glass-shadow-subtle: 0 2px 12px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --glass-shadow-light: 0 4px 16px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.5), 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --glass-shadow-strong: 0 12px 32px rgba(0, 0, 0, 0.6), 0 24px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-shadow-focus: 0 0 0 4px rgba(129, 140, 248, 0.25), 0 8px 32px rgba(129, 140, 248, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* 按钮颜色系统 - 深色模式 */
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-text: white;
+  --btn-primary-hover-bg: var(--color-primary-hover);
+
+  --btn-secondary-bg: var(--glass-bg-secondary);
+  --btn-secondary-text: var(--color-text-primary);
+  --btn-secondary-hover-bg: var(--glass-bg-primary);
+
+  --btn-success-bg: var(--color-success);
+  --btn-success-text: white;
+  --btn-success-hover-bg: var(--color-success-hover);
+
+  --btn-danger-bg: var(--color-danger);
+  --btn-danger-text: white;
+  --btn-danger-hover-bg: var(--color-danger-hover);
+
+  --btn-warning-bg: var(--color-warning);
+  --btn-warning-text: white; /* 深色模式下可以配白色文字 */
+  --btn-warning-hover-bg: #d97706;
+}
+
+/* 浏览器兼容性支持 */
+/* 对于不支持 backdrop-filter 的浏览器，提供更不透明的背景作为降级方案 */
+@supports not (backdrop-filter: blur(1px)) {
+  :root {
+    /* 白天模式降级方案：使用更不透明的背景确保可读性 */
+    --glass-bg-primary: rgba(248, 250, 252, 0.95);
+    --glass-bg-secondary: rgba(241, 245, 249, 0.9);
+    --glass-bg-tertiary: rgba(248, 250, 252, 0.85);
+    --glass-bg-card: rgba(248, 250, 252, 0.98);
+    --glass-bg-popup: rgba(255, 255, 255, 0.98);
+    --glass-bg-hover: rgba(241, 245, 249, 0.95);
+  }
+
+  .dark {
+    /* 深色模式降级方案：保持原有设置 */
+    --glass-bg-primary: rgba(30, 30, 54, 0.85);
+    --glass-bg-secondary: rgba(26, 26, 46, 0.75);
+    --glass-bg-tertiary: rgba(37, 37, 62, 0.65);
+    --glass-bg-card: rgba(42, 42, 66, 0.9);
+    --glass-bg-popup: rgba(31, 41, 55, 0.95);
+    --glass-bg-hover: rgba(50, 50, 72, 0.85);
+  }
+}

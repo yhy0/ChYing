@@ -1,0 +1,446 @@
+/**
+ * 表格组件样式
+ * 提供统一的表格样式和虚拟滚动表格支持
+ */
+
+/* ===== CSS变量定义 ===== */
+:root {
+  /* 表格颜色 */
+  --table-header-bg: var(--glass-bg-medium);
+  --table-header-text: var(--color-text-primary);
+  --table-row-bg: transparent;
+  --table-row-hover-bg: var(--glass-bg-light);
+  --table-row-selected-bg: var(--glass-bg-medium);
+  --table-border-color: var(--glass-border);
+  
+  /* 表格尺寸 */
+  --table-row-height: 33px;
+  --table-header-height: 40px;
+  --table-cell-padding: 0 8px;
+  
+  /* 排序图标颜色 */
+  --table-sort-active-color: var(--color-primary);
+  --table-sort-inactive-color: var(--color-text-tertiary);
+  
+  /* 重置按钮样式 */
+  --reset-btn-bg: rgba(255, 255, 255, 0.9);
+  --reset-btn-hover-bg: rgba(59, 130, 246, 0.05);
+  --reset-btn-border: rgba(209, 213, 219, 0.8);
+  --reset-btn-text: var(--color-primary);
+  --reset-btn-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --reset-btn-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色模式变量 */
+.dark {
+  --reset-btn-bg: rgba(31, 41, 55, 0.9);
+  --reset-btn-hover-bg: rgba(59, 130, 246, 0.1);
+  --reset-btn-border: rgba(75, 85, 99, 0.8);
+}
+
+/* ===== 表格容器样式 ===== */
+.http-traffic-table-container {
+  position: relative;
+  height: 100%;
+}
+
+.virtual-table-container {
+  overflow: auto;
+  position: relative;
+  width: 100%;
+  min-width: fit-content;
+}
+
+/* ===== 虚拟表格样式 ===== */
+.virtual-table {
+  display: grid;
+  width: 100%;
+  min-width: fit-content;
+}
+
+.virtual-table thead {
+  display: grid;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--table-header-bg);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+}
+
+.virtual-table thead tr {
+  display: flex;
+  width: 100%;
+}
+
+.virtual-table th {
+  display: flex;
+  align-items: center;
+  padding: var(--table-cell-padding);
+  color: var(--table-header-text);
+  font-weight: var(--font-weight-medium);
+  border-right: 1px solid var(--table-border-color);
+  position: relative;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.virtual-table th:last-child {
+  border-right: none;
+}
+
+.virtual-table th.text-center {
+  justify-content: center;
+}
+
+/* ===== 表格主体样式 ===== */
+.virtual-table tbody {
+  display: grid;
+  position: relative;
+}
+
+.virtual-row {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: var(--table-row-height);
+  min-height: var(--table-row-height);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.virtual-row:hover {
+  background-color: var(--table-row-hover-bg);
+}
+
+.virtual-row.selected {
+  background-color: var(--table-row-selected-bg);
+  border-left: 3px solid var(--color-primary);
+}
+
+/* 行颜色标记 */
+.virtual-row[data-row-color] {
+  border-left: 3px solid var(--row-color, transparent);
+}
+
+.virtual-row[data-row-color].selected {
+  border-left-width: 4px;
+}
+
+/* ===== 表格单元格样式 ===== */
+.virtual-table td {
+  display: flex;
+  align-items: center;
+  padding: var(--table-cell-padding);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-right: 1px solid var(--table-border-color);
+}
+
+.virtual-table td:last-child {
+  border-right: none;
+}
+
+.virtual-table td.text-center {
+  justify-content: center;
+}
+
+.virtual-table td.text-right {
+  justify-content: flex-end;
+}
+
+/* 单元格内容适应 */
+.virtual-table td > *:not(.toggle-switch) {
+  width: 100%;
+  min-width: 0;
+}
+
+.virtual-table td .toggle-switch {
+  width: auto !important;
+  min-width: auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* ===== 排序功能样式 ===== */
+.sort-icon {
+  margin-left: 4px;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.sort-icon:hover {
+  color: var(--table-sort-active-color);
+}
+
+/* ===== 列调整器样式 ===== */
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: transparent;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  z-index: 1;
+}
+
+.resizer:hover,
+.resizer.resizing {
+  background: var(--color-primary);
+}
+
+/* ===== 重置排序按钮样式 ===== */
+.reset-sort-floating-btn {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.reset-sort-btn {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition: all var(--transition-normal);
+  font-weight: var(--font-weight-medium);
+  min-width: fit-content;
+  padding: 6px 8px;
+  border-radius: var(--radius-lg);
+  background: var(--reset-btn-bg);
+  border: 1px solid var(--reset-btn-border);
+  color: var(--reset-btn-text);
+  box-shadow: var(--reset-btn-shadow);
+  opacity: 0.8;
+}
+
+.reset-sort-btn:hover {
+  opacity: 1;
+  background: var(--reset-btn-hover-bg);
+  box-shadow: var(--reset-btn-hover-shadow);
+  transform: translateY(-1px);
+}
+
+.reset-sort-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.reset-sort-btn i {
+  font-size: 0.875rem;
+}
+
+/* ===== 空状态样式 ===== */
+.empty-state-row {
+  position: static !important;
+  transform: none !important;
+  height: auto !important;
+  min-height: 120px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-row td {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 1024px) {
+  .reset-sort-btn span {
+    display: none !important;
+  }
+
+  .reset-sort-btn {
+    padding: 0.375rem;
+    min-width: auto;
+    border-radius: 50%;
+  }
+
+  .reset-sort-btn i {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .reset-sort-btn {
+    padding: 0.25rem;
+  }
+
+  .reset-sort-btn i {
+    font-size: 0.75rem;
+  }
+  
+  .virtual-table th,
+  .virtual-table td {
+    padding: 0 4px;
+    font-size: var(--text-xs);
+  }
+  
+  :root {
+    --table-row-height: 28px;
+    --table-header-height: 32px;
+  }
+}
+
+/* ===== 性能优化 ===== */
+.virtual-table {
+  contain: layout style paint;
+}
+
+.virtual-row {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+/* ===== 多选复选框样式 ===== */
+.checkbox-header,
+.checkbox-cell {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  text-align: center;
+  padding: 0 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--table-border-color);
+}
+
+.multi-select-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+  /* 完全隐藏原生复选框外观 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* 移除原生样式残留 */
+  background: transparent;
+  background-image: none;
+  /* 自定义外观 */
+  border: 2px solid var(--color-primary);
+  border-radius: 3px;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+/* 复选框选中状态 */
+.multi-select-checkbox:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  /* 确保不显示原生勾选标记 */
+  background-image: none;
+}
+
+/* 复选框选中时的勾选标记 */
+.multi-select-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* 复选框悬停效果 */
+.multi-select-checkbox:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+.multi-select-checkbox:checked:hover {
+  background-color: var(--color-primary-dark, #4f46e5);
+  border-color: var(--color-primary-dark, #4f46e5);
+}
+
+/* 半选状态（indeterminate） */
+.multi-select-checkbox:indeterminate {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.multi-select-checkbox:indeterminate::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 5px;
+  width: 8px;
+  height: 2px;
+  background-color: white;
+  border: none;
+  transform: none;
+}
+
+.multi-select-checkbox:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.checked-row {
+  background-color: var(--color-primary-bg, rgba(59, 130, 246, 0.1));
+}
+
+.checked-row:hover {
+  background-color: var(--color-primary-bg, rgba(59, 130, 246, 0.15));
+}
+
+/* ===== 可访问性增强 ===== */
+@media (prefers-reduced-motion: reduce) {
+  .virtual-row,
+  .reset-sort-btn,
+  .sort-icon {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .virtual-table th,
+  .virtual-table td {
+    border-color: var(--color-text-primary);
+  }
+  
+  .virtual-row.selected {
+    background-color: var(--color-primary-light);
+    border-left-color: var(--color-primary);
+  }
+}
+
+/* ===== 打印样式 ===== */
+@media print {
+  .reset-sort-floating-btn {
+    display: none;
+  }
+  
+  .virtual-table {
+    display: table;
+  }
+  
+  .virtual-table thead {
+    display: table-header-group;
+  }
+  
+  .virtual-table tbody {
+    display: table-row-group;
+  }
+  
+  .virtual-row {
+    display: table-row;
+    position: static;
+    transform: none;
+  }
+  
+  .virtual-table td,
+  .virtual-table th {
+    display: table-cell;
+  }
+}

@@ -1,0 +1,525 @@
+/* 工具类样式 */
+
+/* 过渡动画 */
+.transition-fast {
+  transition: all var(--transition-fast) ease;
+}
+
+.transition-normal {
+  transition: all var(--transition-normal) ease;
+}
+
+.transition-slow {
+  transition: all var(--transition-slow) ease;
+}
+
+/* 常用阴影 */
+.shadow-sm {
+  box-shadow: 0 1px 2px var(--color-shadow);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px var(--color-shadow-hover), 0 2px 4px -1px var(--color-shadow);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px var(--color-shadow-hover), 0 4px 6px -2px var(--color-shadow);
+}
+
+/* 常用间距 */
+.spacing-xs {
+  margin-bottom: 0.25rem;
+}
+
+.spacing-sm {
+  margin-bottom: 0.5rem;
+}
+
+.spacing-md {
+  margin-bottom: 1rem;
+}
+
+.spacing-lg {
+  margin-bottom: 1.5rem;
+}
+
+.spacing-xl {
+  margin-bottom: 2rem;
+}
+
+/* 常用辅助类 */
+
+/* 文本截断 */
+.truncate-text {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.truncate-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hidden {
+  display: none !important;
+}
+
+.invisible {
+  visibility: hidden !important;
+}
+
+/* 通用圆角 */
+.rounded-sm {
+  border-radius: var(--radius-sm);
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* 图标全局样式 */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 液态玻璃工具类 - 增强版 */
+
+/* 基础液态玻璃背景 */
+.glass-bg {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+}
+
+/* 液态玻璃卡片 */
+.glass-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: var(--glass-shadow-medium);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 25%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.5) 75%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* 玻璃卡片悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-strong),
+    0 0 15px rgba(99, 102, 241, 0.1);
+  border-color: var(--glass-border-strong);
+}
+
+/* 液态玻璃面板 */
+.glass-panel {
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  box-shadow: var(--glass-shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 模糊强度工具类 */
+.glass-blur-subtle {
+  backdrop-filter: var(--glass-blur-subtle);
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+}
+
+.glass-blur-light {
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+}
+
+.glass-blur-medium {
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+}
+
+.glass-blur-strong {
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+}
+
+.glass-blur-intense {
+  backdrop-filter: var(--glass-blur-intense);
+  -webkit-backdrop-filter: var(--glass-blur-intense);
+}
+
+/* 液态玻璃阴影工具类 */
+.glass-shadow-subtle {
+  box-shadow: var(--glass-shadow-subtle);
+}
+
+.glass-shadow-light {
+  box-shadow: var(--glass-shadow-light);
+}
+
+.glass-shadow-medium {
+  box-shadow: var(--glass-shadow-medium);
+}
+
+.glass-shadow-strong {
+  box-shadow: var(--glass-shadow-strong);
+}
+
+/* 液态玻璃边框工具类 */
+.glass-border-light {
+  border: 1px solid var(--glass-border-light);
+}
+
+.glass-border-medium {
+  border: 1px solid var(--glass-border);
+}
+
+.glass-border-strong {
+  border: 1px solid var(--glass-border-strong);
+}
+
+/* 液态玻璃圆角工具类 */
+.glass-radius-sm {
+  border-radius: var(--glass-radius-sm);
+}
+
+.glass-radius-md {
+  border-radius: var(--glass-radius-md);
+}
+
+.glass-radius-lg {
+  border-radius: var(--glass-radius-lg);
+}
+
+.glass-radius-xl {
+  border-radius: var(--glass-radius-xl);
+}
+
+/* 液态玻璃悬停效果 - 使用颜色/阴影变化避免布局偏移 */
+.glass-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-strong),
+    0 0 15px rgba(99, 102, 241, 0.1);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-strong);
+}
+
+/* 液态玻璃浮动动画 */
+@keyframes glass-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.glass-float {
+  animation: glass-float 3s ease-in-out infinite;
+}
+
+/* 液态玻璃脉冲动画 */
+@keyframes glass-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.glass-pulse {
+  animation: glass-pulse 2s ease-in-out infinite;
+}
+
+/* 动态光泽效果 - 模拟光线流动 */
+@keyframes glass-shine-flow {
+  0% {
+    background-position: -200% 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 200% 0;
+    opacity: 0;
+  }
+}
+
+.glass-dynamic-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-dynamic-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: glass-shine-flow 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 视差悬停效果 */
+@keyframes glass-parallax-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-2px) translateX(1px);
+  }
+}
+
+.glass-parallax-hover {
+  transition: var(--glass-transition-normal);
+  position: relative;
+}
+
+.glass-parallax-hover:hover {
+  animation: glass-parallax-float 2s ease-in-out infinite;
+}
+
+.glass-parallax-hover:hover > * {
+  transform: translateY(1px) translateX(-0.5px);
+  transition: var(--glass-transition-normal);
+}
+
+/* 边界增强工具类 - 解决白天模式边界模糊 */
+.glass-enhanced-border {
+  border: 1px solid var(--glass-border-strong) !important;
+  box-shadow:
+    var(--glass-shadow-medium),
+    inset 0 0 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.glass-crisp-edge {
+  border: 1px solid var(--glass-border) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.glass-defined-boundary {
+  position: relative;
+  border: 1px solid var(--glass-border-light);
+}
+
+.glass-defined-boundary::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--glass-border-strong);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* 高对比度模式工具类 */
+.glass-high-contrast {
+  background: var(--glass-bg-card) !important;
+  border: 2px solid var(--glass-border-strong) !important;
+  box-shadow: var(--glass-shadow-strong) !important;
+}
+
+/* 表格专用边界增强 */
+.table-enhanced-header {
+  border-bottom: 2px solid var(--glass-border) !important;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+.table-enhanced-cell {
+  border-right: 1px solid var(--glass-border-light);
+  position: relative;
+}
+
+.table-enhanced-cell::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 0;
+  bottom: 10%;
+  width: 1px;
+  background: var(--glass-border);
+  opacity: 0.7;
+}
+
+/* 高级液态玻璃工具类 */
+.glass-multi-layer {
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border-light),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    var(--glass-shadow-medium),
+    0 0 0 0.5px rgba(203, 213, 225, 0.3) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-multi-layer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(165deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(220, 225, 235, 0.2) 100%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.glass-multi-layer::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 0%,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%);
+  filter: blur(0.5px);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* 液态玻璃交互增强 - 使用颜色/阴影变化避免布局偏移 */
+.glass-interactive {
+  transition: var(--glass-transition-normal);
+  cursor: pointer;
+}
+
+.glass-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-border),
+    inset 0 1px 3px rgba(0, 0, 0, 0.08),
+    var(--glass-shadow-strong),
+    0 0 0 1px rgba(148, 163, 184, 0.4),
+    0 0 20px rgba(99, 102, 241, 0.15) !important;
+}
+
+.glass-interactive:active {
+  transform: translateY(0);
+  transition: var(--glass-transition-fast);
+}
+
+/* 液态玻璃文本容器 */
+.glass-text-container {
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-radius: var(--glass-radius-sm);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--glass-border-light);
+  box-shadow: var(--glass-shadow-subtle);
+}
+
+/* 液态玻璃分隔线 */
+.glass-divider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--glass-border) 20%,
+    var(--glass-border-strong) 50%,
+    var(--glass-border) 80%,
+    transparent 100%);
+  margin: 1rem 0;
+  position: relative;
+}
+
+.glass-divider::after {
+  content: '';
+  position: absolute;
+  top: -0.5px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 20%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.3) 80%,
+    transparent 100%);
+}
+
+/* 深色模式适配 */
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px var(--color-shadow);
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px var(--color-shadow-hover), 0 2px 4px -1px var(--color-shadow);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px var(--color-shadow-hover), 0 4px 6px -2px var(--color-shadow);
+}
+
+.dark .glass-card::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}

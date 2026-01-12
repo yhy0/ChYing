@@ -1,0 +1,205 @@
+# Spring Boot Actuator
+/api-docs                       {type="application/json"}       {status=200}
+/v/api-docs                     {type="application/json"}       {status=200}                {root_only}
+/v1/api-docs                    {type="application/json"}       {status=200}                {root_only}
+/v2/api-docs                    {type="application/json"}       {status=200}                {root_only}
+/swagger-ui.html                {status=200}                    {tag="Swagger UI"}
+/actuator                       {type="application/json"}       {tag="_links"}      {status=200}
+/auditevents                    {type="application/json"}       {status=200}
+/autoconfig                     {type="application/json"}       {status=200}
+/beans                          {type="application/json"}       {status=200}
+/eureka                         {type="application/json"}       {status=200}
+/caches                         {type="application/json"}       {status=200}
+/conditions                     {type="application/json"}       {status=200}
+/configprops                    {type="application/json"}       {status=200}
+/docs                           {type="application/json"}       {status=200}
+/dump                           {status=200}
+/env                            {status=200}
+/flyway                         {type="application/json"}       {status=200}
+/heapdump                       {status=200}
+/httptrace                      {type="application/json"}       {status=200}
+/info                           {type="application/json"}       {status=200}
+/intergrationgraph              {type="application/json"}       {status=200}
+/jolokia                        {type="application/json"}       {status=200}
+/logfile                        {type="application/json"}       {status=200}
+/liquibase                      {type="application/json"}       {status=200}
+/metrics                        {type="application/json"}       {status=200}
+/mappings                       {type="application/json"}       {status=200}
+/prometheus                     {type="application/json"}       {status=200}
+/scheduledtasks                 {type="application/json"}       {status=200}
+/sessions                       {type="application/json"}       {status=200}
+/trace                          {type="application/json"}       {status=200}
+/entity/all                     {status=200}                    {root_only}
+
+/swagger/swagger-ui.html            {status=200}        {tag="Swagger UI"}
+/api/swagger-ui.html                {status=200}        {tag="Swagger UI"}          {root_only}
+/swagger/index.html                 {status=200}        {tag="swagger"}
+/v2/swagger-ui.html                 {status=200}        {tag="Swagger UI"}          {root_only}
+/jolokia/list                       {status=200}        {tag="java.lang."}          {root_only}                 {fingprints="java,spring"}
+/gateway/routes/                    {status=200}        {tag="gateway.filter."}
+/gateway/actuator                   {status=200}        {tag="_links"}              {root_only}
+/gateway/actuator/auditevents       {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/beans             {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/conditions        {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/configprops       {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/env               {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/trace             {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/logfile           {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/heapdump          {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/httptrace         {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/hystrix.stream    {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/info              {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/jolokia           {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/mappings          {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/metrics           {status=200}        {root_only}                 {fingprints="java,spring"}
+/gateway/actuator/scheduledtasks    {status=200}        {root_only}                 {fingprints="java,spring"}
+/webpage/system/druid/index.html    {status=200}        {root_only}
+/hystrix/monitor                    {status=200}        {root_only}
+/actuator/auditevents               {status=200}        {root_only}                 {fingprints="java,spring"}
+/actuator/beans                     {status=200}        {root_only}                 {fingprints="java,spring"}
+/actuator/logfile                   {status=200}        {root_only}                 {fingprints="java,spring"}
+/actuator/trace                     {status=200}        {root_only}                 {fingprints="java,spring"}
+/actuator/conditions                {status=200}        {root_only}                 {fingprints="java,spring"}
+/actuator/configprops               {status=200}        {root_only}                 {fingprints="java,spring"}
+/actuator/env                       {type="application/json"}       {tag="spring."}     {status=200}                    {root_only}     {fingprints="java,spring"}
+/actuator/info                      {status=200}                    {root_only}         {fingprints="java,spring"}
+/actuator/heapdump                  {status=200}                    {root_only}         {fingprints="java,spring"}
+/actuator/scheduledtasks            {status=200}                    {root_only}         {fingprints="java,spring"}
+/actuator/httptrace                 {type="application/json"}       {status=200}        {fingprints="java,spring"}      {root_only}
+/actuator/mappings                  {type="application/json"}       {status=200}        {fingprints="java,spring"}      {root_only}
+/actuator/jolokia                   {type="application/json"}       {status=200}        {fingprints="java,spring"}      {root_only}
+/actuator/hystrix.stream            {status=200}                    {root_only}         {fingprints="java,spring"}
+
+/monitor                            {type="application/json"}       {status=200}        {root_only}
+/monitor/auditevents                {type="application/json"}       {status=200}        {root_only}
+/monitor/beans                      {type="application/json"}       {status=200}        {root_only}
+/monitor/conditions                 {type="application/json"}       {status=200}        {root_only}
+/monitor/configprops                {type="application/json"}       {status=200}        {root_only}
+/monitor/env                        {type="application/json"}       {status=200}        {root_only}
+/monitor/info                       {type="application/json"}       {status=200}        {root_only}
+/monitor/heapdump                   {status=200}                    {root_only}
+/monitor/scheduledtasks             {status=200}                    {root_only}
+/monitor/httptrace                  {type="application/json"}       {status=200}        {root_only}
+/monitor/mappings                   {type="application/json"}       {status=200}        {root_only}
+/monitor/jolokia                    {type="application/json"}       {status=200}        {root_only}
+/monitor/hystrix.stream             {type="application/json"}       {status=200}        {root_only}
+/api/api-docs                       {type="application/json"}       {status=200}                    {root_only}
+/api/v/api-docs                     {type="application/json"}       {status=200}                    {root_only}
+/api/v1/api-docs                    {type="application/json"}       {status=200}                    {root_only}
+/api/v2/api-docs                    {type="application/json"}       {status=200}                    {root_only}
+
+
+
+# 先排除 
+#/api/actuator                          {status=200}                {root_only}
+#/api/auditevents                       {status=200}                {root_only}
+#/api/autoconfig                        {status=200}                {root_only}
+#/api/beans                             {status=200}                {root_only}
+#/api/eureka                            {status=200}                {root_only}
+#/api/caches                            {status=200}                {root_only}
+#/api/conditions                        {status=200}                {root_only}
+#/api/configprops                       {status=200}                {root_only}
+#/api/docs                              {status=200}                {root_only}
+#/api/dump                              {status=200}                {root_only}
+#/api/env                               {status=200}                {root_only}
+#/api/flyway                            {status=200}                {root_only}
+#/api/health                            {status=200}                {root_only}
+#/api/heapdump                          {status=200}                {root_only}
+#/api/httptrace                         {status=200}                {root_only}
+#/api/info                              {status=200}                {root_only}
+#/api/intergrationgraph                 {status=200}                {root_only}
+#/api/jolokia                           {status=200}                {root_only}
+#/api/logfile                           {status=200}                {root_only}
+#/api/loggers                           {status=200}                {root_only}
+#/api/liquibase                         {status=200}                {root_only}
+#/api/metrics                           {status=200}                {root_only}
+#/api/mappings                          {status=200}                {root_only}
+#/api/prometheus                        {status=200}                {root_only}
+#/api/refresh                           {status=200}                {root_only}
+#/api/scheduledtasks                    {status=200}                {root_only}
+#/api/sessions                          {status=200}                {root_only}
+#/api/shutdown                          {status=200}                {root_only}
+#/api/trace                             {status=200}                {root_only}
+#/api/threaddump                        {type="application/json"}   {status=200}            {root_only}
+#/api/druid/login.html                  {status=200}                {tag="login"}           {root_only}
+#/api/entity/all                        {status=200}                {root_only}
+#/api/swagger/swagger-ui.html           {status=200}                {tag="swagger"}         {root_only}
+#/api/api/swagger-ui.html               {status=200}                {tag="swagger"}         {root_only}
+#/api/swagger/index.html                {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.1/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.2/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.3/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.4/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.5/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.6/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.7/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.8/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v1.9/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v2/swagger-ui.html                {status=200}                {tag="swagger"}         {root_only}
+#/api/v2.0/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v2.1/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v2.2/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/v2.3/swagger-ui.html              {status=200}                {tag="swagger"}         {root_only}
+#/api/%20/swagger-ui.html               {status=200}                {tag="swagger"}         {root_only}
+#/api/jolokia/list                      {status=200}                {root_only}
+#/api/gateway/actuator                  {status=200}                {root_only}
+#/api/gateway/actuator/auditevents      {status=200}                {root_only}
+#/api/gateway/actuator/beans            {status=200}                {root_only}
+#/api/gateway/actuator/conditions       {status=200}                {root_only}
+#/api/gateway/actuator/configprops      {status=200}                {root_only}
+#/api/gateway/actuator/env              {status=200}                {root_only}
+#/api/gateway/actuator/trace            {status=200}                {root_only}
+#/api/gateway/actuator/health           {status=200}                {root_only}
+#/api/gateway/actuator/logfile          {status=200}                {root_only}
+#/api/gateway/actuator/heapdump         {status=200}                {root_only}
+#/api/gateway/actuator/httptrace        {status=200}                {root_only}
+#/api/gateway/actuator/hystrix.stream   {status=200}                {root_only}
+#/api/gateway/actuator/info             {status=200}                {root_only}
+#/api/gateway/actuator/jolokia          {status=200}                {root_only}
+#/api/gateway/actuator/loggers          {status=200}                {root_only}
+#/api/gateway/actuator/mappings         {status=200}                {root_only}
+#/api/gateway/actuator/metrics          {status=200}                {root_only}
+#/api/gateway/actuator/scheduledtasks   {status=200}                {root_only}
+#/api/gateway/actuator/threaddump       {type="application/json"}   {status=200}                {root_only}
+#/api/gateway/actuator/swagger-ui.html  {status=200}                {tag="swagger"}             {root_only}
+#/api/webpage/system/druid/index.html   {status=200}                {root_only}
+#/api/system/druid/index.html           {status=200}                {root_only}
+#/api/druid/index.html                  {status=200}                {root_only}
+#/api/druid/websession.html             {status=200}                {root_only}
+#/api/hystrix/monitor                   {status=200}                {root_only}
+#/api/actuator/auditevents              {status=200}                {root_only}
+#/api/actuator/beans                    {status=200}                {root_only}
+#/api/actuator/health                   {status=200}                {root_only}
+#/api/actuator/logfile                  {status=200}                {root_only}
+#/api/actuator/trace                    {status=200}                {root_only}
+#/api/actuator/swagger-ui.html          {status=200}                {tag="swagger"}             {root_only}
+#/api/actuator/conditions               {status=200}                {root_only}
+#/api/actuator/configprops              {status=200}                {root_only}
+#/api/actuator/env                      {status=200}                {root_only}
+#/api/actuator/info                     {status=200}                {root_only}
+#/api/actuator/loggers                  {status=200}                {root_only}
+#/api/actuator/heapdump                 {status=200}                {root_only}
+#/api/actuator/threaddump               {type="application/json"}   {status=200}                {root_only}
+#/api/actuator/metrics                  {status=200}                {root_only}
+#/api/actuator/scheduledtasks           {status=200}                {root_only}
+#/api/actuator/httptrace                {status=200}                {root_only}
+#/api/actuator/mappings                 {status=200}                {root_only}
+#/api/actuator/jolokia                  {status=200}                {root_only}
+#/api/actuator/hystrix.stream           {status=200}                {root_only}
+#/api/monitor                           {status=200}                {root_only}
+#/api/monitor/auditevents               {status=200}                {root_only}
+#/api/monitor/beans                     {status=200}                {root_only}
+#/api/monitor/health                    {status=200}                {root_only}
+#/api/monitor/conditions                {status=200}                {root_only}
+#/api/monitor/configprops               {status=200}                {root_only}
+#/api/monitor/env                       {status=200}                {root_only}
+#/api/monitor/info                      {status=200}                {root_only}
+#/api/monitor/loggers                   {status=200}                {root_only}
+#/api/monitor/heapdump                  {status=200}                {root_only}
+#/api/monitor/threaddump                {type="application/json"}   {status=200}                {root_only}
+#/api/monitor/metrics                   {status=200}                {root_only}
+#/api/monitor/scheduledtasks            {status=200}                {root_only}
+#/api/monitor/httptrace                 {status=200}                {root_only}
+#/api/monitor/mappings                  {status=200}                {root_only}
+#/api/monitor/jolokia                   {status=200}                {root_only}
+#/api/monitor/hystrix.stream            {status=200}                {root_only}

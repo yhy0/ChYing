@@ -1,0 +1,617 @@
+/* Decoder 模块样式 - 使用全局变量，移除冗余的模块级变量 */
+
+
+
+/* ======= 布局组件 ======= */
+
+/* 主容器 - 玻璃态设计 */
+.decoder-panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 玻璃态光泽效果 */
+.decoder-panel-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 控制栏 - 玻璃态设计 */
+.decoder-control-bar {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 1rem;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-sm) var(--glass-radius-sm) 0 0;
+  box-shadow: var(--glass-shadow-sm);
+  min-height: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.decoder-control-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+/* 内容容器 */
+.decoder-content-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* 面板布局 - 玻璃态设计 */
+.decoder-panels {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+/* 单个面板 - 玻璃态设计 */
+.decoder-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border-right: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-sm);
+  margin: 0.25rem;
+  position: relative;
+}
+
+/* 玻璃态光泽效果 */
+.decoder-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 面板头部 - 玻璃态设计 */
+.decoder-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-sm) var(--glass-radius-sm) 0 0;
+  height: 40px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃态光泽效果 */
+.decoder-panel-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+/* ======= 标签页组件 ======= */
+/* 使用统一的标签组组件，移除重复样式 */
+
+/* 解码器特定的标签容器样式 */
+.decoder-tabs-container {
+  /* 继承 tab-group.css 中的 .decoder-tabs 样式 */
+  /* 只保留解码器特定的定制 */
+  overflow-y: auto;
+  max-height: 120px; /* 允许最多显示3行标签 */
+  scrollbar-width: thin;
+  transition: max-height 0.3s ease;
+  flex-shrink: 0; /* 防止压缩 */
+}
+
+/* 玻璃态光泽效果 */
+.decoder-tabs-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.decoder-tabs-container::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.decoder-tabs-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.decoder-tabs-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--glass-bg-primary), var(--glass-bg-secondary));
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border-radius: var(--glass-radius-sm);
+  border: 1px solid var(--glass-border);
+}
+
+/* 标签样式 - 玻璃态设计 */
+.decoder-tab {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  padding: 0.2rem 0.5rem 0.2rem 0.75rem; /* 减小上下内边距 */
+  border-radius: var(--glass-radius-sm) var(--glass-radius-sm) 0 0;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  overflow: hidden;
+  margin-top: 0px; /* 移除顶部外边距，由父元素的my-0.5控制 */
+  margin-right: 1px;
+  margin-bottom: 0px;
+  animation: tab-appear 0.3s ease-out;
+  will-change: transform, opacity, background-color;
+  transform-origin: center bottom;
+}
+
+/* 玻璃态光泽效果 */
+.decoder-tab::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.decoder-tab::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background-color: transparent;
+  transform: scaleX(0.2);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.decoder-tab:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border);
+  transform: translateY(-2px); /* 增强悬停效果 */
+  box-shadow: var(--glass-shadow-sm);
+}
+
+.decoder-tab:hover::before {
+  transform: scaleX(0.8); /* 减小悬停时指示器的宽度 */
+  opacity: 0.6; /* 减小不透明度 */
+  background-color: var(--color-primary);
+}
+
+.decoder-tab-active {
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-md);
+  transform: translateY(-2px);
+  z-index: 2;
+  animation: tab-active 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.decoder-tab-active::before {
+  transform: scaleX(1);
+  opacity: 0.9; /* 调整不透明度 */
+  background-color: var(--color-primary);
+  height: 2px; /* 减小指示器的高度 */
+  animation: indicator-appear 0.25s ease-out forwards;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); /* 减小阴影 */
+}
+
+.decoder-tab-name {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  margin-left: 0.25rem;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.decoder-tab-active .decoder-tab-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transform: none;
+  transform-origin: left center;
+  text-shadow: none;
+}
+
+.dark .decoder-tab-active .decoder-tab-name {
+  font-weight: 700;
+}
+
+.decoder-tab:not(.decoder-tab-active) .decoder-tab-name {
+  color: var(--decoder-text-secondary);
+}
+
+.decoder-tab-close {
+  margin-left: 0.25rem;
+  color: var(--decoder-text-muted);
+  opacity: 0;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.decoder-tab:hover .decoder-tab-close {
+  opacity: 1;
+}
+
+.decoder-tab-close:hover {
+  color: var(--decoder-text-primary);
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.2);
+}
+
+.decoder-tab-active .decoder-tab-close {
+  opacity: 0.8;
+}
+
+/* 添加新标签按钮 */
+.decoder-add-tab {
+  padding: 6px 10px;
+  background: transparent;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  color: var(--decoder-text-secondary);
+  font-size: 14px;
+  transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+}
+
+.decoder-add-tab:hover {
+  background-color: var(--decoder-bg-secondary-hover);
+  color: var(--decoder-text-primary);
+  transform: translateY(-1px);
+}
+
+/* 拖拽相关样式 */
+.decoder-tab-dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+  animation: decoder-float 0.5s ease-in-out infinite alternate;
+  transform: scale(1.05) translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+  z-index: 100;
+  border: 2px dashed var(--decoder-btn-primary) !important;
+  background-color: var(--decoder-bg-tab-active) !important;
+}
+
+.decoder-tab-dragover {
+  position: relative;
+  animation: highlight-pulse 1s infinite;
+  z-index: 5;
+}
+
+.decoder-tab-dragover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  bottom: 0;
+  width: 8px;
+  background-color: var(--decoder-btn-primary);
+  border-radius: 9999px;
+  z-index: 10;
+  animation: width-pulse 1.5s infinite;
+}
+
+.decoder-tab-dragover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(79, 70, 229, 0.12);
+  z-index: -1;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+}
+
+/* ======= 按钮样式 ======= */
+/* 基础按钮样式已统一到 components/button.css */
+
+/* ======= 特殊组件 ======= */
+
+/* 编码/解码切换组 */
+.decoder-toggle-group {
+  display: flex;
+  border-radius: 0.375rem;
+  background-color: var(--decoder-bg-secondary);
+  border: 1px solid var(--decoder-border);
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
+  min-width: 180px;
+  box-shadow: var(--decoder-shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.decoder-toggle-group::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  width: calc(50% - 2px);
+  background: linear-gradient(135deg, var(--decoder-btn-primary) 0%, var(--decoder-btn-primary-hover) 100%);
+  border-radius: 0.25rem;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 0;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.2), 0 2px 6px rgba(79, 70, 229, 0.1);
+  opacity: 0.95;
+}
+
+.dark .decoder-toggle-group::before {
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3), 0 2px 6px rgba(99, 102, 241, 0.2), 0 0 8px rgba(99, 102, 241, 0.15);
+  opacity: 0.9;
+  background: linear-gradient(135deg, var(--decoder-btn-primary) 0%, var(--decoder-btn-primary-hover) 100%);
+}
+
+.decoder-toggle-group.decode::before {
+  transform: translateX(100%);
+  background: linear-gradient(135deg, var(--decoder-action-warning) 0%, #e27b00 100%);
+}
+
+.dark .decoder-toggle-group.decode::before {
+  background: linear-gradient(135deg, var(--decoder-action-warning) 0%, #e27b00 100%);
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3), 0 2px 6px rgba(245, 158, 11, 0.2), 0 0 8px rgba(245, 158, 11, 0.15);
+}
+
+.decoder-toggle-option {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  z-index: 1;
+  position: relative;
+  flex: 1;
+  text-align: center;
+  color: var(--decoder-text-secondary);
+  transition: all 0.25s ease;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.decoder-toggle-option:not(:disabled):hover {
+  color: var(--decoder-text-primary);
+  transform: translateY(-1px);
+}
+
+.decoder-toggle-option.active {
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.dark .decoder-toggle-option.active {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.decoder-toggle-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* 交换按钮 */
+.btn-swap {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-swap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(45deg, transparent 0%, transparent 40%, rgba(79, 70, 229, 0.1) 50%, transparent 60%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  z-index: 0;
+}
+
+.btn-swap:hover::after {
+  transform: translateX(100%);
+}
+
+.btn-swap i {
+  transition: transform 0.2s ease;
+}
+
+.btn-swap:hover i {
+  transform: rotate(180deg);
+}
+
+/* 清除按钮 */
+.btn-clear {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-clear::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(45deg, transparent 0%, transparent 40%, rgba(239, 68, 68, 0.1) 50%, transparent 60%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  z-index: 0;
+}
+
+.btn-clear:hover::after {
+  transform: translateX(100%);
+}
+
+.btn-clear:hover {
+  color: var(--decoder-action-error);
+}
+
+/* CodeMirror 编辑器样式 */
+.decoder-panel .cm-editor {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.decoder-panel .cm-scroller {
+  font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  line-height: 1.5;
+}
+
+/* ======= 动画 ======= */
+
+/* 浮动动画 */
+@keyframes decoder-float {
+  0% {
+    transform: scale(1.05) translateY(-3px);
+  }
+  100% {
+    transform: scale(1.05) translateY(-6px);
+  }
+}
+
+/* 高亮脉冲动画 */
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+/* 宽度脉冲动画 */
+@keyframes width-pulse {
+  0% {
+    opacity: 0.4;
+    width: 3px;
+  }
+  50% {
+    opacity: 1;
+    width: 8px;
+  }
+  100% {
+    opacity: 0.4;
+    width: 3px;
+  }
+}
+
+/* 淡入淡出动画 */
+.animate-fade-in-out {
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 标签页动画已移至 animations.css 统一管理 */
+
+/* Decoder container */
+.decoder-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 修复侧边栏的布局问题 */
+.app-layout-sidebar {
+  flex-shrink: 0;
+  width: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  z-index: 50;
+  overflow: visible;
+  position: relative;
+}
+
+.app-layout-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}

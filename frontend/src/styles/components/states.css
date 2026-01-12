@@ -1,0 +1,269 @@
+/* 状态样式 */
+
+/* 通用空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  height: 100%;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  max-width: 300px;
+}
+
+/* 通用加载状态 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 通用页面/组件过渡动画 */
+.fade-enter-active,
+.fade-leave-active,
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to,
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+/* 工具提示通用样式 */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 4px 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+[data-tooltip]:after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.dark [data-tooltip]:before {
+  background-color: rgba(31, 41, 55, 0.9);
+}
+
+.dark [data-tooltip]:after {
+  border-top-color: rgba(31, 41, 55, 0.9);
+}
+
+/* 代码片段样式 */
+.code-snippet {
+  display: inline-block;
+  padding: 0.125rem 0.25rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  color: var(--color-text-primary);
+}
+
+.dark .code-snippet {
+  background-color: rgba(55, 65, 81, 0.5);
+  border-color: rgba(75, 85, 99, 0.4);
+} 
+
+/* 深色模式下的其他状态样式 */
+.dark .empty-state {
+  color: var(--color-text-tertiary);
+}
+
+.dark .loading-spinner {
+  border-color: var(--color-border);
+  border-top-color: var(--color-primary);
+}
+
+/* 状态徽章基础样式 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  min-width: 3rem;
+  height: 1.5rem;
+}
+
+/* 状态徽章颜色变体 */
+.status-badge.status-success {
+  background-color: var(--color-success-bg, #dcfce7);
+  color: var(--color-success-text, #166534);
+  border: 1px solid var(--color-success-border, #bbf7d0);
+}
+
+.status-badge.status-danger {
+  background-color: var(--color-danger-bg, #fef2f2);
+  color: var(--color-danger-text, #dc2626);
+  border: 1px solid var(--color-danger-border, #fecaca);
+}
+
+.status-badge.status-warning {
+  background-color: var(--color-warning-bg, #fffbeb);
+  color: var(--color-warning-text, #d97706);
+  border: 1px solid var(--color-warning-border, #fed7aa);
+}
+
+.status-badge.status-info {
+  background-color: var(--color-info-bg, #eff6ff);
+  color: var(--color-info-text, #2563eb);
+  border: 1px solid var(--color-info-border, #bfdbfe);
+}
+
+.status-badge.status-secondary {
+  background-color: var(--color-secondary-bg, #f8fafc);
+  color: var(--color-secondary-text, #64748b);
+  border: 1px solid var(--color-secondary-border, #e2e8f0);
+}
+
+/* 深色模式状态徽章 */
+.dark .status-badge.status-success {
+  background-color: var(--color-success-bg-dark, rgba(34, 197, 94, 0.1));
+  color: var(--color-success-text-dark, #4ade80);
+  border-color: var(--color-success-border-dark, rgba(34, 197, 94, 0.2));
+}
+
+.dark .status-badge.status-danger {
+  background-color: var(--color-danger-bg-dark, rgba(239, 68, 68, 0.1));
+  color: var(--color-danger-text-dark, #f87171);
+  border-color: var(--color-danger-border-dark, rgba(239, 68, 68, 0.2));
+}
+
+.dark .status-badge.status-warning {
+  background-color: var(--color-warning-bg-dark, rgba(245, 158, 11, 0.1));
+  color: var(--color-warning-text-dark, #fbbf24);
+  border-color: var(--color-warning-border-dark, rgba(245, 158, 11, 0.2));
+}
+
+.dark .status-badge.status-info {
+  background-color: var(--color-info-bg-dark, rgba(59, 130, 246, 0.1));
+  color: var(--color-info-text-dark, #60a5fa);
+  border-color: var(--color-info-border-dark, rgba(59, 130, 246, 0.2));
+}
+
+.dark .status-badge.status-secondary {
+  background-color: var(--color-secondary-bg-dark, rgba(148, 163, 184, 0.1));
+  color: var(--color-secondary-text-dark, #94a3b8);
+  border-color: var(--color-secondary-border-dark, rgba(148, 163, 184, 0.2));
+}
+
+/* 状态徽章悬停效果 */
+.status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .status-badge:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 等级徽章样式（用于漏洞等级显示） */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.level-badge.large {
+  padding: 4px 12px;
+  font-size: 0.875rem;
+}
+
+.level-badge i {
+  font-size: 0.875rem;
+}
+
+/* 计数徽章样式 */
+.count-badge {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+} 

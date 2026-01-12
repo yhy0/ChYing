@@ -1,0 +1,196 @@
+/* 通用详情摘要样式 - 液态玻璃设计 */
+
+/* 详情摘要容器 */
+.detail-summary {
+  padding: var(--spacing-lg);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-bottom: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* 详情摘要液态光泽效果 */
+.detail-summary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 25%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.4) 75%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* 摘要网格布局 */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  font-size: var(--text-sm);
+}
+
+/* 摘要区域 - 液态玻璃设计 */
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-subtle);
+  -webkit-backdrop-filter: var(--glass-blur-subtle);
+  border-radius: var(--glass-radius-sm);
+  padding: var(--spacing-md);
+  border: 1px solid var(--glass-border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 摘要区域光泽效果 */
+.summary-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 摘要项 */
+.summary-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+/* 摘要标签 */
+.summary-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 摘要值 */
+.summary-value {
+  color: var(--color-text-primary);
+  flex: 1;
+  word-break: break-word;
+}
+
+/* 信息头部 - 液态玻璃设计 */
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--glass-bg-primary);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 信息头部光泽效果 */
+.info-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.info-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.info-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-xs);
+}
+
+/* 详情网格 */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* 详情项 */
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-item label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.detail-item span,
+.detail-item p {
+  color: var(--color-text-primary);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+/* 特殊文本样式 */
+.text-danger {
+  color: var(--color-danger);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .summary-grid,
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .info-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+  
+  .info-right {
+    align-items: flex-start;
+  }
+} 

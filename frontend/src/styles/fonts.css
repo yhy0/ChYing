@@ -1,0 +1,27 @@
+/* 字体加载配置 - 双字体策略 */
+
+/* Inter 字体 - 用于 UI 文本（从 Google Fonts CDN 加载） */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Maple Mono NF CN 字体 - 用于代码区域 */
+@font-face {
+  font-family: 'Maple Mono NF CN';
+  src: local('Maple Mono NF CN'),
+       local('MapleMono-NF-CN'),
+       url('/fonts/MapleMono-Medium.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * 双字体策略说明：
+ * - UI 文本（标题、按钮、标签）使用 Inter 无衬线字体，提高可读性
+ * - 代码区域（编辑器、HTTP 查看器、终端）使用 Maple Mono 等宽字体
+ *
+ * 备注：如果需要更多 Maple Mono 字重，可以从以下地址下载：
+ * https://github.com/subframe7536/maple-font/releases
+ *
+ * 或使用 jsDelivr CDN（中国可访问）：
+ * https://cdn.jsdelivr.net/gh/subframe7536/maple-font@v7.9/
+ */

@@ -1,0 +1,8 @@
+# Druid
+/druid/websession.html    {status=200}      {type="html"}     {tag="session"}   {root_only}
+/system/druid/websession.html    {status=200}      {type="html"}     {tag="session"}   {root_only}
+/webpage/system/druid/websession.html(jeecg)    {status=200}      {type="html"}     {tag="session"}   {root_only}
+
+/druid/login.html       {status=200}      {type="html"}     {tag="login"}   {root_only}
+/system/druid/index.html        {status=200}      {type="html"}     {tag="login"}   {root_only}
+/webpage/system/druid/login.html        {status=200}      {type="html"}     {tag="login"}   {root_only}

@@ -1,0 +1,380 @@
+/* 通用统计面板样式 - 玻璃态设计 */
+
+/* 统计容器 */
+.statistics-container {
+  padding: var(--spacing-md);
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-md);
+  overflow-y: auto;
+  height: 100%;
+  position: relative;
+}
+
+/* 玻璃态光泽效果 */
+.statistics-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 统计头部 */
+.stats-header {
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stats-header h3 {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* 统计区域 */
+.stats-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.stats-section:last-child {
+  margin-bottom: 0;
+}
+
+.stats-section h3,
+.stats-section h4 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stats-section h4 {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* 概览网格 */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.overview-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+/* 统计卡片 - 玻璃态设计 */
+.stat-card {
+  padding: var(--spacing-md);
+  text-align: center;
+  border-radius: var(--glass-radius-md);
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--glass-border);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow-md);
+}
+
+/* 玻璃态光泽效果 */
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  pointer-events: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--glass-border-strong);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.stat-card.status-success::before {
+  background: var(--color-success);
+}
+
+.stat-card.status-info::before {
+  background: var(--color-info);
+}
+
+.stat-card.status-warning::before {
+  background: var(--color-warning);
+}
+
+.stat-card.status-danger::before {
+  background: var(--color-danger);
+}
+
+/* 统计头部（卡片内） */
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-header i {
+  font-size: var(--text-sm);
+}
+
+/* 统计数字 */
+.stat-number {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* 统计标签 */
+.stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* 统计列表 */
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* 统计项 */
+.stat-item {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.stat-item:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 统计信息 */
+.stat-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.stat-info i {
+  font-size: var(--text-sm);
+}
+
+.stat-info .stat-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* 统计值 */
+.stat-value {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.stat-value .stat-number {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  min-width: 24px;
+  text-align: right;
+  margin: 0;
+}
+
+/* 进度条 */
+.progress-bar {
+  width: 64px;
+  height: 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+/* 等级分布 */
+.level-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.level-stat {
+  display: grid;
+  grid-template-columns: 1fr 60px 30px;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.level-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.level-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.level-count {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-left: auto;
+}
+
+.level-bar {
+  height: 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.level-progress {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.level-percentage {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  text-align: right;
+}
+
+/* 排行榜 */
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ranking-item {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.ranking-number {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.ranking-name {
+  font-size: var(--text-xs);
+  color: var(--color-text-primary);
+}
+
+.ranking-count {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  padding: 2px 6px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius-full);
+}
+
+/* 快速操作 */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+/* 分布区域 */
+.distribution-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.ranking-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.ranking-section:last-child {
+  margin-bottom: 0;
+}
+
+/* 深色模式适配 */
+.dark .stats-header {
+  border-color: var(--color-border);
+}
+
+.dark .stats-section h3,
+.dark .stats-section h4 {
+  color: var(--color-text-primary);
+}
+
+.dark .stat-number {
+  color: var(--color-text-primary);
+}
+
+.dark .level-bar {
+  background: var(--color-bg-tertiary);
+}
+
+.dark .ranking-count {
+  background: var(--color-bg-tertiary);
+} 

@@ -1,0 +1,30 @@
+/* 匹配替换模块特有样式 - 大部分样式已移至通用组件 */
+
+/* 匹配替换容器特定布局 - 玻璃态设计 */
+.plugin-container .plugin-table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 200px;
+  background: var(--glass-bg-tertiary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-md);
+}
+
+/* 规则操作按钮组 - 玻璃态设计 */
+.rule-actions {
+  display: flex;
+  gap: 4px;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-sm);
+  padding: 0.25rem;
+}
+
+/* 规则操作按钮特殊颜色 */
+.up-button:hover, .down-button:hover {
+  color: var(--color-success) !important;
+}

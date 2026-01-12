@@ -1,5 +1,9 @@
 # 承影（ChYing）：三年磨一剑，一个安全人的开源梦
 
+<p align="center">
+  <img src="./images/b5e9f48a-d10c-4428-bad9-1673f1084af8.png" width="400" alt="承影">
+</p>
+
 > 写在前面
 >
 > 2023 年 4 月，我在 GitHub 上创建了一个叫 "承影" 的项目。

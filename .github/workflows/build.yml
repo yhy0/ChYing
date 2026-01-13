@@ -138,6 +138,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
           CC: ${{ matrix.goos == 'windows' && 'gcc' || '' }}
+          PRODUCTION: "true"
         run: |
           wails3 task ${{ matrix.build_task }}
 

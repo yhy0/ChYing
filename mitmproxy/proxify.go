@@ -25,6 +25,7 @@ import (
 	"github.com/projectdiscovery/proxify/pkg/logger/elastic"
 	"github.com/projectdiscovery/proxify/pkg/logger/kafka"
 	proxifyTypes "github.com/projectdiscovery/proxify/pkg/types"
+	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/conf/file"
 )
 
@@ -136,7 +137,7 @@ func getDefaultProxifyOptions() *proxify.Options {
 		ResponseMatchReplaceDSL: nil,
 
 		// Network
-		ListenAddrHTTP:      "127.0.0.1:9080", // HTTP代理监听地址
+		ListenAddrHTTP:      fmt.Sprintf("127.0.0.1:%d", conf.ProxyPort), // HTTP代理监听地址，使用配置的端口
 		ListenAddrSocks5:    "",               // SOCKS5代理监听地址 (如果不需要则为空)
 		ListenDNSAddr:       "",               // DNS服务器监听地址 (如果不需要则为空)
 		DNSMapping:          "",               // DNS映射

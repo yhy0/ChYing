@@ -3,112 +3,77 @@ package qqwry
 // https://github.com/zu1k/nali
 
 import (
-    "bytes"
-    "compress/zlib"
-    "encoding/binary"
-    "errors"
-    "github.com/yhy0/logging"
-    "io"
-    "net/http"
-    "os"
-    "time"
+	"errors"
+	"io"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/yhy0/logging"
 )
 
 const (
-    mirror = "https://qqwry.mirror.noc.one/qqwry.rar"
-    key    = "https://qqwry.mirror.noc.one/copywrite.rar"
+	// 使用 metowolf 的 GitHub 镜像，直接提供解密后的 qqwry.dat
+	qqwryURL = "https://github.com/metowolf/qqwry.dat/releases/latest/download/qqwry.dat"
 )
 
 func Download(filePath string) error {
-    data, err := downloadAndDecrypt()
-    if err != nil {
-        return err
-    }
-    return SaveFile(filePath, data)
+	data, err := downloadQQwry()
+	if err != nil {
+		return err
+	}
+	return SaveFile(filePath, data)
+}
+
+func downloadQQwry() ([]byte, error) {
+	return Get(qqwryURL)
 }
 
 func Get(url string) ([]byte, error) {
-    var UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-    Client := http.DefaultClient
-    Client.Timeout = time.Second * 30
-    Client.Transport = &http.Transport{
-        TLSHandshakeTimeout:   time.Second * 5,
-        IdleConnTimeout:       time.Second * 20,
-        ResponseHeaderTimeout: time.Second * 20,
-        ExpectContinueTimeout: time.Second * 20,
-    }
-    req, err := http.NewRequest(http.MethodGet, url, nil)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-    req.Header.Set("User-Agent", UserAgent)
-    resp, err := Client.Do(req)
-    if err != nil {
-        return nil, err
-    }
-    if resp == nil {
-        return nil, errors.New("http response is nil")
-    }
-    if resp.StatusCode != 200 {
-        return nil, errors.New("http response status code is not 200")
-    }
-    defer resp.Body.Close()
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        return nil, err
-    }
-    return body, nil
+	var UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+	Client := &http.Client{
+		Timeout: time.Second * 60, // 增加超时时间，因为文件较大
+		Transport: &http.Transport{
+			TLSHandshakeTimeout:   time.Second * 10,
+			IdleConnTimeout:       time.Second * 30,
+			ResponseHeaderTimeout: time.Second * 30,
+			ExpectContinueTimeout: time.Second * 30,
+		},
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+	req.Header.Set("User-Agent", UserAgent)
+	resp, err := Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp == nil {
+		return nil, errors.New("http response is nil")
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New("http response status code is not 200")
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
 }
 
 func SaveFile(path string, data []byte) (err error) {
-    // Remove file if exist
-    _, err = os.Stat(path)
-    if err == nil {
-        err = os.Remove(path)
-        if err != nil {
-            logging.Logger.Errorln("旧文件删除失败" + err.Error())
-        }
-    }
-    
-    // save file
-    return os.WriteFile(path, data, 0644)
-}
+	// Remove file if exist
+	_, err = os.Stat(path)
+	if err == nil {
+		err = os.Remove(path)
+		if err != nil {
+			logging.Logger.Errorln("旧文件删除失败" + err.Error())
+		}
+	}
 
-func downloadAndDecrypt() (data []byte, err error) {
-    data, err = Get(mirror)
-    if err != nil {
-        return nil, err
-    }
-    key, err := getCopyWriteKey()
-    if err != nil {
-        return nil, err
-    }
-    
-    return unRar(data, key)
-}
-
-func unRar(data []byte, key uint32) ([]byte, error) {
-    for i := 0; i < 0x200; i++ {
-        key = key * 0x805
-        key++
-        key = key & 0xff
-        
-        data[i] = byte(uint32(data[i]) ^ key)
-    }
-    
-    reader, err := zlib.NewReader(bytes.NewReader(data))
-    if err != nil {
-        return nil, err
-    }
-    
-    return io.ReadAll(reader)
-}
-
-func getCopyWriteKey() (uint32, error) {
-    body, err := Get(key)
-    if err != nil {
-        return 0, err
-    }
-    return binary.LittleEndian.Uint32(body[5*4:]), nil
+	// save file
+	return os.WriteFile(path, data, 0644)
 }

@@ -3,7 +3,6 @@ package collection
 import (
     "github.com/thoas/go-funk"
     regexp "github.com/wasilibs/go-re2"
-    "github.com/yhy0/ChYing/lib/jsluice"
     "github.com/yhy0/ChYing/pkg/Jie/conf"
     "github.com/yhy0/ChYing/pkg/Jie/pkg/output"
     "github.com/yhy0/ChYing/pkg/Jie/pkg/util"
@@ -143,11 +142,7 @@ func Api(target, body string, contentType string) []string {
     }
     
     if funk.Contains(contentType, "application/javascript") {
-        analyzer := jsluice.NewAnalyzer([]byte(body))
-        for _, u := range analyzer.GetURLs() {
-            logging.Logger.Debugln("[jsluice]", target, u.URL)
-            res = append(res, u.URL)
-        }
+        res = append(res, analyzeJsluice(target, body)...)
     }
     return funk.UniqString(res)
 }

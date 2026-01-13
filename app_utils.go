@@ -10,11 +10,13 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/shirou/gopsutil/process"
 	"github.com/yhy0/ChYing/conf"
+	"github.com/yhy0/ChYing/conf/file"
 	"github.com/yhy0/ChYing/pkg/Jie/pkg/output"
 	"github.com/yhy0/ChYing/pkg/Jie/pkg/protocols/httpx"
 	"github.com/yhy0/ChYing/pkg/coder/twj"
 	"github.com/yhy0/ChYing/pkg/db"
 	"github.com/yhy0/ChYing/pkg/gadgets/fuzz"
+	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/logging"
 )
 
@@ -266,4 +268,9 @@ func (a *App) ClearVulnerabilities() Result {
 		return Result{Error: err.Error()}
 	}
 	return Result{Data: "漏洞数据已清空"}
+}
+
+// OpenConfigDir 打开配置目录
+func (a *App) OpenConfigDir() error {
+	return utils.OpenFolder(file.ChyingDir)
 }

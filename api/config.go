@@ -21,7 +21,7 @@ func NewConfigAPI() *ConfigAPI {
 
 // GetConfig 获取配置信息
 func (c *ConfigAPI) GetConfig() string {
-	config := `{"proxy": "127.0.0.1:9080", "jwt_file": "` + filepath.Join(file.ChyingDir, "jwt.txt") + `"}`
+	config := fmt.Sprintf(`{"proxy": "127.0.0.1:%d", "jwt_file": "%s"}`, conf.ProxyPort, filepath.Join(file.ChyingDir, "jwt.txt"))
 	logging.Logger.Infoln(config)
 	return config
 }
@@ -32,7 +32,7 @@ func (c *ConfigAPI) GetConfigStatus() map[string]interface{} {
 	status := map[string]interface{}{
 		"config_file":   conf.GetConfigFilePath(),
 		"proxy_enabled": config.Proxy.Enabled,
-		"proxy_address": fmt.Sprintf("%s:%d", config.Proxy.Host, config.Proxy.Port),
+		"proxy_address": fmt.Sprintf("127.0.0.1:%d", conf.ProxyPort), // 使用实际运行的代理端口
 		"scan_enabled": map[string]bool{
 			"port_scan": config.Scan.EnablePortScan,
 			"dir_scan":  config.Scan.EnableDirScan,

@@ -1160,7 +1160,7 @@ onBeforeUnmount(() => {
               {{ t('modules.proxy.test_intercept') || '测试拦截功能' }}
             </h4>
             <div class="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-              <p>1. 确保浏览器代理设置为: 127.0.0.1:9080</p>
+              <p>1. 确保浏览器代理设置为 ChYing 代理地址（点击顶部浏览器图标可自动配置）</p>
               <p>2. 访问任意网站（如 httpbin.org/get）</p>
               <p>3. 请求将出现在上方队列中等待处理</p>
               <p>4. 可以修改请求内容，然后点击 Forward 或 Drop</p>

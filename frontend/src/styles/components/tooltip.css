@@ -27,7 +27,7 @@
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
   transform: translateY(5px);
 }
 
@@ -36,6 +36,7 @@
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0s;
 }
 
 /* ========== Tooltip 位置变体 ========== */

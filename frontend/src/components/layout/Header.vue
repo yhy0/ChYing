@@ -6,7 +6,7 @@ import { setLanguage } from '../../i18n';
 import { setTheme, getCurrentTheme } from '../../theme';
 import { useModulesStore } from '../../store/modules';
 // @ts-ignore - 忽略模块导入错误
-import { OpenChromeBrowser, NewClaudeAgentWindow } from "../../../bindings/github.com/yhy0/ChYing/app.js";
+import { OpenChromeBrowser, NewClaudeAgentWindow, GetConfigStatus, OpenConfigDir } from "../../../bindings/github.com/yhy0/ChYing/app.js";
 
 const route = useRoute();
 const store = useModulesStore();
@@ -30,8 +30,20 @@ const moduleInfo = computed(() => {
 
 // Chrome浏览器配置
 const showChromeModal = ref(false);
-const proxyUrl = ref('http://127.0.0.1:9080');
+const proxyUrl = ref('http://127.0.0.1:9080'); // 默认值，会在 onMounted 中更新
 const isLaunchingBrowser = ref(false);
+
+// 从后端获取代理端口配置
+const loadProxyConfig = async () => {
+  try {
+    const status = await GetConfigStatus();
+    if (status && status.proxy_address) {
+      proxyUrl.value = `http://${status.proxy_address}`;
+    }
+  } catch (error) {
+    console.error('获取代理配置失败:', error);
+  }
+};
 
 // 启动Chrome浏览器
 const launchChrome = () => {
@@ -67,6 +79,17 @@ const openClaudeAgent = () => {
     })
     .catch((error: Error) => {
       console.error('打开Claude Agent窗口失败:', error);
+    });
+};
+
+// 打开配置目录
+const openConfigDirectory = () => {
+  OpenConfigDir()
+    .then(() => {
+      console.log('配置目录已打开');
+    })
+    .catch((error: Error) => {
+      console.error('打开配置目录失败:', error);
     });
 };
 
@@ -174,7 +197,10 @@ const handleStorageChange = (e: StorageEvent) => {
 onMounted(() => {
   // 监听storage事件（包括所有窗口的主题变化）
   window.addEventListener('storage', handleStorageChange);
-  
+
+  // 加载代理配置
+  loadProxyConfig();
+
   // 保存清理函数
   onUnmounted(() => {
     window.removeEventListener('storage', handleStorageChange);
@@ -192,61 +218,83 @@ onMounted(() => {
     <div class="flex items-center space-x-2">
 
       <!-- Claude AI Agent 按钮 -->
-      <button
-        class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-        @click="openClaudeAgent"
-        :title="t('common.ui.claudeAgent')"
-        :aria-label="t('common.ui.claudeAgent')"
-      >
-        <i class="bx bx-bot text-base flex items-center justify-center w-5 h-5"></i>
-      </button>
+      <div class="tooltip-container">
+        <button
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          @click="openClaudeAgent"
+          :aria-label="t('common.ui.claudeAgent')"
+        >
+          <i class="bx bx-bot text-base flex items-center justify-center w-5 h-5"></i>
+        </button>
+        <span class="tooltip-text tooltip-bottom">{{ t('common.ui.claudeAgent') }}</span>
+      </div>
 
       <!-- 新增启动Chrome浏览器按钮 -->
-      <button
-        class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-        @click="openChromeModal"
-        :title="t('common.ui.launchChrome')"
-        :aria-label="t('common.ui.launchChrome')"
-      >
-        <i class="bx bx-globe text-base flex items-center justify-center w-5 h-5"></i> 
-      </button>
-      
-      <!-- 通知按钮 -->
-      <button
-        class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative"
-        @click="toggleNotifications"
-        :title="t('common.ui.notifications')"
-        :aria-label="t('common.ui.notifications')"
-      >
-        <i class="bx bx-bell text-base flex items-center justify-center w-5 h-5"></i>
-        <!-- 未读消息数量 -->
-        <div 
-          v-if="unreadCount > 0" 
-          class="absolute -top--0.5 -right--0.5 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+      <div class="tooltip-container">
+        <button
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          @click="openChromeModal"
+          :aria-label="t('common.ui.launchChrome')"
         >
-          {{ unreadCount > 9 ? '9+' : unreadCount }}
-        </div>
-      </button>
-      
+          <i class="bx bx-globe text-base flex items-center justify-center w-5 h-5"></i>
+        </button>
+        <span class="tooltip-text tooltip-bottom">{{ t('common.ui.launchChrome') }}</span>
+      </div>
+
+      <!-- 打开配置目录按钮 -->
+      <div class="tooltip-container">
+        <button
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          @click="openConfigDirectory"
+          :aria-label="t('common.ui.openConfigDir')"
+        >
+          <i class="bx bx-folder-open text-base flex items-center justify-center w-5 h-5"></i>
+        </button>
+        <span class="tooltip-text tooltip-bottom">{{ t('common.ui.openConfigDir') }}</span>
+      </div>
+
+      <!-- 通知按钮 -->
+      <div class="tooltip-container">
+        <button
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative"
+          @click="toggleNotifications"
+          :aria-label="t('common.ui.notifications')"
+        >
+          <i class="bx bx-bell text-base flex items-center justify-center w-5 h-5"></i>
+          <!-- 未读消息数量 -->
+          <div
+            v-if="unreadCount > 0"
+            class="absolute -top--0.5 -right--0.5 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+          >
+            {{ unreadCount > 9 ? '9+' : unreadCount }}
+          </div>
+        </button>
+        <span class="tooltip-text tooltip-bottom">{{ t('common.ui.notifications') }}</span>
+      </div>
+
       <!-- Language Toggle -->
-      <button
-        class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-        @click="toggleLanguage"
-        :title="language === 'en' ? t('common.language.switch_to_zh') : t('common.language.switch_to_en')"
-        :aria-label="language === 'en' ? t('common.language.switch_to_zh') : t('common.language.switch_to_en')"
-      >
-        <span class="bx text-base flex items-center justify-center w-5 h-5">{{ language === 'en' ? '🇺🇸' : '🇨🇳' }}</span>
-      </button>
-      
+      <div class="tooltip-container">
+        <button
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          @click="toggleLanguage"
+          :aria-label="language === 'en' ? t('common.language.switch_to_zh') : t('common.language.switch_to_en')"
+        >
+          <span class="bx text-base flex items-center justify-center w-5 h-5">{{ language === 'en' ? '🇺🇸' : '🇨🇳' }}</span>
+        </button>
+        <span class="tooltip-text tooltip-bottom">{{ language === 'en' ? t('common.language.switch_to_zh') : t('common.language.switch_to_en') }}</span>
+      </div>
+
       <!-- Theme Toggle -->
-      <button
-        class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-        @click="toggleTheme"
-        :title="getThemeButtonTitle()"
-        :aria-label="getThemeButtonTitle()"
-      >
-        <i class="bx text-base flex items-center justify-center w-5 h-5" :class="getThemeIcon()"></i>
-      </button>
+      <div class="tooltip-container">
+        <button
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          @click="toggleTheme"
+          :aria-label="getThemeButtonTitle()"
+        >
+          <i class="bx text-base flex items-center justify-center w-5 h-5" :class="getThemeIcon()"></i>
+        </button>
+        <span class="tooltip-text tooltip-bottom">{{ getThemeButtonTitle() }}</span>
+      </div>
     </div>
   </header>
 

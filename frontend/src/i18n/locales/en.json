@@ -81,6 +81,8 @@
       "filter": "Filter",
       "refresh": "Refresh",
       "claudeAgent": "AI Security Assistant",
+      "launchChrome": "Launch Chrome Browser",
+      "openConfigDir": "Open Config Directory",
       "accessibility": {
         "selectAll": "Select all rows",
         "selectRow": "Select row {id}"

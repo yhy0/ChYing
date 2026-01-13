@@ -3,8 +3,6 @@ package conf
 import (
 	"fmt"
 	"time"
-
-	JieConf "github.com/yhy0/ChYing/pkg/Jie/conf"
 )
 
 /**
@@ -35,12 +33,12 @@ const (
 var defaultConfigYaml = []byte(`# ChYing 扫描系统配置文件
 # 配置文件位置: ~/.config/ChYing/config.yaml
 
-version: ` + JieConf.Version + `
+version: 2.0.2
 
 # 代理配置
 proxy:
   host: "127.0.0.1"
-  port: 8080
+  port: 9080
   enabled: true
 
 # 扫描配置

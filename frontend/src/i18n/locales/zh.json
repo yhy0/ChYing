@@ -81,6 +81,8 @@
       "filter": "筛选",
       "refresh": "刷新",
       "claudeAgent": "AI 安全助手",
+      "launchChrome": "启动 Chrome 浏览器",
+      "openConfigDir": "打开配置目录",
       "accessibility": {
         "selectAll": "全选所有行",
         "selectRow": "选择第 {id} 行"

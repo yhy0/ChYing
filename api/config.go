@@ -92,8 +92,8 @@ func (c *ConfigAPI) GetLocalProjects() Result {
 
 	logging.Logger.Infof("🔍 GetLocalProjects 开始执行")
 
-	configDir := filepath.Join(os.Getenv("HOME"), ".config", "ChYing")
-	dbDir := filepath.Join(configDir, "db")
+	// 使用 file.ChyingDir 确保跨平台兼容（Windows 上 os.Getenv("HOME") 为空）
+	dbDir := filepath.Join(file.ChyingDir, "db")
 
 	// 扫描 db 目录下的项目子目录
 	projectDirs := scanProjectDirs(dbDir)
@@ -285,8 +285,8 @@ func formatFileSize(bytes int64) string {
 func (c *ConfigAPI) CreateLocalProject(projectID string, projectName string) Result {
 	logging.Logger.Infof("📁 ConfigAPI.CreateLocalProject 开始: projectID=%s, projectName=%s", projectID, projectName)
 
-	configDir := filepath.Join(os.Getenv("HOME"), ".config", "ChYing")
-	dbDir := filepath.Join(configDir, "db")
+	// 使用 file.ChyingDir 确保跨平台兼容（Windows 上 os.Getenv("HOME") 为空）
+	dbDir := filepath.Join(file.ChyingDir, "db")
 
 	// 确保 db 目录存在
 	if err := os.MkdirAll(dbDir, 0755); err != nil {
@@ -370,8 +370,8 @@ func (c *ConfigAPI) DeleteLocalProject(projectName string) Result {
 		}
 	}
 
-	configDir := filepath.Join(os.Getenv("HOME"), ".config", "ChYing")
-	dbDir := filepath.Join(configDir, "db")
+	// 使用 file.ChyingDir 确保跨平台兼容（Windows 上 os.Getenv("HOME") 为空）
+	dbDir := filepath.Join(file.ChyingDir, "db")
 
 	// 清理项目名称（与创建时保持一致）
 	safeFileName := strings.ReplaceAll(projectName, " ", "_")

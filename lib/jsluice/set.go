@@ -1,5 +1,3 @@
-//go:build !windows
-
 package jsluice
 
 type set map[string]any

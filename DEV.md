@@ -21,6 +21,42 @@ go install
 如果执行 wails3 失败，则需要看 go 的 bin 目录是否已经加入到环境变量 GOPATH
 还需要 npm 环境
 
+## Windows 本地开发环境要求
+
+本项目依赖 CGO（go-sqlite3、tree-sitter-javascript 等），Windows 本地开发需要安装 MinGW：
+
+### 安装 MinGW（推荐使用 MSYS2）
+
+1. 下载并安装 MSYS2：https://www.msys2.org/
+2. 打开 MSYS2 UCRT64 终端，执行：
+   ```bash
+   pacman -S mingw-w64-ucrt-x86_64-gcc
+   ```
+3. 将 MinGW bin 目录添加到系统 PATH 环境变量：
+   ```
+   C:\msys64\ucrt64\bin
+   ```
+4. 验证安装：
+   ```bash
+   gcc --version
+   ```
+
+### 或使用 Chocolatey 安装
+
+```powershell
+choco install mingw
+```
+
+### 确保 CGO 启用
+
+编译时需要确保 `CGO_ENABLED=1`：
+```bash
+set CGO_ENABLED=1
+wails3 task windows:build
+```
+
+**注意**：如果编译时 `CGO_ENABLED=0`，会导致 sqlite 数据库无法工作，程序运行时会崩溃。
+
 https://github.com/yhy0/ChYing-Inside
 https://github.com/wailsapp/wails.git
 

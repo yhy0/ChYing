@@ -26,7 +26,7 @@ tasks:
       BUILD_FLAGS: '{{if eq .PRODUCTION "true"}}-tags production -trimpath -buildvcs=false -ldflags="-w -s -H windowsgui"{{else}}-buildvcs=false -gcflags=all="-l"{{end}}'
     env:
       GOOS: windows
-      CGO_ENABLED: 0
+      CGO_ENABLED: '{{.CGO_ENABLED | default "1"}}'
       GOARCH: '{{.ARCH | default ARCH}}'
       PRODUCTION: '{{.PRODUCTION | default "false"}}'
 

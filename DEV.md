@@ -52,10 +52,21 @@ choco install mingw
 编译时需要确保 `CGO_ENABLED=1`：
 ```bash
 set CGO_ENABLED=1
-wails3 task windows:build
+wails3 task windows:build PRODUCTION=true
 ```
 
 **注意**：如果编译时 `CGO_ENABLED=0`，会导致 sqlite 数据库无法工作，程序运行时会崩溃。
+
+### PRODUCTION 参数说明
+
+`PRODUCTION=true` 参数用于区分开发构建和生产构建：
+
+| 参数 | 构建标志 | 用途 |
+|------|---------|------|
+| 不设置或 `PRODUCTION=false` | `-buildvcs=false -gcflags=all="-l"` | 开发调试，保留调试信息 |
+| `PRODUCTION=true` | `-tags production -trimpath -buildvcs=false -ldflags="-w -s"` | 生产发布，优化体积，移除调试信息 |
+
+**Windows 本地构建必须使用 `PRODUCTION=true`**，否则可能无法正常运行。
 
 https://github.com/yhy0/ChYing-Inside
 https://github.com/wailsapp/wails.git

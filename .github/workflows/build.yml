@@ -15,9 +15,39 @@ jobs:
     # 只在创建标签时运行，而不是在创建分支时运行
     if: startsWith(github.ref, 'refs/tags/')
     strategy:
+      fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        go-version: [1.23]
+        include:
+          # Windows AMD64
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
+            artifact_name: ChYing-windows-amd64.exe
+            build_task: windows:build
+          # Linux AMD64
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            artifact_name: ChYing-linux-amd64
+            build_task: linux:build
+          # Linux ARM64
+          - os: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+            artifact_name: ChYing-linux-arm64
+            build_task: linux:build
+          # macOS AMD64
+          - os: macos-13
+            goos: darwin
+            goarch: amd64
+            artifact_name: ChYing-macos-amd64.zip
+            build_task: darwin:package
+          # macOS ARM64 (Apple Silicon)
+          - os: macos-latest
+            goos: darwin
+            goarch: arm64
+            artifact_name: ChYing-macos-arm64.zip
+            build_task: darwin:package
 
     runs-on: ${{ matrix.os }}
 
@@ -33,11 +63,11 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: '1.23'
 
       - name: Install Linux Dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.goos == 'linux'
         with:
           packages: libgtk-3-dev libwebkit2gtk-4.1-dev build-essential pkg-config
           version: 1.0
@@ -52,10 +82,10 @@ jobs:
         run: |
           # Get current tag
           current_tag=$(git describe --tags --abbrev=0)
-          
+
           # Try to get previous tag
           previous_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          
+
           # Generate commit messages
           if [ -n "$previous_tag" ]; then
             # If previous tag exists, get commits between tags
@@ -64,11 +94,11 @@ jobs:
             # If no previous tag exists, get all commits up to current tag
             commit_messages=$(git log --pretty=format:"- [%s](https://github.com/${{ github.repository }}/commit/%H)" ${current_tag})
           fi
-          
+
           # Add release title
           echo "# Release $current_tag" > commits.txt
           echo "" >> commits.txt
-          
+
           # Save commit messages
           if [ -n "$commit_messages" ]; then
             echo "## Changes" >> commits.txt
@@ -76,8 +106,8 @@ jobs:
           else
             echo "First release" >> commits.txt
           fi
-          
-          echo "Commit messages since last release:" 
+
+          echo "Commit messages since last release:"
           cat commits.txt
           echo "commit_messages_path=$(pwd)/commits.txt" >> $GITHUB_ENV
         shell: bash
@@ -96,36 +126,26 @@ jobs:
       - name: Build
         working-directory: ${{ github.workspace }}
         shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
         run: |
-          # 使用 wails3 task build 构建当前平台的二进制文件
-          # macOS 需要额外打包成 .app
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            wails3 task darwin:package
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            wails3 task windows:build
-          else
-            wails3 task linux:build
-          fi
+          wails3 task ${{ matrix.build_task }}
 
       - name: Prepare Release Files
         id: prepare
         shell: bash
         run: |
-          mkdir release
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            cp bin/*.exe release/
-            echo "ARTIFACT_PATH=release/*.exe" >> $GITHUB_ENV
-            echo "ARTIFACT_NAME=windows" >> $GITHUB_ENV
-          elif [ "${{ runner.os }}" = "macOS" ]; then
+          mkdir -p release
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            cp bin/*.exe "release/${{ matrix.artifact_name }}"
+          elif [ "${{ matrix.goos }}" = "darwin" ]; then
             cp -r bin/*.app release/
-            cd release && zip -r ChYing.zip *.app && cd ..
-            echo "ARTIFACT_PATH=release/ChYing.zip" >> $GITHUB_ENV
-            echo "ARTIFACT_NAME=macos" >> $GITHUB_ENV
+            cd release && zip -r "${{ matrix.artifact_name }}" *.app && rm -rf *.app && cd ..
           else
-            cp bin/* release/
-            echo "ARTIFACT_PATH=release/*" >> $GITHUB_ENV
-            echo "ARTIFACT_NAME=linux" >> $GITHUB_ENV
+            cp bin/* "release/${{ matrix.artifact_name }}"
           fi
+          echo "ARTIFACT_PATH=release/${{ matrix.artifact_name }}" >> $GITHUB_ENV
 
       - name: Create Release
         uses: softprops/action-gh-release@v1

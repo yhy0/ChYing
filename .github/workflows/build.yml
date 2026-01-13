@@ -115,7 +115,7 @@ jobs:
 
           echo "Commit messages since last release:"
           cat commits.txt
-          echo "commit_messages_path=$(pwd)/commits.txt" >> $GITHUB_ENV
+          echo "commit_messages_path=$GITHUB_WORKSPACE/commits.txt" >> $GITHUB_ENV
         shell: bash
 
       - name: Install Wails

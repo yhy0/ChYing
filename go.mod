@@ -45,7 +45,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.8.1
 	github.com/thoas/go-funk v0.9.3
 	github.com/tree-sitter/go-tree-sitter v0.25.0
-	github.com/tree-sitter/tree-sitter-javascript v0.23.1
+	github.com/tree-sitter/tree-sitter-javascript v0.25.0
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.10
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/weppos/publicsuffix-go v0.40.3-0.20250617082559-9b2e24a9e482

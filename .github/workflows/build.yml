@@ -84,38 +84,55 @@ jobs:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch commit messages since last release
+      - name: Fetch release notes
         run: |
           # Get current tag
           current_tag=$(git describe --tags --abbrev=0)
 
-          # Try to get previous tag
-          previous_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          # Try to get tag annotation message
+          tag_message=$(git tag -l --format='%(contents)' "$current_tag" 2>/dev/null || echo "")
 
-          # Generate commit messages
-          if [ -n "$previous_tag" ]; then
-            # If previous tag exists, get commits between tags
-            commit_messages=$(git log --pretty=format:"- [%s](https://github.com/${{ github.repository }}/commit/%H)" ${previous_tag}..${current_tag})
+          if [ -n "$tag_message" ] && [ "$tag_message" != "" ]; then
+            # Use tag annotation as release notes
+            echo "$tag_message" > release_notes.txt
           else
-            # If no previous tag exists, get all commits up to current tag
-            commit_messages=$(git log --pretty=format:"- [%s](https://github.com/${{ github.repository }}/commit/%H)" ${current_tag})
+            # Fallback: generate from commits if no tag annotation
+            previous_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+            echo "# Release $current_tag" > release_notes.txt
+            echo "" >> release_notes.txt
+            echo "## Changes" >> release_notes.txt
+            echo "" >> release_notes.txt
+
+            # Get commit list with full message (subject + body)
+            if [ -n "$previous_tag" ]; then
+              commits=$(git log --pretty=format:"%H" ${previous_tag}..${current_tag})
+            else
+              commits=$(git log --pretty=format:"%H" ${current_tag})
+            fi
+
+            if [ -n "$commits" ]; then
+              for commit_hash in $commits; do
+                subject=$(git log -1 --pretty=format:"%s" $commit_hash)
+                body=$(git log -1 --pretty=format:"%b" $commit_hash)
+                short_hash=$(git log -1 --pretty=format:"%h" $commit_hash)
+
+                echo "### [$subject](https://github.com/${{ github.repository }}/commit/${commit_hash})" >> release_notes.txt
+                echo "" >> release_notes.txt
+
+                if [ -n "$body" ]; then
+                  echo "$body" >> release_notes.txt
+                  echo "" >> release_notes.txt
+                fi
+              done
+            else
+              echo "First release" >> release_notes.txt
+            fi
           fi
 
-          # Add release title
-          echo "# Release $current_tag" > commits.txt
-          echo "" >> commits.txt
-
-          # Save commit messages
-          if [ -n "$commit_messages" ]; then
-            echo "## Changes" >> commits.txt
-            echo "$commit_messages" >> commits.txt
-          else
-            echo "First release" >> commits.txt
-          fi
-
-          echo "Commit messages since last release:"
-          cat commits.txt
-          echo "commit_messages_path=$GITHUB_WORKSPACE/commits.txt" >> $GITHUB_ENV
+          echo "Release notes:"
+          cat release_notes.txt
+          echo "release_notes_path=$GITHUB_WORKSPACE/release_notes.txt" >> $GITHUB_ENV
         shell: bash
 
       - name: Install Wails
@@ -162,6 +179,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{ env.ARTIFACT_PATH }}
-          body_path: ${{ env.commit_messages_path }}
+          body_path: ${{ env.release_notes_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

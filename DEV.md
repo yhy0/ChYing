@@ -16,8 +16,6 @@ cd wails
 git checkout v3-alpha
 cd v3/cmd/wails3
 go install
-
-
 ```
 
 如果执行 wails3 失败，则需要看 go 的 bin 目录是否已经加入到环境变量 GOPATH

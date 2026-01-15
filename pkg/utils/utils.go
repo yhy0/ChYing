@@ -36,9 +36,10 @@ func GetTitle(body string) string {
     return ""
 }
 
-// IsPortOccupied 判断端口号是否被占用
-func IsPortOccupied(port int) bool {
-    address := fmt.Sprintf(":%d", port)
+// IsPortOccupied 判断指定地址的端口是否被占用
+// host 为空时检测所有接口 (0.0.0.0)
+func IsPortOccupied(host string, port int) bool {
+    address := fmt.Sprintf("%s:%d", host, port)
     listener, err := net.Listen("tcp", address)
     if err != nil {
         return true // 端口已被占用
@@ -47,33 +48,44 @@ func IsPortOccupied(port int) bool {
     return false // 端口未被占用
 }
 
-// GetRandomUnusedPort 随机获取一个在 60000 以上的端口号
-func GetRandomUnusedPort() (int, error) {
+// GetRandomUnusedPort 随机获取一个在 60000 以上的可用端口号
+// host 为空时检测所有接口 (0.0.0.0)
+func GetRandomUnusedPort(host string) (int, error) {
     // 设置随机数种子
     rand.Seed(time.Now().UnixNano())
-    
-    // 定义起始端口号和端口号范围，并生成一个随机整数
+
+    // 定义起始端口号和端口号范围
     basePort := 60000
     portRange := 65535 - basePort + 1
-    randomOffset := rand.Intn(portRange)
-    
-    // 计算出最终的端口号
-    port := basePort + randomOffset
-    
-    // 创建一个 TCP 地址对象
-    addr := &net.TCPAddr{IP: nil, Port: port}
-    
-    // 使用 ListenTCP 函数创建一个新的 TCP 监听器，并返回一个 TCP 地址对象
-    listener, err := net.ListenTCP("tcp", addr)
-    if err != nil {
-        return 0, err
+
+    // 解析 host 为 IP
+    var ip net.IP
+    if host != "" {
+        ip = net.ParseIP(host)
     }
-    
-    // 关闭监听器
-    defer listener.Close()
-    
-    // 获取监听器的地址对象，并返回其端口号作为结果
-    return listener.Addr().(*net.TCPAddr).Port, nil
+
+    // 尝试最多 100 次找到可用端口
+    for i := 0; i < 100; i++ {
+        randomOffset := rand.Intn(portRange)
+        port := basePort + randomOffset
+
+        // 创建一个 TCP 地址对象
+        addr := &net.TCPAddr{IP: ip, Port: port}
+
+        // 使用 ListenTCP 函数创建一个新的 TCP 监听器
+        listener, err := net.ListenTCP("tcp", addr)
+        if err != nil {
+            continue // 端口被占用，尝试下一个
+        }
+
+        // 关闭监听器
+        listener.Close()
+
+        // 返回可用端口
+        return port, nil
+    }
+
+    return 0, fmt.Errorf("无法找到可用端口")
 }
 
 func OpenFolder(path string) error {

@@ -68,7 +68,8 @@ const checkPort = async (port: number) => {
   portCheckMessage.value = t('modules.listeners.checkingPort');
 
   try {
-    const response = await CheckPortAvailable(port);
+    // 传入当前配置的 host 进行端口检测
+    const response = await CheckPortAvailable(currentListener.value.host || '127.0.0.1', port);
     if (response.error) {
       throw new Error(response.error);
     }

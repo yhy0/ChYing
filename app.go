@@ -7,15 +7,10 @@ import (
 
 	"github.com/panjf2000/ants/v2"
 	wappalyzer "github.com/projectdiscovery/wappalyzergo"
-	"github.com/sasha-s/go-deadlock"
 	"github.com/yhy0/ChYing/api"
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/conf/file"
-	"github.com/yhy0/ChYing/mitmproxy"
 	JieConf "github.com/yhy0/ChYing/pkg/Jie/conf"
-	"github.com/yhy0/ChYing/pkg/Jie/pkg/mode"
-	"github.com/yhy0/ChYing/pkg/qqwry"
-	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/logging"
 )
 
@@ -29,7 +24,6 @@ import (
    - 类型定义 (Result, InitStep, InitProgress, InitContext, MemoryInfo, Msg)
    - 全局变量声明
    - init() 初始化函数
-   - Startup() 启动函数
 
    其他方法已拆分到以下文件:
    - app_initialization.go: 初始化相关方法
@@ -187,42 +181,3 @@ func init() {
 	}
 }
 
-// Startup 应用启动函数
-func Startup() {
-	// 设置 Jie 为被动模式
-	mode.Passive()
-
-	logging.Logger.Infoln("[+] ChYing 启动成功", conf.Config.FilterSuffix)
-	logging.Logger.Infoln(conf.Config.Exclude)
-	// 插件全部关闭
-	for k := range JieConf.Plugin {
-		JieConf.Plugin[k] = false
-	}
-
-	deadlock.Opts.DeadlockTimeout = 120 * time.Second
-	qqwry.Init()
-
-	// 检测端口是否被占用
-	if utils.IsPortOccupied(conf.ProxyPort) {
-		port, err := utils.GetRandomUnusedPort()
-		if err != nil {
-			logging.Logger.Errorln(err)
-			conf.ProxyPort = 65530
-		} else {
-			conf.ProxyPort = port
-		}
-	}
-
-	// 启动被动代理（异步）
-	go func() {
-		logging.Logger.Infoln("Starting Proxify server in a new goroutine...")
-		mitmproxy.Proxify() // 这个函数内部会调用阻塞的 Run()
-		// 如果 Proxify() 返回 (例如发生错误导致服务停止)，这里可以记录日志
-		logging.Logger.Errorln("Proxify server has stopped.")
-	}()
-
-	// 数据更改通知
-	go EventNotification()
-
-	// 移除自动内存清理，改为前端手动触发
-}

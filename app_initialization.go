@@ -249,14 +249,50 @@ func (a *App) StepProxyServerStart() Result {
 		}
 	}()
 
+	// 获取配置文件中的代理监听地址
+	proxyHost := "127.0.0.1"
+	proxyPort := conf.ProxyPort
+
+	if conf.AppConf.Proxy.Host != "" {
+		proxyHost = conf.AppConf.Proxy.Host
+	}
+	if conf.AppConf.Proxy.Port > 0 {
+		proxyPort = conf.AppConf.Proxy.Port
+	}
+
+	// 如果有启用的监听器，使用第一个启用的监听器配置
+	for _, listener := range conf.AppConf.Proxy.Listeners {
+		if listener.Enabled {
+			proxyHost = listener.Host
+			proxyPort = listener.Port
+			break
+		}
+	}
+
 	// 检测端口是否被占用
-	if utils.IsPortOccupied(conf.ProxyPort) {
-		port, err := utils.GetRandomUnusedPort()
+	if utils.IsPortOccupied(proxyHost, proxyPort) {
+		logging.Logger.Warnf("端口 %s:%d 已被占用，正在寻找可用端口...", proxyHost, proxyPort)
+		port, err := utils.GetRandomUnusedPort(proxyHost)
 		if err != nil {
 			logging.Logger.Errorln(err)
-			conf.ProxyPort = 65530
+			proxyPort = 65530
 		} else {
-			conf.ProxyPort = port
+			proxyPort = port
+		}
+		logging.Logger.Infof("已切换到新端口: %s:%d", proxyHost, proxyPort)
+		// 更新配置
+		conf.ProxyPort = proxyPort
+		conf.ProxyHost = proxyHost
+		conf.AppConf.Proxy.Port = proxyPort
+		conf.AppConf.Proxy.Host = proxyHost
+
+		// 同时更新 Listeners 中的端口配置，确保 Proxify 使用正确的端口
+		for i := range conf.AppConf.Proxy.Listeners {
+			if conf.AppConf.Proxy.Listeners[i].Enabled {
+				conf.AppConf.Proxy.Listeners[i].Port = proxyPort
+				conf.AppConf.Proxy.Listeners[i].Host = proxyHost
+				break
+			}
 		}
 	}
 
@@ -270,24 +306,18 @@ func (a *App) StepProxyServerStart() Result {
 	// 等待代理服务器启动
 	time.Sleep(2 * time.Second)
 
-	// 获取代理监听地址
-	proxyHost := conf.AppConf.Proxy.Host
-	if proxyHost == "" {
-		proxyHost = "127.0.0.1"
-	}
-
 	// 发送代理启动通知事件
 	if wailsApp != nil {
 		wailsApp.Event.Emit("ProxyStarted", map[string]interface{}{
 			"host":    proxyHost,
-			"port":    conf.ProxyPort,
+			"port":    proxyPort,
 			"success": true,
-			"message": fmt.Sprintf("代理服务器已启动，监听地址: %s:%d", proxyHost, conf.ProxyPort),
+			"message": fmt.Sprintf("代理服务器已启动，监听地址: %s:%d", proxyHost, proxyPort),
 		})
 	}
 
 	progress.Success = true
-	progress.Message = fmt.Sprintf("代理服务器启动成功 (端口: %d)", conf.ProxyPort)
+	progress.Message = fmt.Sprintf("代理服务器启动成功 (端口: %d)", proxyPort)
 	logging.Logger.Infoln("✓ 代理服务器启动完成")
 
 	return Result{Data: progress, Error: ""}

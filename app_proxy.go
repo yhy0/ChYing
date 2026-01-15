@@ -412,10 +412,18 @@ func (a *App) GetCertificateInfo() Result {
 }
 
 // CheckPortAvailable 检查端口是否可用
-func (a *App) CheckPortAvailable(port int) Result {
-	isOccupied := utils.IsPortOccupied(port)
+func (a *App) CheckPortAvailable(host string, port int) Result {
+	// 如果 host 为空，使用配置中的默认值
+	if host == "" {
+		host = conf.AppConf.Proxy.Host
+		if host == "" {
+			host = "127.0.0.1"
+		}
+	}
+	isOccupied := utils.IsPortOccupied(host, port)
 	return Result{
 		Data: map[string]interface{}{
+			"host":      host,
 			"port":      port,
 			"available": !isOccupied,
 		},

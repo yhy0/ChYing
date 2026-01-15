@@ -1,0 +1,77 @@
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+    - binary: proxify
+      main: cmd/proxify/proxify.go
+      goos:
+        - linux
+        - windows
+        - darwin
+      goarch:
+        - amd64
+        - 386
+        - arm
+        - arm64
+      ignore:
+        - goos: windows
+          goarch: 'arm'
+        - goos: windows
+          goarch: 'arm64'
+      id: proxify
+
+    - binary: replay
+      main: cmd/replay/replay.go
+      goos:
+        - linux
+        - windows
+        - darwin
+      goarch:
+        - amd64
+        - 386
+        - arm
+        - arm64
+      ignore:
+        - goos: windows
+          goarch: 'arm'
+        - goos: windows
+          goarch: 'arm64'
+      id: replay
+
+    - binary: mitmrelay
+      main: cmd/mitmrelay/mitmrelay.go
+      goos:
+        - linux
+        - windows
+        - darwin
+      goarch:
+        - amd64
+        - 386
+        - arm
+        - arm64
+      ignore:
+        - goos: windows
+          goarch: 'arm'
+        - goos: windows
+          goarch: 'arm64'
+      id: mitmrelay
+
+archives:
+- format: zip
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ if eq .Os "darwin" }}macOS{{ else }}{{ .Os }}{{ end }}_{{ .Arch }}'
+
+
+checksum:
+  algorithm: sha256
+
+announce:
+  slack:
+    enabled: true
+    channel: '#release'
+    username: GoReleaser
+    message_template: 'New Release: {{ .ProjectName }} {{.Tag}} is published! Check it out at {{ .ReleaseURL }}'
+
+  discord:
+    enabled: true
+    message_template: '**New Release: {{ .ProjectName }} {{.Tag}}** is published! Check it out at {{ .ReleaseURL }}'

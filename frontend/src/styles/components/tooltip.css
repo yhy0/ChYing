@@ -6,6 +6,7 @@
 .tooltip-container {
   position: relative;
   display: inline-block;
+  overflow: visible;
 }
 
 /* Tooltip 文本 */

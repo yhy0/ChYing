@@ -40,6 +40,10 @@ import (
 var (
 	lock sync.Mutex
 
+	// currentProxy 当前运行的代理实例
+	currentProxy     *proxify.Proxy
+	currentProxyLock sync.RWMutex
+
 	// TempHistoryCache 用于在请求到达和响应到达之间临时存储HTTP事务的摘要信息。
 	// 键是 flowID (来自martian.Context，用于关联请求和响应)，值是 *data.HTTPHistory (不包含原始请求/响应报文)。
 	// 当请求到达时(onRequestCallback)，会创建条目；当相应响应到达并处理完毕后(onResponseCallback)，条目会被取出并删除。
@@ -117,6 +121,31 @@ func getDefaultProxifyOptions() *proxify.Options {
 	}
 	logging.Logger.Infof("Proxify data directory set to: %s\n", proxifyDataDir)
 
+	// 从配置文件获取代理监听地址
+	proxyHost := "127.0.0.1"
+	proxyPort := conf.ProxyPort
+
+	// 优先使用配置文件中的设置
+	if conf.AppConf.Proxy.Host != "" {
+		proxyHost = conf.AppConf.Proxy.Host
+	}
+	if conf.AppConf.Proxy.Port > 0 {
+		proxyPort = conf.AppConf.Proxy.Port
+	}
+
+	// 如果有启用的监听器，使用第一个启用的监听器配置
+	for _, listener := range conf.AppConf.Proxy.Listeners {
+		if listener.Enabled {
+			proxyHost = listener.Host
+			proxyPort = listener.Port
+			break
+		}
+	}
+
+	// 更新全局 ProxyPort 和 ProxyHost 变量以保持一致性
+	conf.ProxyPort = proxyPort
+	conf.ProxyHost = proxyHost
+
 	return &proxify.Options{
 		// Output
 		OutputDirectory: proxifyDataDir,                                         // 日志和潜在的dump文件存储在这里
@@ -137,7 +166,7 @@ func getDefaultProxifyOptions() *proxify.Options {
 		ResponseMatchReplaceDSL: nil,
 
 		// Network
-		ListenAddrHTTP:      fmt.Sprintf("127.0.0.1:%d", conf.ProxyPort), // HTTP代理监听地址，使用配置的端口
+		ListenAddrHTTP:      fmt.Sprintf("%s:%d", proxyHost, proxyPort), // HTTP代理监听地址，使用配置的端口
 		ListenAddrSocks5:    "",               // SOCKS5代理监听地址 (如果不需要则为空)
 		ListenDNSAddr:       "",               // DNS服务器监听地址 (如果不需要则为空)
 		DNSMapping:          "",               // DNS映射
@@ -256,16 +285,116 @@ func Proxify() {
 	defaultOptions := getDefaultProxifyOptions()
 
 	fmt.Println("Attempting to start Proxify with default options...")
-	proxyInstance, err := ProxifyWithOptions(defaultOptions)
+	proxy, err := ProxifyWithOptions(defaultOptions)
 	if err != nil {
 		logging.Logger.Infof("Error starting Proxify with default options: %v\n", err)
 		return
 	}
 	logging.Logger.Infof("Proxify proxy server starting on %s\n", defaultOptions.ListenAddrHTTP)
-	// Run() 是阻塞的
-	if err := proxyInstance.Run(); err != nil {
-		logging.Logger.Infof("Proxify proxy server run error: %v\n", err)
+
+	// 存储当前代理实例
+	currentProxyLock.Lock()
+	currentProxy = proxy
+	fmt.Printf("[Proxify] 代理实例已存储: %p\n", currentProxy)
+	currentProxyLock.Unlock()
+
+	// 解析监听地址获取 host 和 port
+	listenAddr := defaultOptions.ListenAddrHTTP
+	host := "127.0.0.1"
+	port := "9080"
+	if colonIdx := strings.LastIndex(listenAddr, ":"); colonIdx != -1 {
+		host = listenAddr[:colonIdx]
+		port = listenAddr[colonIdx+1:]
 	}
+
+	// 更新代理状态为运行中
+	StartMitmproxy(host, port, "passive")
+
+	// Run() 是阻塞的
+	if err := proxy.Run(); err != nil {
+		logging.Logger.Infof("Proxify proxy server run error: %v\n", err)
+		// 代理停止时更新状态
+		StopMitmproxy()
+	}
+
+	// 清理代理实例
+	currentProxyLock.Lock()
+	currentProxy = nil
+	currentProxyLock.Unlock()
+}
+
+// StopCurrentProxy 停止当前运行的代理
+func StopCurrentProxy() {
+	currentProxyLock.Lock()
+	defer currentProxyLock.Unlock()
+
+	if currentProxy != nil {
+		logging.Logger.Info("正在停止代理...")
+		fmt.Printf("[StopCurrentProxy] 正在停止代理实例: %p\n", currentProxy)
+		currentProxy.Stop()
+		// 给代理一些时间来清理资源
+		time.Sleep(100 * time.Millisecond)
+		currentProxy = nil
+		logging.Logger.Info("代理已停止")
+	} else {
+		fmt.Println("[StopCurrentProxy] currentProxy 为 nil，无需停止")
+	}
+}
+
+// RestartProxy 重启代理服务
+// 注意：由于 proxify 的 Run() 是阻塞的，重启需要在新的 goroutine 中进行
+func RestartProxy() error {
+	logging.Logger.Info("正在重启代理服务...")
+
+	// 停止当前代理
+	StopCurrentProxy()
+	StopMitmproxy()
+
+	// 获取当前配置的端口和主机
+	host := conf.AppConf.Proxy.Host
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	port := conf.AppConf.Proxy.Port
+	if port == 0 {
+		port = 9080
+	}
+
+	// 等待端口释放，最多等待 10 秒
+	// 使用尝试监听的方式来检查端口是否可用，这比尝试连接更可靠
+	maxRetries := 20
+	addr := fmt.Sprintf("%s:%d", host, port)
+	portReleased := false
+
+	for i := 0; i < maxRetries; i++ {
+		// 尝试在该端口上创建监听器来检查端口是否可用
+		listener, err := net.Listen("tcp", addr)
+		if err == nil {
+			// 端口可用，立即关闭监听器
+			listener.Close()
+			logging.Logger.Infof("端口 %d 已释放，准备重启代理", port)
+			portReleased = true
+			break
+		}
+
+		// 端口仍被占用，等待后重试
+		if i < maxRetries-1 {
+			logging.Logger.Infof("等待端口 %d 释放... (%d/%d)", port, i+1, maxRetries)
+			time.Sleep(500 * time.Millisecond)
+		}
+	}
+
+	if !portReleased {
+		return fmt.Errorf("端口 %d 仍被占用，无法重启代理（等待超时）", port)
+	}
+
+	// 在新的 goroutine 中启动代理
+	go func() {
+		logging.Logger.Info("正在启动新的代理实例...")
+		Proxify()
+	}()
+
+	return nil
 }
 
 // onRequestCallback 是 martian 的请求修饰回调

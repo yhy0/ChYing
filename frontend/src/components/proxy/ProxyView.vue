@@ -9,6 +9,7 @@ import ProxyControlBar from './panels/ProxyControlBar.vue';
 import ProxyHistoryPanel from './panels/ProxyHistoryPanel.vue';
 import ProxyInterceptPanel from './panels/ProxyInterceptPanel.vue';
 import ProxyMatchReplacePanel from './panels/ProxyMatchReplacePanel.vue';
+import ProxyListenersPanel from './panels/ProxyListenersPanel.vue';
 import ProxyNotification from './panels/ProxyNotification.vue';
 import { Events } from "@wailsio/runtime";
 // @ts-ignore 
@@ -30,7 +31,7 @@ const store = useModulesStore();
 const { t } = useI18n();
 
 // 当前激活的选项卡
-const activeTab = ref<'history' | 'intercept' | 'matchreplace'>('history');
+const activeTab = ref<'history' | 'intercept' | 'matchreplace' | 'listeners'>('history');
 
 // 通知信息
 const notification = ref<{ message: string; visible: boolean; type: 'success' | 'error' } | null>(null);
@@ -67,6 +68,8 @@ const dslFilterEnabled = ref(false);
 
 // 组件挂载
 onMounted(() => {
+  // 注意：ProxyStarted 事件监听已移至 App.vue 中全局处理，避免重复通知
+
   // 监听新的HTTP历史记录
   // Wails v3 事件回调接收 WailsEvent 对象，实际数据在 event.data 中
   Events.On("HttpHistory", (event: any) => {
@@ -465,6 +468,7 @@ onBeforeUnmount(() => {
   // 清理 Wails 事件监听器
   Events.Off("HttpHistory");
   Events.Off("HttpMarker");
+  // 注意：ProxyStarted 事件监听已移至 App.vue 中全局处理
   // 清理键盘事件监听器
   window.removeEventListener('keydown', handleKeyDown);
 });
@@ -648,6 +652,15 @@ const clearCheckedItems = () => {
           <i class="bx bx-code-block mr-1.5"></i>
           {{ t('modules.matchReplace.title') }}
         </button>
+
+        <button class="px-4 py-2 text-sm font-medium flex items-center" :class="[
+          activeTab === 'listeners'
+            ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400'
+            : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+        ]" @click="activeTab = 'listeners'">
+          <i class="bx bx-broadcast mr-1.5"></i>
+          {{ t('modules.listeners.title') }}
+        </button>
       </div>
 
       <!-- 内容面板 -->
@@ -676,6 +689,9 @@ const clearCheckedItems = () => {
 
         <!-- 匹配替换面板 -->
         <ProxyMatchReplacePanel v-else-if="activeTab === 'matchreplace'" @notify="handleNotification" />
+
+        <!-- 监听配置面板 -->
+        <ProxyListenersPanel v-else-if="activeTab === 'listeners'" @notify="handleNotification" />
 
       </div>
     </div>

@@ -67,7 +67,9 @@ const launchChrome = () => {
 };
 
 // 打开Chrome配置模态框
-const openChromeModal = () => {
+const openChromeModal = async () => {
+  // 每次打开模态框时重新获取当前代理配置
+  await loadProxyConfig();
   showChromeModal.value = true;
 };
 
@@ -167,8 +169,8 @@ const getThemeIcon = () => {
   }
 };
 
-// 通知计数（初始为0）
-const unreadCount = ref(0);
+// 通知计数（从 store 获取）
+const unreadCount = computed(() => store.notifications.unreadCount);
 
 // 定义向上发送事件的emit
 const emit = defineEmits(['toggleNotifications']);
@@ -254,20 +256,20 @@ onMounted(() => {
       </div>
 
       <!-- 通知按钮 -->
-      <div class="tooltip-container">
+      <div class="tooltip-container overflow-visible">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative"
+          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative notification-btn"
           @click="toggleNotifications"
           :aria-label="t('common.ui.notifications')"
         >
           <i class="bx bx-bell text-base flex items-center justify-center w-5 h-5"></i>
           <!-- 未读消息数量 -->
-          <div
+          <span
             v-if="unreadCount > 0"
-            class="absolute -top--0.5 -right--0.5 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+            class="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-medium flex items-center justify-center pointer-events-none"
           >
             {{ unreadCount > 9 ? '9+' : unreadCount }}
-          </div>
+          </span>
         </button>
         <span class="tooltip-text tooltip-bottom">{{ t('common.ui.notifications') }}</span>
       </div>
@@ -354,5 +356,9 @@ onMounted(() => {
 header {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+}
+
+.notification-btn {
+  overflow: visible !important;
 }
 </style> 

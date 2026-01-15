@@ -40,6 +40,12 @@
   --color-primary-hover: #4338ca;
   --color-primary-rgb: 79, 70, 229;
 
+  /* 品牌色别名 - 用于对话框等组件 */
+  --color-brand: #3b82f6;
+  --color-brand-dark: #2563eb;
+  --color-brand-light: rgba(59, 130, 246, 0.1);
+  --color-gray: #9ca3af;
+
   /* 状态颜色 */
   --color-success: #10b981;
   --color-success-hover: #059669;
@@ -282,6 +288,12 @@
   --color-primary-hover: #4f46e5;
   --color-primary-rgb: 99, 102, 241;
   --color-primary-light-dark: #a5b4fc;
+
+  /* 品牌色别名 - 深色模式 */
+  --color-brand: #60a5fa;
+  --color-brand-dark: #3b82f6;
+  --color-brand-light: rgba(96, 165, 250, 0.15);
+  --color-gray: #6b7280;
 
   /* 状态颜色悬停状态 - 深色模式 */
   --color-success-hover: #059669;

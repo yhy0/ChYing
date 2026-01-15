@@ -2,12 +2,14 @@ package mitmproxy
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/yhy0/ChYing/conf"
+	"github.com/yhy0/ChYing/conf/file"
 	"github.com/yhy0/logging"
 )
 
@@ -111,12 +113,20 @@ func TestProxyRule(rule map[string]interface{}) map[string]interface{} {
 
 // GetCertificateInfo 获取证书信息
 func GetCertificateInfo() map[string]interface{} {
+	certDir := filepath.Join(file.ChyingDir, "proxify_data")
+	certPem := filepath.Join(certDir, "cacert.pem")
+	certCrt := filepath.Join(certDir, "cacert.crt")
+
 	return map[string]interface{}{
-		"issuer":     "ChYing CA",
-		"subject":    "ChYing Proxy",
+		"issuer":     "Proxify CA",
+		"subject":    "Proxify CA",
 		"valid_from": time.Now().Format("2006-01-02 15:04:05"),
 		"valid_to":   time.Now().AddDate(1, 0, 0).Format("2006-01-02 15:04:05"),
-		"installed":  true,
+		"installed":  false,
+		"certDir":    certDir,
+		"certPem":    certPem,
+		"certCrt":    certCrt,
+		"platform":   runtime.GOOS,
 	}
 }
 

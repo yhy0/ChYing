@@ -28,6 +28,15 @@ type Scope struct {
 	Type    string `json:"type"`
 }
 
+// ProxyListener 代理监听器配置
+type ProxyListener struct {
+	ID      string `json:"id" yaml:"id" mapstructure:"id"`
+	Host    string `json:"host" yaml:"host" mapstructure:"host"`
+	Port    int    `json:"port" yaml:"port" mapstructure:"port"`
+	Enabled bool   `json:"enabled" yaml:"enabled" mapstructure:"enabled"`
+	Running bool   `json:"running" yaml:"-" mapstructure:"-"` // 运行时状态，不持久化
+}
+
 // AIConfig AI 配置结构体
 type AIConfig struct {
 	Claude struct {
@@ -86,9 +95,10 @@ type AppConfig struct {
 
 	// 代理配置
 	Proxy struct {
-		Host    string `json:"host" yaml:"host" mapstructure:"host"`
-		Port    int    `json:"port" yaml:"port" mapstructure:"port"`
-		Enabled bool   `json:"enabled" yaml:"enabled" mapstructure:"enabled"`
+		Host      string          `json:"host" yaml:"host" mapstructure:"host"`
+		Port      int             `json:"port" yaml:"port" mapstructure:"port"`
+		Enabled   bool            `json:"enabled" yaml:"enabled" mapstructure:"enabled"`
+		Listeners []ProxyListener `json:"listeners" yaml:"listeners" mapstructure:"listeners"`
 	} `json:"proxy" yaml:"proxy" mapstructure:"proxy"`
 
 	// AI 配置

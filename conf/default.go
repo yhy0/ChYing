@@ -12,6 +12,7 @@ import (
 **/
 
 var ProxyPort = 9080
+var ProxyHost = "127.0.0.1"
 
 var Proxy string
 var Token string
@@ -40,6 +41,11 @@ proxy:
   host: "127.0.0.1"
   port: 9080
   enabled: true
+  listeners:
+    - id: "default"
+      host: "127.0.0.1"
+      port: 9080
+      enabled: true
 
 # 扫描配置
 scan:

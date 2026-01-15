@@ -117,6 +117,14 @@
     }
   },
   "notifications": {
+    "certificate": {
+      "title": "CA Certificate Installation",
+      "message": "Install CA certificate for HTTPS proxy functionality",
+      "path": "Certificate location: {path}",
+      "windowsHint": "Windows: Double-click cacert.crt → Install Certificate → Current User → Place in store → Trusted Root Certification Authorities",
+      "macHint": "macOS: Double-click cacert.pem, find Proxify CA in Keychain Access, double-click and set to Always Trust",
+      "linuxHint": "Linux: Copy cacert.pem to /usr/local/share/ca-certificates/ and run sudo update-ca-certificates"
+    },
     "sql_injection": {
       "title": "SQL Injection Vulnerability",
       "message": "SQL Injection vulnerability found in login.php page, CVSS Score: 7.5"
@@ -832,6 +840,49 @@
     },
     "collection": {
       "settings": "Collection Settings"
+    },
+    "listeners": {
+      "title": "Listeners",
+      "columns": {
+        "running": "Running",
+        "interface": "Interface",
+        "enabled": "Enabled",
+        "actions": "Actions"
+      },
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "host": "Host",
+      "port": "Port",
+      "hostPlaceholder": "e.g.: 127.0.0.1",
+      "portPlaceholder": "e.g.: 9080",
+      "loading": "Loading...",
+      "listenersLoaded": "{count} listeners loaded",
+      "loadError": "Failed to load listeners: {error}",
+      "listenerAdded": "Listener added successfully",
+      "listenerUpdated": "Listener updated successfully",
+      "listenerDeleted": "Listener deleted successfully",
+      "saveError": "Failed to save listener: {error}",
+      "deleteError": "Failed to delete listener: {error}",
+      "listenerToggled": "Listener {enabled}",
+      "toggleError": "Failed to toggle listener: {error}",
+      "enabled": "enabled",
+      "disabled": "disabled",
+      "addListener": "Add Listener",
+      "editListener": "Edit Listener",
+      "enableThisListener": "Enable this listener",
+      "cancel": "Cancel",
+      "save": "Save",
+      "runningStatus": "Running",
+      "stoppedStatus": "Stopped",
+      "toggleEnabled": "Toggle enabled status",
+      "checkingPort": "Checking port...",
+      "portAvailable": "Port is available",
+      "portOccupied": "Port is already in use",
+      "restart": "Restart Proxy",
+      "restartSuccess": "Proxy server restarted successfully",
+      "restartError": "Failed to restart proxy server: {error}",
+      "restarting": "Restarting..."
     },
     "matchReplace": {
       "title": "Match & Replace",

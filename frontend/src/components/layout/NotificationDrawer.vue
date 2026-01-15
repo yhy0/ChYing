@@ -48,7 +48,7 @@ const emit = defineEmits<{
 
 // 前端通知数据接口
 interface Notification {
-  id: number;
+  id: number | string;
   type: 'info' | 'warning' | 'error' | 'success';
   title: string;
   message: string;
@@ -57,8 +57,25 @@ interface Notification {
   vulnerabilityId?: number; // 关联的漏洞ID
 }
 
+// 展开的通知ID
+const expandedNotificationId = ref<number | string | null>(null);
+
+// 切换通知展开状态
+const toggleNotificationExpand = (id: number | string) => {
+  if (expandedNotificationId.value === id) {
+    expandedNotificationId.value = null;
+  } else {
+    expandedNotificationId.value = id;
+  }
+};
+
+// 检查通知是否展开
+const isNotificationExpanded = (id: number | string) => {
+  return expandedNotificationId.value === id;
+};
+
 // 从漏洞 store 生成通知
-const notifications = computed(() => {
+const vulnerabilityNotifications = computed(() => {
   return vulnerabilityStore.vulnerabilities.map(vuln => ({
     id: vuln.id,
     type: mapLevelToType(vuln.level),
@@ -68,6 +85,31 @@ const notifications = computed(() => {
     read: false,
     vulnerabilityId: vuln.id
   }));
+});
+
+// 从 modules store 获取通用通知
+const generalNotifications = computed(() => {
+  const items = store.notifications.items || [];
+  return items.map(item => ({
+    id: item.id,
+    type: item.severity as Notification['type'],
+    title: item.title,
+    message: item.message,
+    time: formatVulnTimestamp(item.timestamp),
+    read: item.read,
+    vulnerabilityId: undefined
+  }));
+});
+
+// 合并所有通知，按时间排序（最新的在前）
+const notifications = computed(() => {
+  const all = [...vulnerabilityNotifications.value, ...generalNotifications.value];
+  return all.sort((a, b) => {
+    // 尝试解析时间进行排序
+    const timeA = new Date(a.time).getTime() || 0;
+    const timeB = new Date(b.time).getTime() || 0;
+    return timeB - timeA;
+  });
 });
 
 // 将后端 VulMessage.Level 映射到前端 Notification.type
@@ -176,9 +218,10 @@ watch(() => props.show, (isVisible) => {
   }
 });
 
-// 清除所有通知（清空漏洞数据）
+// 清除所有通知（清空漏洞数据和通用通知）
 const clearAllNotifications = () => {
   vulnerabilityStore.clearAllVulnerabilities();
+  store.clearNotifications();
   store.setUnreadCount(0);
 };
 </script>
@@ -227,27 +270,45 @@ const clearAllNotifications = () => {
           <div v-else>
             <!-- 通知列表 -->
             <div class="divide-y divide-gray-200 dark:divide-gray-700">
-              <div 
-                v-for="notification in notifications" 
+              <div
+                v-for="notification in notifications"
                 :key="notification.id"
-                class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
                 :class="{ 'bg-blue-50 dark:bg-blue-900/10': !notification.read }"
+                @click="toggleNotificationExpand(notification.id)"
               >
                 <div class="flex items-start">
                   <!-- 图标 -->
-                  <div 
+                  <div
                     class="flex-shrink-0 mr-3 w-8 h-8 rounded-full flex items-center justify-center text-white"
                     :class="getNotificationColorClass(notification.type)"
                   >
                     <i class="bx text-lg" :class="getNotificationIcon(notification.type)"></i>
                   </div>
-                  
+
                   <!-- 内容 -->
                   <div class="flex-1 min-w-0">
-                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ notification.title }}
-                    </h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-3" :title="notification.message">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ notification.title }}
+                      </h3>
+                      <i
+                        class="bx text-gray-400 dark:text-gray-500 ml-2 transition-transform duration-200"
+                        :class="isNotificationExpanded(notification.id) ? 'bx-chevron-up' : 'bx-chevron-down'"
+                      ></i>
+                    </div>
+                    <!-- 折叠状态：显示截断的消息 -->
+                    <p
+                      v-if="!isNotificationExpanded(notification.id)"
+                      class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2"
+                    >
+                      {{ notification.message }}
+                    </p>
+                    <!-- 展开状态：显示完整消息 -->
+                    <p
+                      v-else
+                      class="text-xs text-gray-500 dark:text-gray-400 mt-1 whitespace-pre-wrap break-words"
+                    >
                       {{ notification.message }}
                     </p>
                     <span class="text-xs text-gray-400 dark:text-gray-500 mt-1 block">

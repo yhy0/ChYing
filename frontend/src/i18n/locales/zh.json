@@ -118,6 +118,14 @@
     }
   },
   "notifications": {
+    "certificate": {
+      "title": "CA 证书安装提示",
+      "message": "首次使用 HTTPS 代理功能需要安装 CA 证书",
+      "path": "证书位置：{path}",
+      "windowsHint": "Windows: 双击 cacert.crt 文件，选择\"安装证书\" → \"当前用户\" → \"将所有证书放入下列存储\" → \"受信任的根证书颁发机构\"",
+      "macHint": "macOS: 双击 cacert.pem，在钥匙串访问中找到 Proxify CA，双击并设置为\"始终信任\"",
+      "linuxHint": "Linux: 将 cacert.pem 复制到 /usr/local/share/ca-certificates/ 并运行 sudo update-ca-certificates"
+    },
     "sql_injection": {
       "title": "SQL注入漏洞",
       "message": "在login.php页面发现SQL注入漏洞，CVSS评分：7.5"
@@ -832,6 +840,49 @@
     },
     "collection": {
       "settings": "信息收集设置"
+    },
+    "listeners": {
+      "title": "监听配置",
+      "columns": {
+        "running": "运行中",
+        "interface": "接口",
+        "enabled": "启用",
+        "actions": "操作"
+      },
+      "add": "添加",
+      "edit": "编辑",
+      "delete": "删除",
+      "host": "主机",
+      "port": "端口",
+      "hostPlaceholder": "例如: 127.0.0.1",
+      "portPlaceholder": "例如: 9080",
+      "loading": "加载中...",
+      "listenersLoaded": "已加载 {count} 个监听器",
+      "loadError": "加载监听器失败: {error}",
+      "listenerAdded": "监听器添加成功",
+      "listenerUpdated": "监听器更新成功",
+      "listenerDeleted": "监听器删除成功",
+      "saveError": "保存监听器失败: {error}",
+      "deleteError": "删除监听器失败: {error}",
+      "listenerToggled": "监听器已{enabled}",
+      "toggleError": "切换监听器状态失败: {error}",
+      "enabled": "启用",
+      "disabled": "禁用",
+      "addListener": "添加监听器",
+      "editListener": "编辑监听器",
+      "enableThisListener": "启用此监听器",
+      "cancel": "取消",
+      "save": "保存",
+      "runningStatus": "运行中",
+      "stoppedStatus": "已停止",
+      "toggleEnabled": "切换启用状态",
+      "checkingPort": "正在检测端口...",
+      "portAvailable": "端口可用",
+      "portOccupied": "端口已被占用",
+      "restart": "重启代理",
+      "restartSuccess": "代理服务器重启成功",
+      "restartError": "代理服务器重启失败: {error}",
+      "restarting": "正在重启..."
     },
     "matchReplace": {
       "title": "匹配与替换",

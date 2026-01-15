@@ -1,21 +1,23 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
 import { generateUUID } from '../utils';
-import { 
+import {
   prepareIntruderSourceTarget,
 } from '../utils';
-import eventBus, { 
-  SEND_TO_REPEATER_REQUESTED, 
-  SEND_TO_INTRUDER_FROM_PROXY_REQUESTED, 
-  SEND_TO_INTRUDER_FROM_REPEATER_REQUESTED 
+import eventBus, {
+  SEND_TO_REPEATER_REQUESTED,
+  SEND_TO_INTRUDER_FROM_PROXY_REQUESTED,
+  SEND_TO_INTRUDER_FROM_REPEATER_REQUESTED
 } from '../utils/eventBus';
-import type { 
-  ProxyHistoryItem, 
-  RepeaterTab, 
-  RepeaterGroup, 
-  IntruderTab, 
+import type {
+  ProxyHistoryItem,
+  RepeaterTab,
+  RepeaterGroup,
+  IntruderTab,
   DecoderTab,
   NotificationState,
+  NotificationItem,
+  NotificationSeverity,
   IntruderGroup,
 } from '../types';
 
@@ -47,7 +49,8 @@ export const useModulesStore = defineStore('modules', () => {
   // 通知相关状态
   const notifications = ref<NotificationState>({
     showNotifications: false,
-    unreadCount: 0
+    unreadCount: 0,
+    items: []
   });
   
   interface BaseTabForCreation {
@@ -362,10 +365,49 @@ export const useModulesStore = defineStore('modules', () => {
   }
   
   // 添加新通知
-  function addNotification(p0: { type: string; message: string; }) {
-    // 这里可以实现添加通知的逻辑，例如将通知存储在一个数组中
-    // 同时增加未读数量
+  function addNotification(notification: { type: string; title?: string; message: string; }) {
+    const newItem: NotificationItem = {
+      id: generateUUID(),
+      title: notification.title || '',
+      message: notification.message,
+      timestamp: new Date().toISOString(),
+      read: false,
+      severity: notification.type as NotificationSeverity
+    };
+
+    // 添加到通知列表开头
+    if (!notifications.value.items) {
+      notifications.value.items = [];
+    }
+    notifications.value.items.unshift(newItem);
+
+    // 增加未读数量
     notifications.value.unreadCount++;
+  }
+
+  // 清除所有通知
+  function clearNotifications() {
+    notifications.value.items = [];
+    notifications.value.unreadCount = 0;
+  }
+
+  // 标记通知为已读
+  function markNotificationAsRead(notificationId: string) {
+    const item = notifications.value.items?.find(n => n.id === notificationId);
+    if (item && !item.read) {
+      item.read = true;
+      if (notifications.value.unreadCount > 0) {
+        notifications.value.unreadCount--;
+      }
+    }
+  }
+
+  // 标记所有通知为已读
+  function markAllNotificationsAsRead() {
+    notifications.value.items?.forEach(item => {
+      item.read = true;
+    });
+    notifications.value.unreadCount = 0;
   }
   
   // 返回所有公开的状态和方法
@@ -381,10 +423,10 @@ export const useModulesStore = defineStore('modules', () => {
     decoderTabs,
     decoderTabCounter,
     notifications,
-    
+
     // 计算属性
     activeDecoderTab,
-    
+
     // 方法
     createDecoderTab,
     updateDecoderTab,
@@ -405,6 +447,9 @@ export const useModulesStore = defineStore('modules', () => {
     closeNotifications,
     setUnreadCount,
     addNotification,
+    clearNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
     // 新增 actions
     addRepeaterTabFromEventPayload,
     addIntruderTabFromEventPayload,

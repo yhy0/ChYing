@@ -50,6 +50,13 @@ func ValidateAppConfig() error {
 // SaveConfig 保存配置到文件
 func SaveConfig() error {
 	// 将 AppConf 的值同步到 viper
+
+	// 代理配置
+	viper.Set("proxy.host", AppConf.Proxy.Host)
+	viper.Set("proxy.port", AppConf.Proxy.Port)
+	viper.Set("proxy.enabled", AppConf.Proxy.Enabled)
+	viper.Set("proxy.listeners", AppConf.Proxy.Listeners)
+
 	// AI 配置
 	viper.Set("ai.claude.cli_path", AppConf.AI.Claude.CLIPath)
 	viper.Set("ai.claude.work_dir", AppConf.AI.Claude.WorkDir)

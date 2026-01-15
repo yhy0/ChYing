@@ -32,7 +32,7 @@ func (c *ConfigAPI) GetConfigStatus() map[string]interface{} {
 	status := map[string]interface{}{
 		"config_file":   conf.GetConfigFilePath(),
 		"proxy_enabled": config.Proxy.Enabled,
-		"proxy_address": fmt.Sprintf("127.0.0.1:%d", conf.ProxyPort), // 使用实际运行的代理端口
+		"proxy_address": fmt.Sprintf("%s:%d", conf.ProxyHost, conf.ProxyPort), // 使用实际运行的代理地址
 		"scan_enabled": map[string]bool{
 			"port_scan": config.Scan.EnablePortScan,
 			"dir_scan":  config.Scan.EnableDirScan,

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/mitmproxy"
+	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/logging"
 )
 
@@ -236,5 +237,206 @@ func (a *App) ClearAuthorizationTestResults() Result {
 	mitmproxy.ClearAuthorizationTestResults()
 	return Result{
 		Data: "Authorization test results cleared successfully",
+	}
+}
+
+// ==================== 代理监听器管理 ====================
+
+// GetProxyListeners 获取代理监听器列表
+func (a *App) GetProxyListeners() Result {
+	listeners := conf.AppConf.Proxy.Listeners
+
+	// 如果没有配置监听器，创建一个默认监听器基于当前代理状态
+	if len(listeners) == 0 {
+		status := mitmproxy.GetProxyStatus()
+		host := conf.AppConf.Proxy.Host
+		port := conf.AppConf.Proxy.Port
+
+		// 如果配置中没有，尝试从代理状态获取
+		if host == "" {
+			if h, ok := status["host"].(string); ok && h != "" {
+				host = h
+			} else {
+				host = "127.0.0.1"
+			}
+		}
+		if port == 0 {
+			if p, ok := status["port"].(int); ok && p != 0 {
+				port = p
+			} else {
+				port = 9080
+			}
+		}
+
+		running := false
+		if r, ok := status["running"].(bool); ok {
+			running = r
+		}
+
+		defaultListener := conf.ProxyListener{
+			ID:      "default",
+			Host:    host,
+			Port:    port,
+			Enabled: true,
+			Running: running,
+		}
+		listeners = []conf.ProxyListener{defaultListener}
+	}
+
+	return Result{
+		Data:  listeners,
+		Error: "",
+	}
+}
+
+// SaveProxyListener 保存代理监听器（添加或更新）
+func (a *App) SaveProxyListener(listener conf.ProxyListener) Result {
+	// 查找是否已存在
+	found := false
+	for i, l := range conf.AppConf.Proxy.Listeners {
+		if l.ID == listener.ID {
+			conf.AppConf.Proxy.Listeners[i] = listener
+			found = true
+			break
+		}
+	}
+
+	// 如果不存在则添加
+	if !found {
+		conf.AppConf.Proxy.Listeners = append(conf.AppConf.Proxy.Listeners, listener)
+	}
+
+	// 保存配置到文件
+	if err := conf.SaveConfig(); err != nil {
+		logging.Logger.Errorln("保存监听器配置失败:", err)
+		return Result{
+			Data:  nil,
+			Error: err.Error(),
+		}
+	}
+
+	logging.Logger.Infoln("监听器配置已保存:", listener.ID)
+	return Result{
+		Data:  listener,
+		Error: "",
+	}
+}
+
+// DeleteProxyListener 删除代理监听器
+func (a *App) DeleteProxyListener(id string) Result {
+	var newListeners []conf.ProxyListener
+	found := false
+	for _, l := range conf.AppConf.Proxy.Listeners {
+		if l.ID == id {
+			found = true
+			continue
+		}
+		newListeners = append(newListeners, l)
+	}
+
+	if !found {
+		return Result{
+			Data:  nil,
+			Error: "监听器不存在",
+		}
+	}
+
+	conf.AppConf.Proxy.Listeners = newListeners
+
+	// 保存配置到文件
+	if err := conf.SaveConfig(); err != nil {
+		logging.Logger.Errorln("删除监听器配置失败:", err)
+		return Result{
+			Data:  nil,
+			Error: err.Error(),
+		}
+	}
+
+	logging.Logger.Infoln("监听器已删除:", id)
+	return Result{
+		Data:  id,
+		Error: "",
+	}
+}
+
+// ToggleProxyListener 切换监听器启用状态
+func (a *App) ToggleProxyListener(id string, enabled bool) Result {
+	found := false
+	for i, l := range conf.AppConf.Proxy.Listeners {
+		if l.ID == id {
+			conf.AppConf.Proxy.Listeners[i].Enabled = enabled
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return Result{
+			Data:  nil,
+			Error: "监听器不存在",
+		}
+	}
+
+	// 保存配置到文件
+	if err := conf.SaveConfig(); err != nil {
+		logging.Logger.Errorln("切换监听器状态失败:", err)
+		return Result{
+			Data:  nil,
+			Error: err.Error(),
+		}
+	}
+
+	logging.Logger.Infof("监听器 %s 状态已切换为: %v", id, enabled)
+	return Result{
+		Data:  enabled,
+		Error: "",
+	}
+}
+
+// GetProxyStatus 获取代理状态
+func (a *App) GetProxyStatus() Result {
+	status := mitmproxy.GetProxyStatus()
+	return Result{
+		Data:  status,
+		Error: "",
+	}
+}
+
+// GetCertificateInfo 获取证书信息
+func (a *App) GetCertificateInfo() Result {
+	info := mitmproxy.GetCertificateInfo()
+	return Result{
+		Data:  info,
+		Error: "",
+	}
+}
+
+// CheckPortAvailable 检查端口是否可用
+func (a *App) CheckPortAvailable(port int) Result {
+	isOccupied := utils.IsPortOccupied(port)
+	return Result{
+		Data: map[string]interface{}{
+			"port":      port,
+			"available": !isOccupied,
+		},
+		Error: "",
+	}
+}
+
+// RestartProxyServer 重启代理服务器
+func (a *App) RestartProxyServer() Result {
+	err := mitmproxy.RestartProxy()
+	if err != nil {
+		logging.Logger.Errorln("重启代理服务器失败:", err)
+		return Result{
+			Data:  nil,
+			Error: err.Error(),
+		}
+	}
+
+	logging.Logger.Infoln("代理服务器重启成功")
+	return Result{
+		Data:  "代理服务器正在重启",
+		Error: "",
 	}
 }

@@ -270,6 +270,22 @@ func (a *App) StepProxyServerStart() Result {
 	// 等待代理服务器启动
 	time.Sleep(2 * time.Second)
 
+	// 获取代理监听地址
+	proxyHost := conf.AppConf.Proxy.Host
+	if proxyHost == "" {
+		proxyHost = "127.0.0.1"
+	}
+
+	// 发送代理启动通知事件
+	if wailsApp != nil {
+		wailsApp.Event.Emit("ProxyStarted", map[string]interface{}{
+			"host":    proxyHost,
+			"port":    conf.ProxyPort,
+			"success": true,
+			"message": fmt.Sprintf("代理服务器已启动，监听地址: %s:%d", proxyHost, conf.ProxyPort),
+		})
+	}
+
 	progress.Success = true
 	progress.Message = fmt.Sprintf("代理服务器启动成功 (端口: %d)", conf.ProxyPort)
 	logging.Logger.Infoln("✓ 代理服务器启动完成")

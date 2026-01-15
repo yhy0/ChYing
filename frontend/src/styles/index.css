@@ -62,6 +62,7 @@
 @import './modules/proxy.css';
 @import './modules/proxy-dsl-search.css';
 @import './modules/proxy-match-replace.css';
+@import './modules/proxy-listeners.css';
 @import './modules/repeater.css';
 @import './modules/intruder.css';
 @import './modules/decoder.css';

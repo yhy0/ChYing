@@ -1,0 +1,68 @@
+/* 代理监听器模块特有样式 - 用于动态渲染的单元格内容 */
+
+/* 状态指示器单元格 */
+.status-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-running {
+  background-color: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+  animation: status-pulse 2s infinite;
+}
+
+.status-stopped {
+  background-color: #9ca3af;
+}
+
+@keyframes status-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* 接口代码样式 */
+.interface-code {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  font-size: 12px;
+  padding: 2px 6px;
+  background: var(--glass-bg-tertiary);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+}
+
+/* 监听器操作按钮容器 */
+.listener-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--glass-bg-secondary);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--glass-radius-sm);
+  padding: 0.25rem;
+}
+
+/* 监听器操作按钮特殊颜色 */
+.listener-actions .edit-button:hover {
+  color: #3b82f6 !important;
+}
+
+.listener-actions .delete-button:hover {
+  color: #ef4444 !important;
+}

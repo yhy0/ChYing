@@ -1,0 +1,15 @@
+
+cmd/proxify/proxify
+cmd/proxify/logs/*
+.DS_Store
+cmd/replay/replay
+cmd/mitmrelay/mitmrelay
+*.exe
+dist/*
+
+.vscode
+.devcontainer
+**/proxify_logs.jsonl
+**/proxify_logs.yaml
+/proxify
+**/proxify_logs

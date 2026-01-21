@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 // @ts-ignore
-import { ClaudeUpdateConfig, ClaudeInitialize, ClaudeGetConfig, ClaudeIsInitialized, ClaudeTestConnection, ClaudeTestExternalMCPServer } from "../../../../bindings/github.com/yhy0/ChYing/app.js";
+import { ClaudeUpdateConfig, ClaudeInitialize, ClaudeGetConfig, ClaudeIsInitialized, ClaudeTestConnection, ClaudeTestExternalMCPServer, A2AUpdateConfig, A2ATestConnection } from "../../../../bindings/github.com/yhy0/ChYing/app.js";
 
 // Props
 const props = defineProps<{
@@ -58,6 +58,9 @@ interface MCPServersJson {
 }
 
 // ==================== Claude Code CLI 配置状态 ====================
+// Agent 模式
+const agentMode = ref<'claude-code' | 'a2a'>('claude-code');
+
 const cliPath = ref('');
 const workDir = ref('');
 const model = ref('claude-sonnet-4');
@@ -78,6 +81,17 @@ const mcpPort = ref(0);
 const mcpEnabledTools = ref<string[]>([]);
 const mcpDisabledTools = ref<string[]>([]);
 const mcpExternalServers = ref<ExternalMCPServer[]>([]);
+
+// ==================== A2A 配置状态 ====================
+const a2aEnabled = ref(false);
+const a2aAgentURL = ref('');
+const a2aHeaders = ref<Record<string, string>>({});
+const a2aTimeout = ref(300);
+const a2aEnableSSE = ref(true);
+const a2aHeadersJson = ref('{}');
+const a2aHeadersJsonError = ref('');
+const isTestingA2A = ref(false);
+const a2aAgentInfo = ref<any>(null);
 
 // ==================== 常量定义 ====================
 // 可用的 MCP 工具列表 (需要与 pkg/claude-code/mcp_server.go 保持同步)
@@ -357,6 +371,18 @@ const loadConfig = async () => {
         syncJsonFromServers();
       }
 
+      // 加载 A2A 配置
+      agentMode.value = config.agent_mode || 'claude-code';
+      if (config.a2a) {
+        a2aEnabled.value = config.a2a.enabled ?? false;
+        a2aAgentURL.value = config.a2a.agent_url || '';
+        a2aHeaders.value = config.a2a.headers || {};
+        a2aTimeout.value = config.a2a.timeout || 300;
+        a2aEnableSSE.value = config.a2a.enable_sse ?? true;
+        // 同步 headers JSON
+        a2aHeadersJson.value = JSON.stringify(a2aHeaders.value, null, 2);
+      }
+
       // 如果 API Key 已配置但未初始化，自动尝试初始化
       if (apiKey.value && !isInitialized.value) {
         await autoInitialize();
@@ -416,6 +442,7 @@ const saveConfig = async () => {
       }))
     };
 
+    // 保存 Claude Code 配置
     const result = await ClaudeUpdateConfig(
       cliPath.value,
       workDir.value,
@@ -432,6 +459,20 @@ const saveConfig = async () => {
 
     if (result?.error) {
       throw new Error(result.error);
+    }
+
+    // 保存 A2A 配置
+    const a2aConfig = {
+      enabled: a2aEnabled.value,
+      agent_url: a2aAgentURL.value,
+      headers: a2aHeaders.value,
+      timeout: a2aTimeout.value,
+      enable_sse: a2aEnableSSE.value
+    };
+
+    const a2aResult = await A2AUpdateConfig(agentMode.value, a2aConfig);
+    if (a2aResult?.error) {
+      throw new Error(a2aResult.error);
     }
 
     saveMessage.value = t('settings.ai.save_success', 'Settings saved successfully');
@@ -540,6 +581,60 @@ const testExternalMCPServer = async (server: ExternalMCPServer) => {
   }
 };
 
+// ==================== A2A 相关函数 ====================
+
+// 验证并更新 A2A headers JSON
+const validateAndUpdateA2AHeaders = () => {
+  a2aHeadersJsonError.value = '';
+
+  if (!a2aHeadersJson.value.trim() || a2aHeadersJson.value.trim() === '{}') {
+    a2aHeaders.value = {};
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(a2aHeadersJson.value);
+    if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('Headers must be a JSON object');
+    }
+    a2aHeaders.value = parsed;
+  } catch (e) {
+    a2aHeadersJsonError.value = e instanceof Error ? e.message : 'Invalid JSON format';
+  }
+};
+
+// 测试 A2A Agent 连接
+const testA2AConnection = async () => {
+  if (!a2aAgentURL.value) {
+    showMessage('Agent URL is required', 'error');
+    return;
+  }
+
+  isTestingA2A.value = true;
+  saveMessage.value = '';
+
+  try {
+    const result = await A2ATestConnection(a2aAgentURL.value, a2aHeaders.value);
+
+    if (result?.error) {
+      throw new Error(result.error);
+    }
+
+    const data = result?.data;
+    if (data?.success) {
+      a2aAgentInfo.value = data.agent;
+      showMessage(data.message || 'A2A Agent connection successful', 'success');
+    } else {
+      showMessage(data?.message || 'A2A Agent connection failed', 'error');
+    }
+  } catch (error: any) {
+    console.error('A2A 连接测试失败:', error);
+    showMessage(error.message || 'A2A Agent connection failed', 'error');
+  } finally {
+    isTestingA2A.value = false;
+  }
+};
+
 // 组件挂载时加载配置
 onMounted(() => {
   loadConfig();
@@ -601,6 +696,185 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Agent 模式选择 -->
+      <div class="bg-white dark:bg-[#282838] rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h3 class="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300 flex items-center">
+          <i class="bx bx-bot mr-2 text-gray-400"></i>
+          {{ t('settings.ai.agent_mode', 'Agent Mode') }}
+        </h3>
+
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Claude Code CLI 选项 -->
+          <label
+            class="relative flex items-start p-3 rounded-lg border-2 cursor-pointer transition-all"
+            :class="agentMode === 'claude-code'
+              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'"
+          >
+            <input
+              type="radio"
+              v-model="agentMode"
+              value="claude-code"
+              class="sr-only"
+            />
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <i class="bx bx-terminal text-lg" :class="agentMode === 'claude-code' ? 'text-indigo-500' : 'text-gray-400'"></i>
+                <span class="font-medium text-sm" :class="agentMode === 'claude-code' ? 'text-indigo-700 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300'">
+                  Claude Code CLI
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {{ t('settings.ai.claude_code_desc', 'Use local Claude Code CLI') }}
+              </p>
+            </div>
+            <div v-if="agentMode === 'claude-code'" class="absolute top-2 right-2">
+              <i class="bx bx-check-circle text-indigo-500"></i>
+            </div>
+          </label>
+
+          <!-- A2A Agent 选项 -->
+          <label
+            class="relative flex items-start p-3 rounded-lg border-2 cursor-pointer transition-all"
+            :class="agentMode === 'a2a'
+              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'"
+          >
+            <input
+              type="radio"
+              v-model="agentMode"
+              value="a2a"
+              class="sr-only"
+            />
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <i class="bx bx-globe text-lg" :class="agentMode === 'a2a' ? 'text-indigo-500' : 'text-gray-400'"></i>
+                <span class="font-medium text-sm" :class="agentMode === 'a2a' ? 'text-indigo-700 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300'">
+                  A2A Agent
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {{ t('settings.ai.a2a_desc', 'Connect to remote A2A agent') }}
+              </p>
+            </div>
+            <div v-if="agentMode === 'a2a'" class="absolute top-2 right-2">
+              <i class="bx bx-check-circle text-indigo-500"></i>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- A2A Agent 配置 (仅在 A2A 模式下显示) -->
+      <template v-if="agentMode === 'a2a'">
+        <div class="bg-white dark:bg-[#282838] rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 class="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300 flex items-center">
+            <i class="bx bx-globe mr-2 text-gray-400"></i>
+            {{ t('settings.ai.a2a_config', 'A2A Agent Configuration') }}
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Agent URL -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {{ t('settings.ai.a2a_url', 'Agent URL') }}
+                <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                v-model="a2aAgentURL"
+                :placeholder="t('settings.ai.a2a_url_placeholder', 'https://my-agent.example.com')"
+                class="w-full px-3 py-2 bg-white dark:bg-[#323248] border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
+                spellcheck="false"
+              />
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {{ t('settings.ai.a2a_url_hint', 'The base URL of the A2A agent (Agent Card will be fetched from /.well-known/agent.json)') }}
+              </p>
+            </div>
+
+            <!-- Custom Headers -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {{ t('settings.ai.a2a_headers', 'Custom Headers (JSON)') }}
+              </label>
+              <textarea
+                v-model="a2aHeadersJson"
+                @blur="validateAndUpdateA2AHeaders"
+                :placeholder='`{\n  "Authorization": "Bearer YOUR_TOKEN"\n}`'
+                rows="3"
+                class="w-full px-3 py-2 bg-white dark:bg-[#323248] border rounded-md shadow-sm text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f46e5] resize-y"
+                :class="a2aHeadersJsonError
+                  ? 'border-red-300 dark:border-red-600'
+                  : 'border-gray-300 dark:border-gray-600'"
+                spellcheck="false"
+              ></textarea>
+              <div v-if="a2aHeadersJsonError" class="mt-1 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                <i class="bx bx-error-circle"></i>
+                {{ a2aHeadersJsonError }}
+              </div>
+            </div>
+
+            <!-- Timeout -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {{ t('settings.ai.a2a_timeout', 'Timeout (seconds)') }}
+              </label>
+              <input
+                type="number"
+                v-model.number="a2aTimeout"
+                min="30"
+                max="600"
+                class="w-32 px-3 py-2 bg-white dark:bg-[#323248] border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#4f46e5]"
+              />
+            </div>
+
+            <!-- Enable SSE -->
+            <div class="flex items-center">
+              <input
+                id="a2aEnableSSE"
+                v-model="a2aEnableSSE"
+                type="checkbox"
+                class="w-4 h-4 text-[#4f46e5] border-gray-300 rounded focus:ring-[#4f46e5] dark:focus:ring-[#4f46e5] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              >
+              <label for="a2aEnableSSE" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                {{ t('settings.ai.a2a_enable_sse', 'Enable streaming (SSE)') }}
+              </label>
+            </div>
+
+            <!-- Test Connection Button -->
+            <div class="pt-2">
+              <button
+                type="button"
+                @click="testA2AConnection"
+                :disabled="isTestingA2A || !a2aAgentURL"
+                class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-sm transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i :class="['bx', isTestingA2A ? 'bx-loader-alt bx-spin' : 'bx-plug']"></i>
+                {{ isTestingA2A ? t('common.testing', 'Testing...') : t('settings.ai.a2a_test', 'Test Connection') }}
+              </button>
+            </div>
+
+            <!-- Agent Info (显示连接成功后的信息) -->
+            <div v-if="a2aAgentInfo" class="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div class="text-sm font-medium text-green-700 dark:text-green-400 mb-2">
+                <i class="bx bx-check-circle mr-1"></i>
+                {{ t('settings.ai.a2a_connected', 'Connected to Agent') }}
+              </div>
+              <div class="text-xs text-green-600 dark:text-green-500 space-y-1">
+                <div><strong>Name:</strong> {{ a2aAgentInfo.name }}</div>
+                <div v-if="a2aAgentInfo.description"><strong>Description:</strong> {{ a2aAgentInfo.description }}</div>
+                <div v-if="a2aAgentInfo.version"><strong>Version:</strong> {{ a2aAgentInfo.version }}</div>
+                <div v-if="a2aAgentInfo.capabilities?.length">
+                  <strong>Capabilities:</strong> {{ a2aAgentInfo.capabilities.join(', ') }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Claude Code CLI 配置 (仅在 Claude Code 模式下显示) -->
+      <template v-if="agentMode === 'claude-code'">
 
       <!-- CLI Path -->
       <div class="bg-white dark:bg-[#282838] rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700">
@@ -1154,6 +1428,9 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      </template>
+      <!-- End of Claude Code CLI 配置 -->
 
       <!-- 保存消息 -->
       <div

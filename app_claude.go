@@ -23,12 +23,39 @@ import (
 // claudeClient Claude Code 客户端（全局单例）
 var claudeClient *claudecode.Client
 
+// a2aClient A2A 客户端（全局单例）
+var a2aClient *claudecode.A2AClient
+
 // getClaudeClient 获取或创建 Claude Code 客户端
 func getClaudeClient() *claudecode.Client {
 	if claudeClient == nil {
 		claudeClient = claudecode.NewClient(nil)
 	}
 	return claudeClient
+}
+
+// getA2AClient 获取或创建 A2A 客户端
+func getA2AClient() *claudecode.A2AClient {
+	if a2aClient == nil {
+		appConfig := conf.GetAppConfig()
+		a2aClient = claudecode.NewA2AClient(&claudecode.A2AClientConfig{
+			AgentURL:  appConfig.AI.A2A.AgentURL,
+			Headers:   appConfig.AI.A2A.Headers,
+			Timeout:   appConfig.AI.A2A.Timeout,
+			EnableSSE: appConfig.AI.A2A.EnableSSE,
+		})
+	}
+	return a2aClient
+}
+
+// getAgentMode 获取当前 Agent 模式
+func getAgentMode() string {
+	appConfig := conf.GetAppConfig()
+	mode := appConfig.AI.AgentMode
+	if mode == "" {
+		mode = "claude-code" // 默认使用 Claude Code CLI
+	}
+	return mode
 }
 
 // ClaudeInitialize 初始化 Claude Code 服务
@@ -189,10 +216,24 @@ func (a *App) ClaudeListProjects() Result {
 
 // ClaudeSendMessage 发送消息（流式）- 通过 Wails 事件推送
 func (a *App) ClaudeSendMessage(sessionID, message string) Result {
-	client := getClaudeClient()
 	if wailsApp == nil {
 		return Result{Error: "Wails app not set"}
 	}
+
+	// 根据 Agent 模式选择客户端
+	agentMode := getAgentMode()
+
+	if agentMode == "a2a" {
+		return a.sendMessageViaA2A(sessionID, message)
+	}
+
+	// 默认使用 Claude Code CLI
+	return a.sendMessageViaClaude(sessionID, message)
+}
+
+// sendMessageViaClaude 通过 Claude Code CLI 发送消息
+func (a *App) sendMessageViaClaude(sessionID, message string) Result {
+	client := getClaudeClient()
 
 	// 创建事件通道
 	eventChan := make(chan claudecode.StreamEvent, 100)
@@ -238,6 +279,65 @@ func (a *App) ClaudeSendMessage(sessionID, message string) Result {
 	return Result{Data: "Streaming started"}
 }
 
+// sendMessageViaA2A 通过 A2A 协议发送消息
+func (a *App) sendMessageViaA2A(sessionID, message string) Result {
+	client := getA2AClient()
+
+	// 检查是否已连接
+	if !client.IsConnected() {
+		// 尝试连接
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		if err := client.Connect(ctx); err != nil {
+			return Result{Error: fmt.Sprintf("Failed to connect to A2A agent: %v", err)}
+		}
+	}
+
+	// 创建事件通道
+	eventChan := make(chan claudecode.StreamEvent, 100)
+
+	// 启动 goroutine 处理流式响应
+	go func() {
+		ctx := context.Background()
+		err := client.SendMessage(ctx, sessionID, message, eventChan)
+		if err != nil {
+			logging.Logger.Errorf("A2A streaming error: %v", err)
+			// 发送错误事件
+			wailsApp.Event.Emit(claudecode.EventClaudeError, claudecode.StreamEvent{
+				Type:      "error",
+				Error:     err.Error(),
+				SessionID: sessionID,
+			})
+		}
+	}()
+
+	// 启动 goroutine 转发事件到前端
+	go func() {
+		for event := range eventChan {
+			event.SessionID = sessionID
+			switch event.Type {
+			case "text":
+				wailsApp.Event.Emit(claudecode.EventClaudeText, event)
+			case "tool_use":
+				wailsApp.Event.Emit(claudecode.EventClaudeToolUse, event)
+			case "tool_result":
+				wailsApp.Event.Emit(claudecode.EventClaudeToolResult, event)
+			case "error":
+				wailsApp.Event.Emit(claudecode.EventClaudeError, event)
+			case "done":
+				wailsApp.Event.Emit(claudecode.EventClaudeDone, event)
+			case "cost":
+				wailsApp.Event.Emit(claudecode.EventClaudeCost, event)
+			default:
+				wailsApp.Event.Emit("claude:stream", event)
+			}
+		}
+	}()
+
+	return Result{Data: "Streaming started via A2A"}
+}
+
 // ClaudeConfirmToolExecution 确认工具执行（Claude Code CLI 自动处理工具，此方法保留兼容性）
 func (a *App) ClaudeConfirmToolExecution(sessionID, toolUseID string, confirmed bool) Result {
 	if !confirmed {
@@ -278,6 +378,7 @@ func (a *App) ClaudeGetConfig() Result {
 	}
 
 	return Result{Data: map[string]interface{}{
+		"agent_mode":           appConfig.AI.AgentMode,
 		"cli_path":             appConfig.AI.Claude.CLIPath,
 		"work_dir":             appConfig.AI.Claude.WorkDir,
 		"model":                appConfig.AI.Claude.Model,
@@ -297,6 +398,13 @@ func (a *App) ClaudeGetConfig() Result {
 			"enabled_tools":    appConfig.AI.Claude.MCP.EnabledTools,
 			"disabled_tools":   appConfig.AI.Claude.MCP.DisabledTools,
 			"external_servers": externalServers,
+		},
+		"a2a": map[string]interface{}{
+			"enabled":    appConfig.AI.A2A.Enabled,
+			"agent_url":  appConfig.AI.A2A.AgentURL,
+			"headers":    appConfig.AI.A2A.Headers,
+			"timeout":    appConfig.AI.A2A.Timeout,
+			"enable_sse": appConfig.AI.A2A.EnableSSE,
 		},
 	}}
 }
@@ -323,6 +431,15 @@ type ExternalMCPServerInput struct {
 	Command     string            `json:"command"`
 	Args        []string          `json:"args"`
 	Env         []string          `json:"env"`
+}
+
+// A2AConfigInput A2A 配置输入结构
+type A2AConfigInput struct {
+	Enabled   bool              `json:"enabled"`
+	AgentURL  string            `json:"agent_url"`
+	Headers   map[string]string `json:"headers"`
+	Timeout   int               `json:"timeout"`
+	EnableSSE bool              `json:"enable_sse"`
 }
 
 // ClaudeUpdateConfig 更新 Claude Code 配置
@@ -572,4 +689,101 @@ func (a *App) ClaudeTestExternalMCPServer(serverType string, url string, headers
 	} else {
 		return Result{Error: fmt.Sprintf("Unknown server type: %s", serverType)}
 	}
+}
+
+// ==================== A2A Agent API ====================
+
+// A2AUpdateConfig 更新 A2A 配置
+func (a *App) A2AUpdateConfig(agentMode string, a2aConfig *A2AConfigInput) Result {
+	appConfig := conf.GetAppConfig()
+
+	// 更新 Agent 模式
+	appConfig.AI.AgentMode = agentMode
+
+	// 更新 A2A 配置
+	if a2aConfig != nil {
+		appConfig.AI.A2A.Enabled = a2aConfig.Enabled
+		appConfig.AI.A2A.AgentURL = a2aConfig.AgentURL
+		appConfig.AI.A2A.Headers = a2aConfig.Headers
+		appConfig.AI.A2A.Timeout = a2aConfig.Timeout
+		appConfig.AI.A2A.EnableSSE = a2aConfig.EnableSSE
+
+		// 更新全局 A2A 客户端配置
+		if a2aClient != nil {
+			a2aClient.Disconnect()
+			a2aClient = nil
+		}
+	}
+
+	// 保存配置到文件
+	if err := conf.SaveConfig(); err != nil {
+		logging.Logger.Warnf("保存配置文件失败: %v", err)
+		return Result{Error: fmt.Sprintf("Failed to save config: %v", err)}
+	}
+
+	return Result{Data: "A2A config updated"}
+}
+
+// A2ATestConnection 测试 A2A Agent 连接
+func (a *App) A2ATestConnection(agentURL string, headers map[string]string) Result {
+	if agentURL == "" {
+		return Result{Error: "Agent URL is required"}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	// 创建临时客户端测试连接
+	client := claudecode.NewA2AClient(&claudecode.A2AClientConfig{
+		AgentURL: agentURL,
+		Headers:  headers,
+	})
+
+	if err := client.TestConnection(ctx); err != nil {
+		return Result{Error: fmt.Sprintf("Connection failed: %v", err)}
+	}
+
+	// 获取 Agent 信息
+	if err := client.Connect(ctx); err != nil {
+		return Result{Error: fmt.Sprintf("Failed to connect: %v", err)}
+	}
+	defer client.Disconnect()
+
+	info := client.GetAgentInfo()
+
+	return Result{Data: map[string]interface{}{
+		"success": true,
+		"message": "A2A Agent connection successful",
+		"agent":   info,
+	}}
+}
+
+// A2AGetAgentInfo 获取 A2A Agent 信息
+func (a *App) A2AGetAgentInfo() Result {
+	client := getA2AClient()
+
+	if !client.IsConnected() {
+		// 尝试连接
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		if err := client.Connect(ctx); err != nil {
+			return Result{Error: fmt.Sprintf("Failed to connect to A2A agent: %v", err)}
+		}
+	}
+
+	info := client.GetAgentInfo()
+	if info == nil {
+		return Result{Error: "No agent info available"}
+	}
+
+	return Result{Data: info}
+}
+
+// A2ADisconnect 断开 A2A 连接
+func (a *App) A2ADisconnect() Result {
+	if a2aClient != nil {
+		a2aClient.Disconnect()
+	}
+	return Result{Data: "A2A disconnected"}
 }

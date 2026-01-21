@@ -72,6 +72,18 @@ func (a *App) TwjStop() {
 	twj.Stop = false
 }
 
+// Sign 使用指定算法和密钥签名 JWT
+func (a *App) Sign(headerJson string, payloadJson string, secret string, algorithm string) (res Result) {
+	jwtToken, err := twj.Sign(headerJson, payloadJson, secret, algorithm)
+	if err != nil {
+		logging.Logger.Errorln(err)
+		res.Error = err.Error()
+		return
+	}
+	res.Data = jwtToken
+	return
+}
+
 func (a *App) PredictionApi(api string) []string {
 	logging.Logger.Debug(strings.Split(api, "\n"))
 	return utils.PredictionApi(strings.Split(api, "\n"), 1)

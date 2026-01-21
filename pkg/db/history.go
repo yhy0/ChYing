@@ -213,6 +213,25 @@ func GetHistoryByHid(hid int64) (*HTTPHistory, error) {
 	return &history, nil
 }
 
+// GetHistoriesByHids 根据 Hid 列表批量获取历史记录
+func GetHistoriesByHids(hids []int64) ([]*HTTPHistory, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+
+	if len(hids) == 0 {
+		return []*HTTPHistory{}, nil
+	}
+
+	var histories []*HTTPHistory
+	err := GlobalDB.Where("hid IN ?", hids).Find(&histories).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return histories, nil
+}
+
 func UpdateMarker(hid int64, color string, note string) {
 	if GlobalDB == nil {
 		logging.Logger.Warnln("数据库未初始化，无法更新标记")

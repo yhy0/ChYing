@@ -39,24 +39,39 @@ type ProxyListener struct {
 
 // AIConfig AI 配置结构体
 type AIConfig struct {
+	// Agent 模式: "claude-code" 或 "a2a"
+	AgentMode string `json:"agent_mode" yaml:"agent_mode" mapstructure:"agent_mode"`
+
 	Claude struct {
 		// Claude Code CLI 配置
-		CLIPath         string   `json:"cli_path" yaml:"cli_path" mapstructure:"cli_path"`                            // CLI 路径，默认使用 PATH 中的 claude
-		WorkDir         string   `json:"work_dir" yaml:"work_dir" mapstructure:"work_dir"`                            // 工作目录
-		Model           string   `json:"model" yaml:"model" mapstructure:"model"`                                     // 模型
-		MaxTurns        int      `json:"max_turns" yaml:"max_turns" mapstructure:"max_turns"`                         // 最大回合数
-		SystemPrompt    string   `json:"system_prompt" yaml:"system_prompt" mapstructure:"system_prompt"`             // 系统提示词
-		AllowedTools    []string `json:"allowed_tools" yaml:"allowed_tools" mapstructure:"allowed_tools"`             // 允许的工具列表
-		DisallowedTools []string `json:"disallowed_tools" yaml:"disallowed_tools" mapstructure:"disallowed_tools"`    // 禁用的工具列表
-		PermissionMode  string   `json:"permission_mode" yaml:"permission_mode" mapstructure:"permission_mode"`       // 权限模式
-		RequireToolConfirm bool  `json:"require_tool_confirm" yaml:"require_tool_confirm" mapstructure:"require_tool_confirm"` // 是否需要工具确认
+		CLIPath            string   `json:"cli_path" yaml:"cli_path" mapstructure:"cli_path"`                                        // CLI 路径，默认使用 PATH 中的 claude
+		WorkDir            string   `json:"work_dir" yaml:"work_dir" mapstructure:"work_dir"`                                        // 工作目录
+		Model              string   `json:"model" yaml:"model" mapstructure:"model"`                                                 // 模型
+		MaxTurns           int      `json:"max_turns" yaml:"max_turns" mapstructure:"max_turns"`                                     // 最大回合数
+		SystemPrompt       string   `json:"system_prompt" yaml:"system_prompt" mapstructure:"system_prompt"`                         // 系统提示词
+		AllowedTools       []string `json:"allowed_tools" yaml:"allowed_tools" mapstructure:"allowed_tools"`                         // 允许的工具列表
+		DisallowedTools    []string `json:"disallowed_tools" yaml:"disallowed_tools" mapstructure:"disallowed_tools"`                // 禁用的工具列表
+		PermissionMode     string   `json:"permission_mode" yaml:"permission_mode" mapstructure:"permission_mode"`                   // 权限模式
+		RequireToolConfirm bool     `json:"require_tool_confirm" yaml:"require_tool_confirm" mapstructure:"require_tool_confirm"`    // 是否需要工具确认
 		// 环境变量配置
-		APIKey      string  `json:"api_key" yaml:"api_key" mapstructure:"api_key"`              // ANTHROPIC_API_KEY
-		BaseURL     string  `json:"base_url" yaml:"base_url" mapstructure:"base_url"`           // ANTHROPIC_BASE_URL
+		APIKey      string  `json:"api_key" yaml:"api_key" mapstructure:"api_key"`           // ANTHROPIC_API_KEY
+		BaseURL     string  `json:"base_url" yaml:"base_url" mapstructure:"base_url"`        // ANTHROPIC_BASE_URL
 		Temperature float64 `json:"temperature" yaml:"temperature" mapstructure:"temperature"` // AI_TEMPERATURE
 		// MCP 服务器配置
 		MCP MCPConfig `json:"mcp" yaml:"mcp" mapstructure:"mcp"`
 	} `json:"claude" yaml:"claude" mapstructure:"claude"`
+
+	// A2A Agent 配置
+	A2A A2AConfig `json:"a2a" yaml:"a2a" mapstructure:"a2a"`
+}
+
+// A2AConfig A2A Agent 配置
+type A2AConfig struct {
+	Enabled   bool              `json:"enabled" yaml:"enabled" mapstructure:"enabled"`       // 是否启用
+	AgentURL  string            `json:"agent_url" yaml:"agent_url" mapstructure:"agent_url"` // Agent URL
+	Headers   map[string]string `json:"headers" yaml:"headers" mapstructure:"headers"`       // 自定义请求头
+	Timeout   int               `json:"timeout" yaml:"timeout" mapstructure:"timeout"`       // 超时时间（秒）
+	EnableSSE bool              `json:"enable_sse" yaml:"enable_sse" mapstructure:"enable_sse"` // 是否启用 SSE 流式响应
 }
 
 // MCPConfig MCP 服务器配置

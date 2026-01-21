@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useDebounceFn } from '@vueuse/core';
 // @ts-ignore
-import { GetConfig, Verify, Brute, FileSelection } from "../../../../bindings/github.com/yhy0/ChYing/app.js";
+import { GetConfig, Verify, Brute, FileSelection, Sign } from "../../../../bindings/github.com/yhy0/ChYing/app.js";
 // @ts-ignore
 import { Events } from "@wailsio/runtime";
 
@@ -28,6 +29,10 @@ const jsonError = {
   header: ref<string | undefined>(undefined),
   payload: ref<string | undefined>(undefined)
 };
+
+// 防止循环更新的标志
+const isUpdatingFromJwt = ref(false);
+const isUpdatingFromEditor = ref(false);
 
 // 算法选项
 const algorithms = [
@@ -97,14 +102,18 @@ const jwtParts = computed(() => {
 
 // 监听JWT解析结果变化，更新JSON编辑区域
 watch(() => jwtParts.value.header, (newHeader) => {
-  if (newHeader) {
+  if (newHeader && !isUpdatingFromEditor.value) {
+    isUpdatingFromJwt.value = true;
     headerJson.value = JSON.stringify(newHeader, null, 2);
+    isUpdatingFromJwt.value = false;
   }
 }, { immediate: true });
 
 watch(() => jwtParts.value.payload, (newPayload) => {
-  if (newPayload) {
+  if (newPayload && !isUpdatingFromEditor.value) {
+    isUpdatingFromJwt.value = true;
     payloadJson.value = JSON.stringify(newPayload, null, 2);
+    isUpdatingFromJwt.value = false;
   }
 }, { immediate: true });
 
@@ -115,73 +124,110 @@ const decodeJwt = () => {
   console.log('JWT解码完成');
 };
 
-// 监听编辑区域变化，尝试更新JWT
-watch(headerJson, (newValue) => {
-  try {
-    if (!newValue) return;
-    const newHeader = JSON.parse(newValue);
-    jsonError.header.value = undefined;
+// 重新签名 JWT（当 header、payload 或 secret 变化时调用）
+const resignJwtImpl = async () => {
+  if (!headerJson.value || !payloadJson.value) return;
 
-    // 重新生成JWT
-    regenerateJwt('header', newHeader);
+  // 验证 JSON 格式
+  try {
+    JSON.parse(headerJson.value);
+    JSON.parse(payloadJson.value);
   } catch (e) {
-    jsonError.header.value = t('modules.plugins.jwt_analyzer.invalid_json', '无效的JSON格式');
+    return; // JSON 格式错误，不进行签名
   }
-}, { deep: true });
 
-watch(payloadJson, (newValue) => {
-  try {
-    if (!newValue) return;
-    const newPayload = JSON.parse(newValue);
-    jsonError.payload.value = undefined;
-
-    // 重新生成JWT
-    regenerateJwt('payload', newPayload);
-  } catch (e) {
-    jsonError.payload.value = t('modules.plugins.jwt_analyzer.invalid_json', '无效的JSON格式');
+  // 如果没有 secret，只更新 header 和 payload 部分（不重新计算签名）
+  if (!secretKey.value) {
+    regenerateJwtWithoutSign();
+    return;
   }
-}, { deep: true });
 
-// 从编辑区域生成JWT
-const encodeJwt = () => {
+  // 只支持 HS 系列算法的签名
+  if (!selectedAlgorithm.value.startsWith('HS')) {
+    regenerateJwtWithoutSign();
+    return;
+  }
+
   try {
-    if (!headerJson.value || !payloadJson.value) return;
+    isUpdatingFromEditor.value = true;
+    const result = await Sign(headerJson.value, payloadJson.value, secretKey.value, selectedAlgorithm.value);
+    if (result.error === "") {
+      jwtInput.value = result.data;
+    }
+    isUpdatingFromEditor.value = false;
+  } catch (error) {
+    console.error('签名失败:', error);
+    isUpdatingFromEditor.value = false;
+  }
+};
 
+// 使用防抖包装，避免频繁调用后端
+const resignJwt = useDebounceFn(resignJwtImpl, 300);
+
+// 不重新计算签名，只更新 header 和 payload
+const regenerateJwtWithoutSign = () => {
+  try {
     const header = JSON.parse(headerJson.value);
     const payload = JSON.parse(payloadJson.value);
 
     const headerBase64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const payloadBase64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 
-    // 这里应该实际计算签名，但为了简化，我们保留原有的签名
-    const signature = jwtParts.value.signature || '';
+    const parts = jwtInput.value.split('.');
+    const signature = parts.length === 3 ? parts[2] : '';
 
+    isUpdatingFromEditor.value = true;
     jwtInput.value = `${headerBase64}.${payloadBase64}.${signature}`;
+    isUpdatingFromEditor.value = false;
   } catch (e) {
-    console.error('编码JWT时出错:', e);
+    console.error('更新JWT失败:', e);
   }
 };
 
-// 重新生成JWT
-const regenerateJwt = (part: 'header' | 'payload', newData: any) => {
-  if (!jwtInput.value) return;
+// 监听编辑区域变化，尝试更新JWT
+watch(headerJson, (newValue) => {
+  if (isUpdatingFromJwt.value) return;
 
-  const parts = jwtInput.value.split('.');
-  if (parts.length !== 3) return;
-
-  let header, payload, signature;
-
-  if (part === 'header') {
-    header = btoa(JSON.stringify(newData)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-    payload = parts[1];
-    signature = parts[2];
-  } else {
-    header = parts[0];
-    payload = btoa(JSON.stringify(newData)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-    signature = parts[2];
+  try {
+    if (!newValue) return;
+    JSON.parse(newValue);
+    jsonError.header.value = undefined;
+    resignJwt();
+  } catch (e) {
+    jsonError.header.value = t('modules.plugins.jwt_analyzer.invalid_json', '无效的JSON格式');
   }
+}, { deep: true });
 
-  jwtInput.value = `${header}.${payload}.${signature}`;
+watch(payloadJson, (newValue) => {
+  if (isUpdatingFromJwt.value) return;
+
+  try {
+    if (!newValue) return;
+    JSON.parse(newValue);
+    jsonError.payload.value = undefined;
+    resignJwt();
+  } catch (e) {
+    jsonError.payload.value = t('modules.plugins.jwt_analyzer.invalid_json', '无效的JSON格式');
+  }
+}, { deep: true });
+
+// 监听 secret 变化，重新签名
+watch(secretKey, () => {
+  if (headerJson.value && payloadJson.value) {
+    resignJwt();
+  }
+});
+
+// 监听算法变化，重新签名
+watch(selectedAlgorithm, () => {
+  if (headerJson.value && payloadJson.value) {
+    resignJwt();
+  }
+});
+
+// 从编辑区域生成JWT（手动触发签名）
+const encodeJwt = () => {
+  resignJwtImpl();
 };
 
 // 验证结果类型
@@ -209,7 +255,6 @@ const verifyJwt = () => {
       isVerifying.value = false;
       verificationStatus.value = 'success';
       verificationResult.value = t('modules.plugins.jwt_analyzer.verify_success');
-      jwtParts.value.signature = result.data;
     })
   } catch (error) {
     verificationStatus.value = 'error';
@@ -241,7 +286,6 @@ const bruteJwt = () => {
         isVerifying.value = false;
         verificationStatus.value = 'success';
         verificationResult.value = t('modules.plugins.jwt_analyzer.verify_success');
-        jwtParts.value.signature = result.data;
       })
     } else {
       verificationStatus.value = 'error';

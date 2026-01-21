@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/yhy0/ChYing/pkg/db"
 	"github.com/yhy0/logging"
 )
 
@@ -471,18 +472,80 @@ Selected Vulnerabilities: %d items`, len(ctx.SelectedVulnIDs))
 
 // buildPromptWithContext 构建带上下文的提示词
 func (c *Client) buildPromptWithContext(message string, ctx *AgentContext) string {
-	// 如果有选中的流量或漏洞，添加到消息中
-	if ctx != nil && (len(ctx.SelectedTrafficIDs) > 0 || len(ctx.SelectedVulnIDs) > 0) {
-		prefix := ""
-		if len(ctx.SelectedTrafficIDs) > 0 {
-			prefix += fmt.Sprintf("[Selected %d traffic records] ", len(ctx.SelectedTrafficIDs))
-		}
-		if len(ctx.SelectedVulnIDs) > 0 {
-			prefix += fmt.Sprintf("[Selected %d vulnerabilities] ", len(ctx.SelectedVulnIDs))
-		}
-		return prefix + message
+	// 如果没有选中的流量或漏洞，直接返回原消息
+	if ctx == nil || (len(ctx.SelectedTrafficIDs) == 0 && len(ctx.SelectedVulnIDs) == 0) {
+		return message
 	}
-	return message
+
+	var contextParts []string
+
+	// 处理选中的流量
+	if len(ctx.SelectedTrafficIDs) > 0 {
+		trafficContext := c.buildTrafficContext(ctx.SelectedTrafficIDs)
+		if trafficContext != "" {
+			contextParts = append(contextParts, trafficContext)
+		}
+	}
+
+	// 处理选中的漏洞
+	if len(ctx.SelectedVulnIDs) > 0 {
+		contextParts = append(contextParts, fmt.Sprintf("[Selected %d vulnerabilities: %s]",
+			len(ctx.SelectedVulnIDs), strings.Join(ctx.SelectedVulnIDs, ", ")))
+	}
+
+	if len(contextParts) == 0 {
+		return message
+	}
+
+	return strings.Join(contextParts, "\n") + "\n\n" + message
+}
+
+// buildTrafficContext 构建流量上下文信息
+func (c *Client) buildTrafficContext(trafficIDs []string) string {
+	if len(trafficIDs) == 0 {
+		return ""
+	}
+
+	// 转换 ID 为 int64
+	var hids []int64
+	for _, idStr := range trafficIDs {
+		var id int64
+		if _, err := fmt.Sscanf(idStr, "%d", &id); err == nil {
+			hids = append(hids, id)
+		}
+	}
+
+	if len(hids) == 0 {
+		return fmt.Sprintf("[Selected %d traffic records (IDs: %s)]",
+			len(trafficIDs), strings.Join(trafficIDs, ", "))
+	}
+
+	// 从数据库获取流量摘要
+	histories, err := db.GetHistoriesByHids(hids)
+	if err != nil {
+		logging.Logger.Warnf("Failed to get traffic histories: %v", err)
+		return fmt.Sprintf("[Selected %d traffic records (IDs: %s)]",
+			len(trafficIDs), strings.Join(trafficIDs, ", "))
+	}
+
+	if len(histories) == 0 {
+		return fmt.Sprintf("[Selected %d traffic records (IDs: %s)]",
+			len(trafficIDs), strings.Join(trafficIDs, ", "))
+	}
+
+	// 构建摘要信息
+	var summaries []string
+	for _, h := range histories {
+		// 格式: ID | Method | Host | Path | Status
+		summary := fmt.Sprintf("  - ID:%d | %s %s%s | Status:%s",
+			h.Hid, h.Method, h.Host, h.Path, h.Status)
+		summaries = append(summaries, summary)
+	}
+
+	return fmt.Sprintf(`[Selected %d HTTP traffic records]
+Traffic Summary (use get_traffic_detail tool with traffic_id to get full request/response):
+%s`,
+		len(histories), strings.Join(summaries, "\n"))
 }
 
 // handleOutput 处理 CLI 输出

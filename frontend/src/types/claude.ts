@@ -82,20 +82,14 @@ export interface MCPConfig {
 }
 
 // Claude Code CLI 配置
+// 简化版：只包含 ChYing 管理的配置项
+// API Key、代理、MCP 服务器等配置请在 ~/.claude/settings.json 中设置
 export interface ClaudeConfig {
   cliPath?: string;           // Claude Code CLI 路径
-  workDir?: string;           // 工作目录
   model: string;              // 模型名称
   maxTurns?: number;          // 最大对话轮数
   systemPrompt?: string;      // 系统提示词
-  allowedTools?: string[];    // 允许的工具列表
-  disallowedTools?: string[]; // 禁止的工具列表
-  permissionMode?: string;    // 权限模式
-  requireToolConfirm: boolean; // 是否需要工具确认
-  apiKey?: string;            // API Key
-  baseURL?: string;           // Base URL
-  temperature?: number;       // Temperature
-  mcp?: MCPConfig;            // MCP 配置
+  permissionMode?: string;    // 权限模式: default, acceptEdits, plan, bypassPermissions
 }
 
 // 发送消息请求
@@ -147,7 +141,6 @@ export interface ClaudeState {
   config: ClaudeConfig | null;
   error: string | null;
   streamingContent: string;
-  mcpServerUrl: string;
   costInfo: CostInfo | null;
 }
 

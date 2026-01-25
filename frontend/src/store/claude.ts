@@ -30,11 +30,8 @@ import {
   ClaudeSendMessage,
   ClaudeConfirmToolExecution,
   ClaudeUpdateContext,
-  ClaudeStopSession,
-  ClaudeGetMCPServerURL
+  ClaudeStopSession
 } from "../../bindings/github.com/yhy0/ChYing/app.js";
-// @ts-ignore
-import { MCPConfigInput, ExternalMCPServerInput } from "../../bindings/github.com/yhy0/ChYing/models.js";
 import { Events } from "@wailsio/runtime";
 
 /**
@@ -68,9 +65,6 @@ export const useClaudeStore = defineStore('claude', () => {
 
   // 流式内容缓冲
   const streamingContent = ref('');
-
-  // MCP Server URL
-  const mcpServerUrl = ref<string>('');
 
   // 费用统计
   const costInfo = ref<{
@@ -122,9 +116,6 @@ export const useClaudeStore = defineStore('claude', () => {
       // 获取配置
       await fetchConfig();
 
-      // 获取 MCP Server URL
-      await fetchMCPServerUrl();
-
       // 设置事件监听
       setupEventListeners();
 
@@ -162,14 +153,10 @@ export const useClaudeStore = defineStore('claude', () => {
         const data = result.data;
         config.value = {
           cliPath: data.cli_path,
-          workDir: data.work_dir,
           model: data.model,
           maxTurns: data.max_turns,
           systemPrompt: data.system_prompt,
-          allowedTools: data.allowed_tools,
-          disallowedTools: data.disallowed_tools,
-          permissionMode: data.permission_mode,
-          requireToolConfirm: data.require_tool_confirm
+          permissionMode: data.permission_mode
         } as ClaudeConfig;
       }
     } catch (e) {
@@ -179,53 +166,20 @@ export const useClaudeStore = defineStore('claude', () => {
 
   /**
    * 更新配置
+   * 简化版：只更新 ChYing 管理的配置项
+   * API Key、代理、MCP 服务器等配置请在 ~/.claude/settings.json 中设置
    */
   const updateConfig = async (newConfig: Partial<ClaudeConfig>): Promise<boolean> => {
     try {
       const currentConfig = config.value || {};
       const mergedConfig = { ...currentConfig, ...newConfig };
 
-      // 构建 MCP 配置对象，使用 Wails 生成的类型
-      let mcpConfig: MCPConfigInput | null = null;
-      if (mergedConfig.mcp) {
-        // 转换外部服务器配置
-        const externalServers = (mergedConfig.mcp.external_servers || []).map((s: any) => 
-          new ExternalMCPServerInput({
-            id: s.id || '',
-            name: s.name || '',
-            type: s.type || 'sse',
-            enabled: s.enabled ?? true,
-            description: s.description || '',
-            url: s.url || '',
-            headers: s.headers || {},
-            command: s.command || '',
-            args: s.args || [],
-            env: s.env || []
-          })
-        );
-
-        mcpConfig = new MCPConfigInput({
-          enabled: mergedConfig.mcp.enabled ?? true,
-          mode: mergedConfig.mcp.mode || 'sse',
-          port: mergedConfig.mcp.port || 0,
-          enabled_tools: mergedConfig.mcp.enabled_tools || [],
-          disabled_tools: mergedConfig.mcp.disabled_tools || [],
-          external_servers: externalServers
-        });
-      }
-
       const result = await ClaudeUpdateConfig(
         mergedConfig.cliPath || '',
-        mergedConfig.workDir || '',
         mergedConfig.model || '',
         mergedConfig.maxTurns || 50,
         mergedConfig.systemPrompt || '',
-        mergedConfig.permissionMode || 'default',
-        mergedConfig.requireToolConfirm ?? true,
-        mergedConfig.apiKey || '',
-        mergedConfig.baseURL || '',
-        mergedConfig.temperature ?? 0.7,
-        mcpConfig
+        mergedConfig.permissionMode || 'default'
       );
 
       if (result?.error) {
@@ -238,20 +192,6 @@ export const useClaudeStore = defineStore('claude', () => {
     } catch (e) {
       error.value = e instanceof Error ? e.message : String(e);
       return false;
-    }
-  };
-
-  /**
-   * 获取 MCP Server URL
-   */
-  const fetchMCPServerUrl = async () => {
-    try {
-      const result = await ClaudeGetMCPServerURL();
-      if (result?.data) {
-        mcpServerUrl.value = result.data;
-      }
-    } catch (e) {
-      console.error('获取 MCP Server URL 失败:', e);
     }
   };
 
@@ -544,9 +484,9 @@ export const useClaudeStore = defineStore('claude', () => {
             }
           }
 
-          // 检查是否需要确认（Claude Code CLI 通常自动处理工具）
+          // Claude Code CLI 自动处理工具确认，这里只记录危险工具用于 UI 显示
           const toolInfo = getToolInfo(toolUse.name);
-          if (toolInfo.dangerous && config.value?.requireToolConfirm) {
+          if (toolInfo.dangerous) {
             if (!pendingToolUses.value.find(tu => tu.id === toolUse.id)) {
               pendingToolUses.value.push(toolUse);
             }
@@ -758,7 +698,6 @@ export const useClaudeStore = defineStore('claude', () => {
     config.value = null;
     error.value = null;
     streamingContent.value = '';
-    mcpServerUrl.value = '';
     costInfo.value = null;
   };
 
@@ -775,7 +714,6 @@ export const useClaudeStore = defineStore('claude', () => {
     config,
     error,
     streamingContent,
-    mcpServerUrl,
     costInfo,
 
     // 计算属性
@@ -788,7 +726,6 @@ export const useClaudeStore = defineStore('claude', () => {
     checkInitialized,
     fetchConfig,
     updateConfig,
-    fetchMCPServerUrl,
 
     // 会话管理
     createSession,

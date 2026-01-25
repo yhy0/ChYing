@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -29,7 +32,7 @@ var a2aClient *claudecode.A2AClient
 // getClaudeClient 获取或创建 Claude Code 客户端
 func getClaudeClient() *claudecode.Client {
 	if claudeClient == nil {
-		claudeClient = claudecode.NewClient(nil)
+		claudeClient = claudecode.NewClient()
 	}
 	return claudeClient
 }
@@ -65,25 +68,18 @@ func (a *App) ClaudeInitialize() Result {
 	// 从配置获取设置
 	appConfig := conf.GetAppConfig()
 	config := &claudecode.Config{
-		CLIPath:            appConfig.AI.Claude.CLIPath,
-		WorkDir:            appConfig.AI.Claude.WorkDir,
-		Model:              appConfig.AI.Claude.Model,
-		MaxTurns:           appConfig.AI.Claude.MaxTurns,
-		SystemPrompt:       appConfig.AI.Claude.SystemPrompt,
-		AllowedTools:       appConfig.AI.Claude.AllowedTools,
-		DisallowedTools:    appConfig.AI.Claude.DisallowedTools,
-		PermissionMode:     appConfig.AI.Claude.PermissionMode,
-		RequireToolConfirm: appConfig.AI.Claude.RequireToolConfirm,
-		APIKey:             appConfig.AI.Claude.APIKey,
-		BaseURL:            appConfig.AI.Claude.BaseURL,
-		Temperature:        appConfig.AI.Claude.Temperature,
+		CLIPath:        appConfig.AI.Claude.CLIPath,
+		Model:          appConfig.AI.Claude.Model,
+		MaxTurns:       appConfig.AI.Claude.MaxTurns,
+		SystemPrompt:   appConfig.AI.Claude.SystemPrompt,
+		PermissionMode: appConfig.AI.Claude.PermissionMode,
 	}
 
 	// 更新配置
 	client.UpdateConfig(config)
 
 	// 初始化客户端
-	if err := client.Initialize(); err != nil {
+	if err := client.Initialize(config); err != nil {
 		return Result{Error: err.Error()}
 	}
 
@@ -128,13 +124,24 @@ func (a *App) ClaudeGetSession(sessionID string) Result {
 		return Result{Error: "Session not found"}
 	}
 
+	// 尝试从 transcript 文件获取历史
+	history := session.History
+	if session.TranscriptPath != "" {
+		transcriptHistory, err := claudecode.ReadTranscript(session.TranscriptPath)
+		if err == nil && len(transcriptHistory) > 0 {
+			history = transcriptHistory
+		}
+	}
+
 	return Result{Data: map[string]interface{}{
-		"session_id": session.ID,
-		"project_id": session.ProjectID,
-		"created_at": session.CreatedAt,
-		"updated_at": session.UpdatedAt,
-		"context":    session.Context,
-		"history":    session.History,
+		"session_id":      session.ID,
+		"project_id":      session.ProjectID,
+		"created_at":      session.CreatedAt,
+		"updated_at":      session.UpdatedAt,
+		"context":         session.Context,
+		"history":         history,
+		"conversation_id": session.ConversationID,
+		"transcript_path": session.TranscriptPath,
 	}}
 }
 
@@ -144,6 +151,15 @@ func (a *App) ClaudeGetSessionHistory(sessionID string) Result {
 	session := client.GetSession(sessionID)
 	if session == nil {
 		return Result{Error: "Session not found"}
+	}
+
+	// 优先从 transcript 文件获取历史
+	if session.TranscriptPath != "" {
+		transcriptHistory, err := claudecode.ReadTranscript(session.TranscriptPath)
+		if err == nil && len(transcriptHistory) > 0 {
+			return Result{Data: transcriptHistory}
+		}
+		logging.Logger.Warnf("Failed to read transcript for session %s: %v, falling back to session history", sessionID, err)
 	}
 
 	return Result{Data: session.History}
@@ -360,45 +376,15 @@ func (a *App) ClaudeGetConfig() Result {
 	// 始终从应用配置文件读取配置，确保配置界面能正确显示已保存的配置
 	appConfig := conf.GetAppConfig()
 
-	// 转换外部 MCP 服务器配置
-	externalServers := make([]map[string]interface{}, len(appConfig.AI.Claude.MCP.ExternalServers))
-	for i, s := range appConfig.AI.Claude.MCP.ExternalServers {
-		externalServers[i] = map[string]interface{}{
-			"id":          s.ID,
-			"name":        s.Name,
-			"type":        s.Type,
-			"enabled":     s.Enabled,
-			"description": s.Description,
-			"url":         s.URL,
-			"headers":     s.Headers,
-			"command":     s.Command,
-			"args":        s.Args,
-			"env":         s.Env,
-		}
-	}
-
 	return Result{Data: map[string]interface{}{
-		"agent_mode":           appConfig.AI.AgentMode,
-		"cli_path":             appConfig.AI.Claude.CLIPath,
-		"work_dir":             appConfig.AI.Claude.WorkDir,
-		"model":                appConfig.AI.Claude.Model,
-		"max_turns":            appConfig.AI.Claude.MaxTurns,
-		"system_prompt":        appConfig.AI.Claude.SystemPrompt,
-		"allowed_tools":        appConfig.AI.Claude.AllowedTools,
-		"disallowed_tools":     appConfig.AI.Claude.DisallowedTools,
-		"permission_mode":      appConfig.AI.Claude.PermissionMode,
-		"require_tool_confirm": appConfig.AI.Claude.RequireToolConfirm,
-		"api_key":              appConfig.AI.Claude.APIKey,
-		"base_url":             appConfig.AI.Claude.BaseURL,
-		"temperature":          appConfig.AI.Claude.Temperature,
-		"mcp": map[string]interface{}{
-			"enabled":          appConfig.AI.Claude.MCP.Enabled,
-			"mode":             appConfig.AI.Claude.MCP.Mode,
-			"port":             appConfig.AI.Claude.MCP.Port,
-			"enabled_tools":    appConfig.AI.Claude.MCP.EnabledTools,
-			"disabled_tools":   appConfig.AI.Claude.MCP.DisabledTools,
-			"external_servers": externalServers,
-		},
+		"agent_mode":      appConfig.AI.AgentMode,
+		"cli_path":        appConfig.AI.Claude.CLIPath,
+		"model":           appConfig.AI.Claude.Model,
+		"max_turns":       appConfig.AI.Claude.MaxTurns,
+		"system_prompt":   appConfig.AI.Claude.SystemPrompt,
+		"permission_mode": appConfig.AI.Claude.PermissionMode,
+		// 注意: API Key、代理、MCP 服务器等配置请在 ~/.claude/settings.json 中设置
+		// ChYing 会自动复用 Claude CLI 的用户配置
 		"a2a": map[string]interface{}{
 			"enabled":    appConfig.AI.A2A.Enabled,
 			"agent_url":  appConfig.AI.A2A.AgentURL,
@@ -407,30 +393,6 @@ func (a *App) ClaudeGetConfig() Result {
 			"enable_sse": appConfig.AI.A2A.EnableSSE,
 		},
 	}}
-}
-
-// MCPConfigInput MCP 配置输入结构
-type MCPConfigInput struct {
-	Enabled         bool                     `json:"enabled"`
-	Mode            string                   `json:"mode"`
-	Port            int                      `json:"port"`
-	EnabledTools    []string                 `json:"enabled_tools"`
-	DisabledTools   []string                 `json:"disabled_tools"`
-	ExternalServers []ExternalMCPServerInput `json:"external_servers"`
-}
-
-// ExternalMCPServerInput 外部 MCP 服务器输入结构
-type ExternalMCPServerInput struct {
-	ID          string            `json:"id"`
-	Name        string            `json:"name"`
-	Type        string            `json:"type"`
-	Enabled     bool              `json:"enabled"`
-	Description string            `json:"description"`
-	URL         string            `json:"url"`
-	Headers     map[string]string `json:"headers"`
-	Command     string            `json:"command"`
-	Args        []string          `json:"args"`
-	Env         []string          `json:"env"`
 }
 
 // A2AConfigInput A2A 配置输入结构
@@ -443,71 +405,23 @@ type A2AConfigInput struct {
 }
 
 // ClaudeUpdateConfig 更新 Claude Code 配置
-func (a *App) ClaudeUpdateConfig(cliPath string, workDir string, model string, maxTurns int, systemPrompt string, permissionMode string, requireToolConfirm bool, apiKey string, baseURL string, temperature float64, mcpConfig *MCPConfigInput) Result {
+func (a *App) ClaudeUpdateConfig(cliPath string, model string, maxTurns int, systemPrompt string, permissionMode string) Result {
 	client := getClaudeClient()
 	config := &claudecode.Config{
-		CLIPath:            cliPath,
-		WorkDir:            workDir,
-		Model:              model,
-		MaxTurns:           maxTurns,
-		SystemPrompt:       systemPrompt,
-		PermissionMode:     permissionMode,
-		RequireToolConfirm: requireToolConfirm,
-		APIKey:             apiKey,
-		BaseURL:            baseURL,
-		Temperature:        temperature,
+		CLIPath:        cliPath,
+		Model:          model,
+		MaxTurns:       maxTurns,
+		SystemPrompt:   systemPrompt,
+		PermissionMode: permissionMode,
 	}
 
 	// 同时更新应用配置文件
 	appConfig := conf.GetAppConfig()
 	appConfig.AI.Claude.CLIPath = cliPath
-	appConfig.AI.Claude.WorkDir = workDir
 	appConfig.AI.Claude.Model = model
 	appConfig.AI.Claude.MaxTurns = maxTurns
 	appConfig.AI.Claude.SystemPrompt = systemPrompt
 	appConfig.AI.Claude.PermissionMode = permissionMode
-	appConfig.AI.Claude.RequireToolConfirm = requireToolConfirm
-	appConfig.AI.Claude.APIKey = apiKey
-	appConfig.AI.Claude.BaseURL = baseURL
-	appConfig.AI.Claude.Temperature = temperature
-
-	// 更新 MCP 配置
-	if mcpConfig != nil {
-		appConfig.AI.Claude.MCP.Enabled = mcpConfig.Enabled
-		appConfig.AI.Claude.MCP.Mode = mcpConfig.Mode
-		appConfig.AI.Claude.MCP.Port = mcpConfig.Port
-		appConfig.AI.Claude.MCP.EnabledTools = mcpConfig.EnabledTools
-		appConfig.AI.Claude.MCP.DisabledTools = mcpConfig.DisabledTools
-
-		// 更新外部 MCP 服务器配置
-		if mcpConfig.ExternalServers != nil {
-			externalServers := make([]conf.ExternalMCPServer, len(mcpConfig.ExternalServers))
-			for i, s := range mcpConfig.ExternalServers {
-				externalServers[i] = conf.ExternalMCPServer{
-					ID:          s.ID,
-					Name:        s.Name,
-					Type:        s.Type,
-					Enabled:     s.Enabled,
-					Description: s.Description,
-					URL:         s.URL,
-					Headers:     s.Headers,
-					Command:     s.Command,
-					Args:        s.Args,
-					Env:         s.Env,
-				}
-			}
-			appConfig.AI.Claude.MCP.ExternalServers = externalServers
-		}
-
-		// 同步到 claudecode.Config
-		config.BuiltinMCP = claudecode.BuiltinMCPConfig{
-			Enabled:       mcpConfig.Enabled,
-			Mode:          mcpConfig.Mode,
-			Port:          mcpConfig.Port,
-			EnabledTools:  mcpConfig.EnabledTools,
-			DisabledTools: mcpConfig.DisabledTools,
-		}
-	}
 
 	// 保存配置到文件
 	if err := conf.SaveConfig(); err != nil {
@@ -537,19 +451,16 @@ func (a *App) ClaudeGetMCPServerURL() Result {
 }
 
 // ClaudeTestConnection 测试 LLM 连接
-// 发送一个简单的测试消息来验证 API 配置是否正确
+// 发送一个简单的测试消息来验证 Claude CLI 是否可用
 func (a *App) ClaudeTestConnection() Result {
 	client := getClaudeClient()
 
 	// 从配置获取设置
 	appConfig := conf.GetAppConfig()
 	config := &claudecode.Config{
-		CLIPath:     appConfig.AI.Claude.CLIPath,
-		WorkDir:     appConfig.AI.Claude.WorkDir,
-		Model:       appConfig.AI.Claude.Model,
-		APIKey:      appConfig.AI.Claude.APIKey,
-		BaseURL:     appConfig.AI.Claude.BaseURL,
-		Temperature: appConfig.AI.Claude.Temperature,
+		CLIPath:        appConfig.AI.Claude.CLIPath,
+		Model:          appConfig.AI.Claude.Model,
+		PermissionMode: appConfig.AI.Claude.PermissionMode,
 	}
 
 	// 更新配置
@@ -561,7 +472,7 @@ func (a *App) ClaudeTestConnection() Result {
 		return Result{Error: err.Error()}
 	}
 
-	return Result{Data: "LLM connection test successful"}
+	return Result{Data: "Claude CLI connection test successful"}
 }
 
 // ClaudeTestExternalMCPServer 测试外部 MCP 服务器连接
@@ -786,4 +697,108 @@ func (a *App) A2ADisconnect() Result {
 		a2aClient.Disconnect()
 	}
 	return Result{Data: "A2A disconnected"}
+}
+
+// ==================== Claude CLI Settings API ====================
+
+// ClaudeGetCLISettings 获取 Claude CLI 的 settings.json 内容
+// 读取 ~/.claude/settings.json 文件
+func (a *App) ClaudeGetCLISettings() Result {
+	homeDir := os.Getenv("HOME")
+	if homeDir == "" {
+		var err error
+		homeDir, err = os.UserHomeDir()
+		if err != nil {
+			return Result{Error: fmt.Sprintf("Failed to get home directory: %v", err)}
+		}
+	}
+
+	settingsPath := filepath.Join(homeDir, ".claude", "settings.json")
+
+	// 检查文件是否存在
+	if _, err := os.Stat(settingsPath); os.IsNotExist(err) {
+		// 文件不存在，返回空配置
+		return Result{Data: map[string]any{
+			"path":     settingsPath,
+			"exists":   false,
+			"settings": map[string]any{},
+		}}
+	}
+
+	// 读取文件内容
+	data, err := os.ReadFile(settingsPath)
+	if err != nil {
+		return Result{Error: fmt.Sprintf("Failed to read settings file: %v", err)}
+	}
+
+	// 解析 JSON
+	var settings map[string]any
+	if err := json.Unmarshal(data, &settings); err != nil {
+		return Result{Error: fmt.Sprintf("Failed to parse settings JSON: %v", err)}
+	}
+
+	return Result{Data: map[string]any{
+		"path":     settingsPath,
+		"exists":   true,
+		"settings": settings,
+		"raw":      string(data),
+	}}
+}
+
+// ClaudeUpdateCLISettings 更新 Claude CLI 的 settings.json 内容
+// 写入 ~/.claude/settings.json 文件
+func (a *App) ClaudeUpdateCLISettings(settingsJSON string) Result {
+	// 先验证 JSON 格式
+	var settings map[string]any
+	if err := json.Unmarshal([]byte(settingsJSON), &settings); err != nil {
+		return Result{Error: fmt.Sprintf("Invalid JSON format: %v", err)}
+	}
+
+	homeDir := os.Getenv("HOME")
+	if homeDir == "" {
+		var err error
+		homeDir, err = os.UserHomeDir()
+		if err != nil {
+			return Result{Error: fmt.Sprintf("Failed to get home directory: %v", err)}
+		}
+	}
+
+	claudeDir := filepath.Join(homeDir, ".claude")
+	settingsPath := filepath.Join(claudeDir, "settings.json")
+
+	// 确保 .claude 目录存在
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		return Result{Error: fmt.Sprintf("Failed to create .claude directory: %v", err)}
+	}
+
+	// 格式化 JSON（美化输出）
+	formattedJSON, err := json.MarshalIndent(settings, "", "  ")
+	if err != nil {
+		return Result{Error: fmt.Sprintf("Failed to format JSON: %v", err)}
+	}
+
+	// 写入文件
+	if err := os.WriteFile(settingsPath, formattedJSON, 0644); err != nil {
+		return Result{Error: fmt.Sprintf("Failed to write settings file: %v", err)}
+	}
+
+	logging.Logger.Infof("Claude CLI settings updated: %s", settingsPath)
+
+	return Result{Data: map[string]any{
+		"path":    settingsPath,
+		"message": "Settings saved successfully",
+	}}
+}
+
+// ClaudeValidateCLISettings 验证 Claude CLI settings JSON 格式
+func (a *App) ClaudeValidateCLISettings(settingsJSON string) Result {
+	var settings map[string]any
+	if err := json.Unmarshal([]byte(settingsJSON), &settings); err != nil {
+		return Result{Error: fmt.Sprintf("Invalid JSON: %v", err)}
+	}
+
+	return Result{Data: map[string]any{
+		"valid":   true,
+		"message": "JSON format is valid",
+	}}
 }

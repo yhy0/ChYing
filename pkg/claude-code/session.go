@@ -2,6 +2,7 @@ package claudecode
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 
@@ -352,6 +353,43 @@ func (m *SessionManager) SetConversationID(sessionID, conversationID string) {
 	}
 }
 
+// SetTranscriptPath 设置 Claude CLI transcript 文件路径
+func (m *SessionManager) SetTranscriptPath(sessionID, transcriptPath string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if session, exists := m.sessions[sessionID]; exists {
+		session.TranscriptPath = transcriptPath
+		session.UpdatedAt = time.Now()
+
+		// 持久化到数据库
+		if err := db.UpdateClaudeSessionTranscriptPath(sessionID, transcriptPath); err != nil {
+			logging.Logger.Errorf("更新会话 TranscriptPath 失败: %v", err)
+		}
+	}
+}
+
+// GetTranscriptHistory 获取会话的 transcript 历史
+func (m *SessionManager) GetTranscriptHistory(sessionID string) ([]ChatMessage, error) {
+	session := m.GetSession(sessionID)
+	if session == nil {
+		return nil, fmt.Errorf("session not found: %s", sessionID)
+	}
+
+	// 如果有 transcript path，从 jsonl 文件读取
+	if session.TranscriptPath != "" {
+		messages, err := ReadTranscript(session.TranscriptPath)
+		if err != nil {
+			logging.Logger.Warnf("Failed to read transcript: %v, falling back to session history", err)
+			return session.History, nil
+		}
+		return messages, nil
+	}
+
+	// 否则返回内存中的历史
+	return session.History, nil
+}
+
 // CleanupOldSessions 清理过期会话
 func (m *SessionManager) CleanupOldSessions(maxAge time.Duration) int {
 	m.mu.Lock()
@@ -548,6 +586,7 @@ func (m *SessionManager) dbSessionToSession(dbSession *db.ClaudeSession) *Sessio
 		UpdatedAt:      dbSession.UpdatedAt,
 		History:        history,
 		ConversationID: dbSession.ConversationID,
+		TranscriptPath: dbSession.TranscriptPath,
 	}
 }
 

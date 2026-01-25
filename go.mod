@@ -23,7 +23,6 @@ require (
 	github.com/ipinfo/go/v2 v2.10.0
 	github.com/klauspost/compress v1.18.2
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/mark3labs/mcp-go v0.43.2
 	github.com/panjf2000/ants/v2 v2.11.4
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/dsl v0.8.12
@@ -50,6 +49,7 @@ require (
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.59
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/weppos/publicsuffix-go v0.50.3-0.20260108123922-15eaa75052c0
+	github.com/yhy0/claude-agent-sdk-go v0.0.0
 	github.com/yhy0/logging v0.0.0-20231128014545-22711cccc3b0
 	github.com/yhy0/sizedwaitgroup v1.0.1
 	github.com/yl2chen/cidranger v1.0.2
@@ -76,7 +76,6 @@ require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
@@ -133,7 +132,6 @@ require (
 	github.com/hdm/jarm-go v0.0.7 // indirect
 	github.com/iangcarroll/cookiemonster v1.6.0 // indirect
 	github.com/icholy/digest v1.1.0 // indirect
-	github.com/invopop/jsonschema v0.13.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
@@ -154,7 +152,6 @@ require (
 	github.com/lestrrat-go/strftime v1.1.1 // indirect
 	github.com/lmittmann/tint v1.1.2 // indirect
 	github.com/logrusorgru/aurora/v4 v4.0.0 // indirect
-	github.com/mailru/easyjson v0.9.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-pointer v0.0.1 // indirect
@@ -221,11 +218,9 @@ require (
 	github.com/vulncheck-oss/go-exploit v1.53.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.23 // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb // indirect
-	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
-	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	github.com/ysmood/fetchup v0.5.3 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/got v0.42.3 // indirect
@@ -266,3 +261,6 @@ replace github.com/ysmood/fetchup => github.com/ysmood/fetchup v0.2.3
 
 // 使用本地修改的 proxify 库，修复 Stop() 方法以正确释放端口
 replace github.com/projectdiscovery/proxify => ./lib/proxify
+
+// 使用本地 claude-agent-sdk-go，等待测试完成后提交
+replace github.com/yhy0/claude-agent-sdk-go => /Users/yhy/Documents/Github/claude-agent-sdk-go

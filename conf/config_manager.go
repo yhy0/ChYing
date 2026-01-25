@@ -59,23 +59,10 @@ func SaveConfig() error {
 
 	// AI 配置
 	viper.Set("ai.claude.cli_path", AppConf.AI.Claude.CLIPath)
-	viper.Set("ai.claude.work_dir", AppConf.AI.Claude.WorkDir)
 	viper.Set("ai.claude.model", AppConf.AI.Claude.Model)
 	viper.Set("ai.claude.max_turns", AppConf.AI.Claude.MaxTurns)
 	viper.Set("ai.claude.system_prompt", AppConf.AI.Claude.SystemPrompt)
 	viper.Set("ai.claude.permission_mode", AppConf.AI.Claude.PermissionMode)
-	viper.Set("ai.claude.require_tool_confirm", AppConf.AI.Claude.RequireToolConfirm)
-	viper.Set("ai.claude.api_key", AppConf.AI.Claude.APIKey)
-	viper.Set("ai.claude.base_url", AppConf.AI.Claude.BaseURL)
-	viper.Set("ai.claude.temperature", AppConf.AI.Claude.Temperature)
-
-	// MCP 配置
-	viper.Set("ai.claude.mcp.enabled", AppConf.AI.Claude.MCP.Enabled)
-	viper.Set("ai.claude.mcp.mode", AppConf.AI.Claude.MCP.Mode)
-	viper.Set("ai.claude.mcp.port", AppConf.AI.Claude.MCP.Port)
-	viper.Set("ai.claude.mcp.enabled_tools", AppConf.AI.Claude.MCP.EnabledTools)
-	viper.Set("ai.claude.mcp.disabled_tools", AppConf.AI.Claude.MCP.DisabledTools)
-	viper.Set("ai.claude.mcp.external_servers", AppConf.AI.Claude.MCP.ExternalServers)
 
 	return viper.WriteConfig()
 }

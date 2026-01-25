@@ -27,6 +27,9 @@ import (
 
 var GlobalDB *gorm.DB
 
+// CurrentProjectName 当前项目名称
+var CurrentProjectName string
+
 // dbWriteMutex 用于保护 SQLite 写操作，防止 "database is locked" 错误
 var dbWriteMutex sync.Mutex
 
@@ -98,6 +101,9 @@ func InitSQL(project string, DBType string) {
 
 	// 项目名称（去掉 .db 后缀）
 	projectName := strings.TrimSuffix(project, ".db")
+
+	// 保存当前项目名称到全局变量
+	CurrentProjectName = projectName
 
 	// 数据库文件放在 db/<projectName>/<projectName>.db 子目录中
 	projectDir := path.Join(file.ChyingDir, "db", projectName)

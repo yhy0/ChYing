@@ -44,21 +44,13 @@ type AIConfig struct {
 
 	Claude struct {
 		// Claude Code CLI 配置
-		CLIPath            string   `json:"cli_path" yaml:"cli_path" mapstructure:"cli_path"`                                        // CLI 路径，默认使用 PATH 中的 claude
-		WorkDir            string   `json:"work_dir" yaml:"work_dir" mapstructure:"work_dir"`                                        // 工作目录
-		Model              string   `json:"model" yaml:"model" mapstructure:"model"`                                                 // 模型
-		MaxTurns           int      `json:"max_turns" yaml:"max_turns" mapstructure:"max_turns"`                                     // 最大回合数
-		SystemPrompt       string   `json:"system_prompt" yaml:"system_prompt" mapstructure:"system_prompt"`                         // 系统提示词
-		AllowedTools       []string `json:"allowed_tools" yaml:"allowed_tools" mapstructure:"allowed_tools"`                         // 允许的工具列表
-		DisallowedTools    []string `json:"disallowed_tools" yaml:"disallowed_tools" mapstructure:"disallowed_tools"`                // 禁用的工具列表
-		PermissionMode     string   `json:"permission_mode" yaml:"permission_mode" mapstructure:"permission_mode"`                   // 权限模式
-		RequireToolConfirm bool     `json:"require_tool_confirm" yaml:"require_tool_confirm" mapstructure:"require_tool_confirm"`    // 是否需要工具确认
-		// 环境变量配置
-		APIKey      string  `json:"api_key" yaml:"api_key" mapstructure:"api_key"`           // ANTHROPIC_API_KEY
-		BaseURL     string  `json:"base_url" yaml:"base_url" mapstructure:"base_url"`        // ANTHROPIC_BASE_URL
-		Temperature float64 `json:"temperature" yaml:"temperature" mapstructure:"temperature"` // AI_TEMPERATURE
-		// MCP 服务器配置
-		MCP MCPConfig `json:"mcp" yaml:"mcp" mapstructure:"mcp"`
+		CLIPath        string `json:"cli_path" yaml:"cli_path" mapstructure:"cli_path"`                   // CLI 路径，默认使用 PATH 中的 claude
+		Model          string `json:"model" yaml:"model" mapstructure:"model"`                            // 模型
+		MaxTurns       int    `json:"max_turns" yaml:"max_turns" mapstructure:"max_turns"`                // 最大回合数
+		SystemPrompt   string `json:"system_prompt" yaml:"system_prompt" mapstructure:"system_prompt"`    // 系统提示词
+		PermissionMode string `json:"permission_mode" yaml:"permission_mode" mapstructure:"permission_mode"` // 权限模式
+		// 注意: API Key、代理、MCP 服务器等配置请在 ~/.claude/settings.json 中设置
+		// ChYing 会自动复用 Claude CLI 的用户配置
 	} `json:"claude" yaml:"claude" mapstructure:"claude"`
 
 	// A2A Agent 配置
@@ -72,33 +64,6 @@ type A2AConfig struct {
 	Headers   map[string]string `json:"headers" yaml:"headers" mapstructure:"headers"`       // 自定义请求头
 	Timeout   int               `json:"timeout" yaml:"timeout" mapstructure:"timeout"`       // 超时时间（秒）
 	EnableSSE bool              `json:"enable_sse" yaml:"enable_sse" mapstructure:"enable_sse"` // 是否启用 SSE 流式响应
-}
-
-// MCPConfig MCP 服务器配置
-type MCPConfig struct {
-	Enabled       bool     `json:"enabled" yaml:"enabled" mapstructure:"enabled"`                         // 是否启用内置 MCP 服务器
-	Mode          string   `json:"mode" yaml:"mode" mapstructure:"mode"`                                   // 运行模式: "sse" 或 "stdio"
-	Port          int      `json:"port" yaml:"port" mapstructure:"port"`                                   // SSE 模式端口（0 表示自动选择）
-	EnabledTools  []string `json:"enabled_tools" yaml:"enabled_tools" mapstructure:"enabled_tools"`       // 启用的工具列表（空表示全部启用）
-	DisabledTools []string `json:"disabled_tools" yaml:"disabled_tools" mapstructure:"disabled_tools"`    // 禁用的工具列表
-	// 外部 MCP 服务器配置
-	ExternalServers []ExternalMCPServer `json:"external_servers" yaml:"external_servers" mapstructure:"external_servers"` // 外部 MCP 服务器列表
-}
-
-// ExternalMCPServer 外部 MCP 服务器配置
-type ExternalMCPServer struct {
-	ID          string            `json:"id" yaml:"id" mapstructure:"id"`                           // 唯一标识符
-	Name        string            `json:"name" yaml:"name" mapstructure:"name"`                     // 显示名称
-	Type        string            `json:"type" yaml:"type" mapstructure:"type"`                     // 类型: "sse" 或 "stdio"
-	Enabled     bool              `json:"enabled" yaml:"enabled" mapstructure:"enabled"`            // 是否启用
-	Description string            `json:"description" yaml:"description" mapstructure:"description"` // 描述
-	// SSE 模式配置
-	URL     string            `json:"url" yaml:"url" mapstructure:"url"`               // SSE 服务器 URL
-	Headers map[string]string `json:"headers" yaml:"headers" mapstructure:"headers"`   // 自定义请求头（如认证）
-	// STDIO 模式配置
-	Command string   `json:"command" yaml:"command" mapstructure:"command"` // 命令路径
-	Args    []string `json:"args" yaml:"args" mapstructure:"args"`          // 命令参数
-	Env     []string `json:"env" yaml:"env" mapstructure:"env"`             // 环境变量 (KEY=VALUE 格式)
 }
 
 // AppConfig 应用完整配置结构体

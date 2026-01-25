@@ -23,6 +23,7 @@ type ClaudeSession struct {
 	Context        string    `gorm:"type:text" json:"context"`                // 上下文 JSON
 	History        string    `gorm:"type:text" json:"history"`                // 消息历史 JSON
 	ConversationID string    `json:"conversation_id"`                         // Claude Code 会话 ID
+	TranscriptPath string    `json:"transcript_path"`                         // Claude CLI transcript 文件路径
 	MessageCount   int       `gorm:"default:0" json:"message_count"`          // 消息数量
 	TotalCostUSD   float64   `gorm:"default:0" json:"total_cost_usd"`         // 总费用
 	TotalTokens    int       `gorm:"default:0" json:"total_tokens"`           // 总 token 数
@@ -242,6 +243,21 @@ func UpdateClaudeSessionConversationID(sessionID, conversationID string) error {
 			Where("session_id = ?", sessionID).
 			Updates(map[string]interface{}{
 				"conversation_id": conversationID,
+				"updated_at":      time.Now(),
+			}).Error
+	}, 3)
+}
+
+// UpdateClaudeSessionTranscriptPath 更新 Claude CLI transcript 文件路径
+func UpdateClaudeSessionTranscriptPath(sessionID, transcriptPath string) error {
+	if GlobalDB == nil {
+		return nil
+	}
+	return RetryOnLocked("UpdateClaudeSessionTranscriptPath", func() error {
+		return GlobalDB.Model(&ClaudeSession{}).
+			Where("session_id = ?", sessionID).
+			Updates(map[string]interface{}{
+				"transcript_path": transcriptPath,
 				"updated_at":      time.Now(),
 			}).Error
 	}, 3)

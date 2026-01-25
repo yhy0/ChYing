@@ -173,10 +173,18 @@ const handleRouteQuery = () => {
 // 处理流量 ID 列表
 const handleTrafficIds = (ids: number[]) => {
   selectedTrafficIds.value = ids;
+
+  // 将流量 ID 添加到上下文中，以便后端获取流量详情
+  agentContext.value = {
+    ...agentContext.value,
+    selectedTrafficIds: ids.map(id => String(id))
+  };
+  claudeStore.updateContext(agentContext.value);
+
   // 构建预填充消息
-  const message = t('claude.prefill.analyzeTraffic', { 
-    count: ids.length, 
-    ids: ids.join(', ') 
+  const message = t('claude.prefill.analyzeTraffic', {
+    count: ids.length,
+    ids: ids.join(', ')
   }, `Please analyze the following ${ids.length} HTTP traffic records (IDs: ${ids.join(', ')}). Look for potential security vulnerabilities, sensitive information leaks, and suspicious patterns.`);
   prefillMessage.value = message;
 };

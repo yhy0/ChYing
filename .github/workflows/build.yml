@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  build:
     # 只在创建标签时运行，而不是在创建分支时运行
     if: startsWith(github.ref, 'refs/tags/')
     strategy:
@@ -84,6 +84,68 @@ jobs:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install Wails
+        shell: bash
+        run: |
+          # 回到 GITHUB_WORKSPACE 的父目录
+          cd ..
+          # wails 仓库与项目目录同级
+          git clone https://github.com/wailsapp/wails.git
+          cd wails
+          git checkout v3-alpha
+          cd v3/cmd/wails3
+          go install
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 1
+          CC: ${{ matrix.goos == 'windows' && 'gcc' || '' }}
+          PRODUCTION: "true"
+        run: |
+          wails3 task ${{ matrix.build_task }}
+
+      - name: Prepare Release Files
+        id: prepare
+        shell: bash
+        run: |
+          mkdir -p release
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            cp bin/*.exe "release/${{ matrix.artifact_name }}"
+          elif [ "${{ matrix.goos }}" = "darwin" ]; then
+            cp -r bin/*.app release/
+            cd release && zip -r "${{ matrix.artifact_name }}" *.app && rm -rf *.app && cd ..
+          else
+            cp bin/* "release/${{ matrix.artifact_name }}"
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: release/${{ matrix.artifact_name }}
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
       - name: Fetch release notes
         run: |
           # Get current tag
@@ -132,53 +194,16 @@ jobs:
 
           echo "Release notes:"
           cat release_notes.txt
-          echo "release_notes_path=$GITHUB_WORKSPACE/release_notes.txt" >> $GITHUB_ENV
         shell: bash
 
-      - name: Install Wails
-        shell: bash
-        run: |
-          # 回到 GITHUB_WORKSPACE 的父目录
-          cd ..
-          # wails 仓库与项目目录同级
-          git clone https://github.com/wailsapp/wails.git
-          cd wails
-          git checkout v3-alpha
-          cd v3/cmd/wails3
-          go install
-
-      - name: Build
-        working-directory: ${{ github.workspace }}
-        shell: bash
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: 1
-          CC: ${{ matrix.goos == 'windows' && 'gcc' || '' }}
-          PRODUCTION: "true"
-        run: |
-          wails3 task ${{ matrix.build_task }}
-
-      - name: Prepare Release Files
-        id: prepare
-        shell: bash
-        run: |
-          mkdir -p release
-          if [ "${{ matrix.goos }}" = "windows" ]; then
-            cp bin/*.exe "release/${{ matrix.artifact_name }}"
-          elif [ "${{ matrix.goos }}" = "darwin" ]; then
-            cp -r bin/*.app release/
-            cd release && zip -r "${{ matrix.artifact_name }}" *.app && rm -rf *.app && cd ..
-          else
-            cp bin/* "release/${{ matrix.artifact_name }}"
-          fi
-          echo "ARTIFACT_PATH=release/${{ matrix.artifact_name }}" >> $GITHUB_ENV
+      - name: List Release Files
+        run: ls -la release/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ARTIFACT_PATH }}
-          body_path: ${{ env.release_notes_path }}
+          files: release/*
+          body_path: release_notes.txt
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

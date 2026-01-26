@@ -261,6 +261,3 @@ replace github.com/ysmood/fetchup => github.com/ysmood/fetchup v0.2.3
 
 // 使用本地修改的 proxify 库，修复 Stop() 方法以正确释放端口
 replace github.com/projectdiscovery/proxify => ./lib/proxify
-
-// 使用本地 claude-agent-sdk-go，等待测试完成后提交
-replace github.com/yhy0/claude-agent-sdk-go => /Users/yhy/Documents/Github/claude-agent-sdk-go

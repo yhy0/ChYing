@@ -550,6 +550,8 @@ github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 h1:nIPpBwaJSVYIxUFsDv3M8ofm
 github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8/go.mod h1:HUYIGzjTL3rfEspMxjDjgmT5uz5wzYJKVo23qUhYTos=
 github.com/xyproto/randomstring v1.0.5 h1:YtlWPoRdgMu3NZtP45drfy1GKoojuR7hmRcnhZqKjWU=
 github.com/xyproto/randomstring v1.0.5/go.mod h1:rgmS5DeNXLivK7YprL0pY+lTuhNQW3iGxZ18UQApw/E=
+github.com/yhy0/claude-agent-sdk-go v0.0.0-20260125133125-c9f120a6c28e h1:tcaCR+Qwvx6N4X6Tx3CpqBnOcGeO2DTtGrquOOabGMQ=
+github.com/yhy0/claude-agent-sdk-go v0.0.0-20260125133125-c9f120a6c28e/go.mod h1:jgLc5+Xx7y1mx+9SJs1yecvaXXt5HNsSDQtL/WRIoGE=
 github.com/yhy0/logging v0.0.0-20231128014545-22711cccc3b0 h1:ANZZm1sR5FKK/0x/AV+842HFHA3EJYJaTVpFM9X/qHI=
 github.com/yhy0/logging v0.0.0-20231128014545-22711cccc3b0/go.mod h1:DjdElPsDqf4IhYGiBtUKGT8i75RBZSwl+KgsaMJlZpU=
 github.com/yhy0/sizedwaitgroup v1.0.1 h1:3Q0GsMlPd6XMIMRBY768uD81shNiU2rMjk3vmGICMdc=

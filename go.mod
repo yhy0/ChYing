@@ -49,7 +49,7 @@ require (
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.59
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/weppos/publicsuffix-go v0.50.3-0.20260108123922-15eaa75052c0
-	github.com/yhy0/claude-agent-sdk-go v0.0.0
+	github.com/yhy0/claude-agent-sdk-go v0.0.0-20260125133125-c9f120a6c28e
 	github.com/yhy0/logging v0.0.0-20231128014545-22711cccc3b0
 	github.com/yhy0/sizedwaitgroup v1.0.1
 	github.com/yl2chen/cidranger v1.0.2

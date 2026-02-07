@@ -21,7 +21,7 @@ require (
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/imroc/req/v3 v3.57.0
 	github.com/ipinfo/go/v2 v2.10.0
-	github.com/klauspost/compress v1.18.2
+	github.com/klauspost/compress v1.18.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/panjf2000/ants/v2 v2.11.4
 	github.com/pkg/errors v0.9.1
@@ -88,7 +88,8 @@ require (
 	github.com/chainreactors/utils v0.0.0-20251216161625-70054cf04e88 // indirect
 	github.com/chromedp/cdproto v0.0.0-20250803210736-d308e07a266d // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
-	github.com/cloudflare/circl v1.6.2 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
+	github.com/coder/websocket v1.8.14 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect

@@ -515,13 +515,13 @@ const interceptColumns = computed<HttpTrafficColumn<any>[]>(() => [
       
       // 如果有 host，显示 host + path 格式
       if (host) {
-        return h('div', { class: 'flex truncate max-w-0' }, [
-          h('span', { class: 'font-medium text-gray-800 dark:text-gray-200' }, host),
-          h('span', { class: 'text-gray-500 dark:text-gray-400 ml-1' }, path)
+        return h('div', { class: 'flex truncate min-w-0 w-full' }, [
+          h('span', { class: 'font-medium text-gray-800 dark:text-gray-200 truncate' }, host),
+          h('span', { class: 'text-gray-500 dark:text-gray-400 ml-1 truncate' }, path)
         ]);
       }
       // 如果没有 host，显示完整 URL 或 path
-      return h('div', { class: 'flex truncate max-w-0' }, [
+      return h('div', { class: 'flex truncate min-w-0 w-full' }, [
         h('span', { class: 'text-gray-600 dark:text-gray-300' }, displayUrl || '(未知)')
       ]);
     }

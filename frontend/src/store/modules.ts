@@ -27,6 +27,7 @@ export const useModulesStore = defineStore('modules', () => {
 
   // Proxy模块状态
   const proxyHistory = ref<ProxyHistoryItem[]>([]);
+  const proxyInterceptEnabled = ref(false);
   
   // Repeater模块状态
   const repeaterTabs = ref<RepeaterTab[]>([]);
@@ -414,6 +415,7 @@ export const useModulesStore = defineStore('modules', () => {
   return {
     // 状态
     proxyHistory,
+    proxyInterceptEnabled,
     repeaterTabs,
     repeaterTabCounter,
     repeaterGroups,

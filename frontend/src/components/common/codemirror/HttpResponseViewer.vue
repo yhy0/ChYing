@@ -7,6 +7,7 @@ type ResponseData = string;
 const props = defineProps<{
   data: ResponseData;
   readOnly?: boolean;
+  bodyFormatted?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -21,6 +22,7 @@ const emit = defineEmits<{
       :data="props.data"
       :read-only="props.readOnly"
       :is-response="true"
+      :body-formatted="props.bodyFormatted"
       @update:data="emit('update:data', $event)"
     />
   </div>

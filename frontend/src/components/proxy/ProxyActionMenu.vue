@@ -40,8 +40,9 @@ const hasActiveFilters = computed(() => {
   return !!(props.filterOptions.method ||
            props.filterOptions.host ||
            props.filterOptions.path ||
-           props.filterOptions.status ||
-           props.filterOptions.contentType);
+           props.filterOptions.status.length > 0 ||
+           props.filterOptions.contentType ||
+           props.filterOptions.extension.length > 0);
 });
 
 const isHostFiltered = computed(() => !!props.filterOptions.host);

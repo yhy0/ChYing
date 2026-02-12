@@ -427,6 +427,22 @@ func onRequestCallback(req *http.Request, ctx *martian.Context) error {
 		req.Body = io.NopCloser(bytes.NewBuffer(requestBodyBytes))
 	}
 
+	// Body 已完整读取到内存，移除 chunked 编码标记，避免 DumpRequestOut 输出 chunk 格式
+	if req.TransferEncoding != nil {
+		for _, te := range req.TransferEncoding {
+			if strings.EqualFold(te, "chunked") {
+				req.TransferEncoding = nil
+				req.ContentLength = int64(len(requestBodyBytes))
+				// 同时更新 Header
+				req.Header.Del("Transfer-Encoding")
+				if len(requestBodyBytes) > 0 {
+					req.Header.Set("Content-Length", strconv.Itoa(len(requestBodyBytes)))
+				}
+				break
+			}
+		}
+	}
+
 	// 2. 生成初始请求dump
 	reqDump, err := httputil.DumpRequestOut(req, true)
 	if err != nil {

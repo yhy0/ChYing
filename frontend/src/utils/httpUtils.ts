@@ -68,6 +68,121 @@ export function convertToHex(text: string): string {
 }
 
 /**
+ * 格式化HTTP报文的body部分（JSON/XML），保留headers原样
+ * 返回 { formatted: string, lineMapping: number[] } 
+ * lineMapping[i] 表示格式化后第 i 行对应原始文档的行号（从1开始）
+ * 如果无法格式化则返回 null
+ */
+export function formatHttpBody(content: string): { formatted: string; lineMapping: number[] } | null {
+  if (!content || typeof content !== 'string') return null;
+  
+  // 分离 headers 和 body
+  const splitIdx = content.indexOf('\n\n');
+  if (splitIdx === -1) return null;
+  
+  const headersPart = content.substring(0, splitIdx);
+  const bodyPart = content.substring(splitIdx + 2); // skip \n\n
+  
+  if (!bodyPart.trim()) return null;
+  
+  let formattedBody: string | null = null;
+  
+  // 尝试格式化 JSON
+  try {
+    const trimmed = bodyPart.trim();
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+        (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+      const parsed = JSON.parse(trimmed);
+      formattedBody = JSON.stringify(parsed, null, 2);
+    }
+  } catch (_) {
+    // not valid JSON
+  }
+  
+  // 尝试格式化 XML
+  if (!formattedBody && bodyPart.trim().startsWith('<')) {
+    formattedBody = formatXml(bodyPart.trim());
+  }
+  
+  if (!formattedBody || formattedBody === bodyPart.trim()) return null;
+  
+  // 构建格式化后的完整内容
+  const formatted = headersPart + '\n\n' + formattedBody;
+  
+  // 构建行号映射：headers 部分行号不变，body 部分所有格式化行都映射到原始 body 的起始行
+  const headerLines = headersPart.split('\n');
+  const emptyLine = 1; // 空行
+  const originalBodyLines = bodyPart.split('\n');
+  const formattedBodyLines = formattedBody.split('\n');
+  
+  const lineMapping: number[] = [];
+  
+  // headers 行：1:1 映射
+  for (let i = 0; i < headerLines.length; i++) {
+    lineMapping.push(i + 1);
+  }
+  // 空行
+  lineMapping.push(headerLines.length + 1);
+  
+  // body 部分：格式化后的行映射到原始行号
+  // 原始 body 起始行号
+  const bodyStartLine = headerLines.length + emptyLine + 1;
+  
+  // 策略：将格式化后的行按原始行逐一对应
+  // 如果原始 body 只有1行（常见情况：一行JSON），所有格式化行都映射到同一个原始行号
+  // 如果原始 body 有多行，按比例分配
+  if (originalBodyLines.length <= 1) {
+    // 单行 body 格式化展开 — 所有格式化行都映射到同一原始行号
+    for (let i = 0; i < formattedBodyLines.length; i++) {
+      lineMapping.push(bodyStartLine);
+    }
+  } else {
+    // 多行 body — 按比例分配
+    let origLineIdx = 0;
+    for (let i = 0; i < formattedBodyLines.length; i++) {
+      lineMapping.push(bodyStartLine + origLineIdx);
+      const ratio = (i + 1) / formattedBodyLines.length;
+      origLineIdx = Math.min(
+        Math.floor(ratio * originalBodyLines.length),
+        originalBodyLines.length - 1
+      );
+    }
+  }
+  
+  return { formatted, lineMapping };
+}
+
+/**
+ * 简单的 XML 格式化
+ */
+function formatXml(xml: string): string {
+  let formatted = '';
+  let indent = 0;
+  const lines = xml.replace(/(>)\s*(<)/g, '$1\n$2').split('\n');
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    
+    // 闭合标签减少缩进
+    if (trimmed.startsWith('</')) {
+      indent = Math.max(0, indent - 1);
+    }
+    
+    formatted += '  '.repeat(indent) + trimmed + '\n';
+    
+    // 开放标签增加缩进（排除自闭合和注释）
+    if (trimmed.startsWith('<') && !trimmed.startsWith('</') && 
+        !trimmed.startsWith('<?') && !trimmed.startsWith('<!') &&
+        !trimmed.endsWith('/>') && !trimmed.includes('</')) {
+      indent++;
+    }
+  }
+  
+  return formatted.trimEnd();
+}
+
+/**
  * 获取响应的Content-Type
  */
 export function getResponseContentType(headers: string): string {

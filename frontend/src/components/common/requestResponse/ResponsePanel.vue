@@ -47,6 +47,9 @@ const copyResponse = () => {
   copyToClipboard(props.normalizedResponseData);
 };
 
+// Body 格式化状态
+const bodyFormatted = ref(true);
+
 // 控制标签滑块位置
 const tabsContainerRef = ref<HTMLElement | null>(null);
 const tabSliderRef = ref<HTMLElement | null>(null);
@@ -140,6 +143,14 @@ onBeforeUnmount(() => {
       <div class="ml-auto flex items-center">
         <button 
           class="action-button mr-2 tooltip-container"
+          @click="bodyFormatted = !bodyFormatted"
+          :class="{ 'active': bodyFormatted }"
+        >
+          <i class="bx bx-code-curly text-base"></i>
+          <span class="tooltip-text">{{ bodyFormatted ? '显示原始格式' : '格式化 Body' }}</span>
+        </button>
+        <button 
+          class="action-button mr-2 tooltip-container"
           @click="emit('toggle-word-wrap')"
           :class="{ 'active': wordWrap }"
         >
@@ -165,6 +176,7 @@ onBeforeUnmount(() => {
           v-if="responseViewType === 'pretty'"
           :data="normalizedResponseData"
           :read-only="readOnly"
+          :body-formatted="bodyFormatted"
           @update:data="handleResponseUpdate"
           class="editor-view"
           :key="'pretty'"

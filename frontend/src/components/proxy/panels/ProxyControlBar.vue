@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import ProxyFilter from '../ProxyFilter.vue';
 import ProxyDSLSearch from './ProxyDSLSearch.vue';
 import type { FilterOptions } from '../ProxyFilter.vue';
+import type { ProxyHistoryItem } from '../../../store';
 // @ts-ignore
 import {
   GetConfig
@@ -32,6 +33,7 @@ onMounted(() => {
 
 const props = defineProps<{
   interceptEnabled: boolean;
+  proxyHistory: ProxyHistoryItem[];
 }>();
 
 const emit = defineEmits<{
@@ -53,13 +55,11 @@ const showFilterModal = ref(false);
 // 过滤器变更
 const handleFilterChange = (options: FilterOptions) => {
   emit('filter', options);
-  showFilterModal.value = false;
 };
 
 // 重置过滤器
 const handleResetFilter = () => {
   emit('reset-filter');
-  showFilterModal.value = false;
 };
 
 // 拦截控制
@@ -171,9 +171,8 @@ const handleNotify = (notification: { message: string; type: 'success' | 'error'
     </div>
     
     <!-- Filter Modal -->
-    <div v-if="showFilterModal" class="absolute inset-x-0 top-[5rem] z-20 bg-white dark:bg-[#1e1e36] shadow-lg border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
-      <div class="flex justify-between items-center px-3 py-1 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#292945]">
-        <h3 class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ t('modules.proxy.filter.title') }}</h3>
+    <div v-show="showFilterModal" class="absolute inset-x-0 top-[5rem] z-20 bg-white dark:bg-[#1e1e36] shadow-lg border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
+      <div class="flex justify-end items-center px-3 py-0.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#292945]">
         <button 
           @click="showFilterModal = false" 
           class="btn btn-icon text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 w-4 h-4"
@@ -181,12 +180,11 @@ const handleNotify = (notification: { message: string; type: 'success' | 'error'
           <i class="bx bx-x"></i>
         </button>
       </div>
-      <div class="p-2">
-        <ProxyFilter 
-          @filter="handleFilterChange" 
-          @reset="handleResetFilter" 
-        />
-      </div>
+      <ProxyFilter 
+        :proxyHistory="props.proxyHistory"
+        @filter="handleFilterChange" 
+        @reset="handleResetFilter" 
+      />
     </div>
   </div>
 </template> 

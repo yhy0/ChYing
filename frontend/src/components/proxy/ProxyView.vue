@@ -40,9 +40,14 @@ const notification = ref<{ message: string; visible: boolean; type: 'success' | 
 const filterOptions = ref<FilterOptions>({
   method: '',
   host: '',
+  hostMode: 'include',
   path: '',
-  status: '',
+  pathMode: 'include',
+  status: [],
+  statusSearch: '',
   contentType: '',
+  extension: [],
+  extensionMode: 'exclude',
 });
 
 // 显示通知
@@ -163,7 +168,10 @@ onMounted(() => {
 });
 
 const selectedItem = ref<ProxyHistoryItem | null>(null);
-const proxyInterceptEnabled = ref(false);
+const proxyInterceptEnabled = computed({
+  get: () => store.proxyInterceptEnabled,
+  set: (val: boolean) => { store.proxyInterceptEnabled = val; }
+});
 const showContextMenu = ref(false);
 const contextMenuPos = ref({ x: 0, y: 0 });
 const contextMenuRequest = ref<ProxyHistoryItem | null>(null);
@@ -178,51 +186,57 @@ const showFloatingBar = computed(() => checkedItems.value.length > 0);
 // Filter the proxy history items based on the current filter options
 const filteredProxyHistory = computed(() => {
   return store.proxyHistory.filter(item => {
+    const f = filterOptions.value;
+
     // If all filter options are empty, return all items
-    if (!filterOptions.value.method &&
-        !filterOptions.value.host &&
-        !filterOptions.value.path &&
-        !filterOptions.value.status &&
-        !filterOptions.value.contentType) {
+    if (!f.method &&
+        !f.host &&
+        !f.path &&
+        f.status.length === 0 &&
+        !f.contentType &&
+        f.extension.length === 0) {
       return true;
     }
 
     // Apply method filter
-    if (filterOptions.value.method &&
-        item.method.toLowerCase() !== filterOptions.value.method.toLowerCase()) {
+    if (f.method && item.method.toLowerCase() !== f.method.toLowerCase()) {
       return false;
     }
 
-    // Apply host filter
-    if (filterOptions.value.host &&
-        !item.host.toLowerCase().includes(filterOptions.value.host.toLowerCase())) {
-      return false;
+    // Apply host filter (include/exclude mode)
+    if (f.host) {
+      const matches = item.host.toLowerCase().includes(f.host.toLowerCase());
+      if (f.hostMode === 'include' && !matches) return false;
+      if (f.hostMode === 'exclude' && matches) return false;
     }
 
-    // Apply path filter
-    if (filterOptions.value.path &&
-        !item.path.toLowerCase().includes(filterOptions.value.path.toLowerCase())) {
-      return false;
+    // Apply path filter (include/exclude mode)
+    if (f.path) {
+      const matches = item.path.toLowerCase().includes(f.path.toLowerCase());
+      if (f.pathMode === 'include' && !matches) return false;
+      if (f.pathMode === 'exclude' && matches) return false;
     }
 
-    // Apply status filter
-    if (filterOptions.value.status) {
-      // Allow filtering by status code range (e.g. 2xx, 4xx)
-      if (filterOptions.value.status.endsWith('xx')) {
-        const statusPrefix = filterOptions.value.status.charAt(0);
-        const itemStatusPrefix = String(item.status).charAt(0);
-        if (statusPrefix !== itemStatusPrefix) {
-          return false;
-        }
-      } else if (String(item.status) !== filterOptions.value.status) {
-        return false;
-      }
+    // Apply status filter (multi-select)
+    if (f.status.length > 0) {
+      const itemStatus = String(item.status);
+      if (!f.status.includes(itemStatus)) return false;
     }
 
     // Apply content type filter
-    if (filterOptions.value.contentType &&
-        !item.mimeType.toLowerCase().includes(filterOptions.value.contentType.toLowerCase())) {
+    if (f.contentType &&
+        !item.mimeType.toLowerCase().includes(f.contentType.toLowerCase())) {
       return false;
+    }
+
+    // Apply extension filter (include/exclude mode)
+    if (f.extension.length > 0) {
+      const itemExt = (item.extension || '').toLowerCase().replace(/^\./, '');
+      if (f.extensionMode === 'exclude') {
+        if (f.extension.includes(itemExt)) return false;
+      } else {
+        if (!f.extension.includes(itemExt)) return false;
+      }
     }
 
     return true;
@@ -428,9 +442,14 @@ const handleResetFilter = () => {
   filterOptions.value = {
     method: '',
     host: '',
+    hostMode: 'include',
     path: '',
-    status: '',
+    pathMode: 'include',
+    status: [],
+    statusSearch: '',
     contentType: '',
+    extension: [],
+    extensionMode: 'exclude',
   };
 };
 
@@ -555,9 +574,14 @@ const handleFilterByHost = (host: string) => {
   filterOptions.value = {
     method: '',
     host: host,
+    hostMode: 'include',
     path: '',
-    status: '',
+    pathMode: 'include',
+    status: [],
+    statusSearch: '',
     contentType: '',
+    extension: [],
+    extensionMode: 'exclude',
   };
   showNotification(`已筛选主机: ${host}`, 'success');
   closeContextMenu();
@@ -568,9 +592,14 @@ const handleFilterByMethod = (method: string) => {
   filterOptions.value = {
     method: method,
     host: '',
+    hostMode: 'include',
     path: '',
-    status: '',
+    pathMode: 'include',
+    status: [],
+    statusSearch: '',
     contentType: '',
+    extension: [],
+    extensionMode: 'exclude',
   };
   showNotification(`已筛选方法: ${method}`, 'success');
   closeContextMenu();
@@ -581,9 +610,14 @@ const handleClearFilters = () => {
   filterOptions.value = {
     method: '',
     host: '',
+    hostMode: 'include',
     path: '',
-    status: '',
+    pathMode: 'include',
+    status: [],
+    statusSearch: '',
     contentType: '',
+    extension: [],
+    extensionMode: 'exclude',
   };
   showNotification('已清除所有筛选条件', 'success');
   closeContextMenu();
@@ -616,7 +650,7 @@ const clearCheckedItems = () => {
       :visible="notification.visible" @close="closeNotification" />
 
     <!-- 控制栏 -->
-    <ProxyControlBar :interceptEnabled="proxyInterceptEnabled" @toggle-intercept="toggleInterception"
+    <ProxyControlBar :interceptEnabled="proxyInterceptEnabled" :proxyHistory="store.proxyHistory" @toggle-intercept="toggleInterception"
       @filter="handleFilterChange" @reset-filter="handleResetFilter" @clear="clearHistory"
       @send-to-repeater="sendToRepeater" @send-to-intruder="sendToIntruder" @search-results="handleDSLSearchResults"
       @clear-search="clearDSLFilter" @notify="handleNotification" />

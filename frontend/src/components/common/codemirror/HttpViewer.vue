@@ -2,20 +2,22 @@
 import { ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue';
 import { EditorState } from '@codemirror/state';
 import type { Extension } from '@codemirror/state';
-import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
+import { EditorView, keymap, lineNumbers, highlightActiveLine, gutter, GutterMarker } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { search, searchKeymap, openSearchPanel } from '@codemirror/search';
 import { syntaxHighlighting } from '@codemirror/language';
 import { 
   createHighlightStyle,
   createEditorTheme,
-  createHttpMixedEditor
+  createHttpMixedEditor,
+  formatHttpBody
 } from '../../../utils';
 
 const props = defineProps<{
   data: string;
   readOnly?: boolean;
   isResponse?: boolean;
+  bodyFormatted?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -24,6 +26,43 @@ const emit = defineEmits<{
 
 const editorRef = ref<HTMLElement | null>(null);
 let editorView: EditorView | null = null;
+
+// 格式化相关状态
+let currentLineMapping: number[] | null = null;
+let isShowingFormatted = false;
+let rawContent: string = '';
+
+// 自定义行号 GutterMarker
+class MappedLineNumber extends GutterMarker {
+  constructor(readonly lineNo: string) { super(); }
+  toDOM() {
+    const el = document.createTextNode(this.lineNo);
+    return el;
+  }
+}
+
+// 创建自定义行号 gutter（使用映射的行号）
+// 只在行号与上一行不同时才显示，否则显示空白（类似自动换行效果）
+function createMappedLineNumbers(lineMapping: number[]) {
+  return gutter({
+    class: 'cm-lineNumbers',
+    lineMarker(view, line) {
+      const lineIndex = view.state.doc.lineAt(line.from).number - 1;
+      if (lineIndex < lineMapping.length) {
+        const currentLineNo = lineMapping[lineIndex];
+        // 第一行始终显示，后续行只有行号变化时才显示
+        if (lineIndex === 0 || lineMapping[lineIndex - 1] !== currentLineNo) {
+          return new MappedLineNumber(String(currentLineNo));
+        }
+        return new MappedLineNumber('');
+      }
+      return new MappedLineNumber('');
+    },
+    initialSpacer() {
+      return new MappedLineNumber('99');
+    }
+  });
+}
 
 // 创建编辑器
 const createEditor = (
@@ -35,11 +74,31 @@ const createEditor = (
   // 确保content是字符串
   content = String(content || '');
   
+  // 格式化处理：如果启用了格式化，替换显示内容并使用自定义行号
+  let displayContent = content;
+  let lineMapping: number[] | null = null;
+  
+  if (props.bodyFormatted) {
+    const result = formatHttpBody(content);
+    if (result) {
+      displayContent = result.formatted;
+      lineMapping = result.lineMapping;
+      currentLineMapping = lineMapping;
+      isShowingFormatted = true;
+      rawContent = content;
+    }
+  } else {
+    currentLineMapping = null;
+    isShowingFormatted = false;
+    rawContent = content;
+  }
+  
   // 创建高亮样式
   const highlightStyle = createHighlightStyle(isDarkMode);
   
   const extensions: Extension[] = [
-    lineNumbers(),
+    // 使用自定义行号或标准行号
+    lineMapping ? createMappedLineNumbers(lineMapping) : lineNumbers(),
     highlightActiveLine(),
     history(),
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
@@ -208,20 +267,20 @@ const createEditor = (
       }
     }),
     EditorView.updateListener.of(update => {
-      if (update.docChanged && !readOnly) {
-        // 文档内容变更时触发更新
+      if (update.docChanged && !readOnly && !isShowingFormatted) {
+        // 文档内容变更时触发更新（格式化模式下不回传，避免覆盖原始数据）
         emit('update:data', update.state.doc.toString());
       }
     }),
     EditorView.theme(createEditorTheme(isDarkMode)),
     // 添加HTTP混合语法高亮
-    ...createHttpMixedEditor(content, props.isResponse)
+    ...createHttpMixedEditor(displayContent, props.isResponse)
   ];
 
   // 创建编辑器实例
   const view = new EditorView({
     state: EditorState.create({
-      doc: content,
+      doc: displayContent,
       extensions: extensions
     }),
     parent: element
@@ -257,6 +316,17 @@ const updateContent = () => {
   
   // 如果内容没有变化，不处理
   if (content === lastContent) return;
+
+  // 如果处于格式化模式，数据变化时需要重建编辑器（因为行号映射可能变化）
+  if (props.bodyFormatted && editorView && editorRef.value) {
+    const scrollTop = editorView.scrollDOM.scrollTop;
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    editorView.destroy();
+    editorView = createEditor(editorRef.value, content, props.readOnly, isDarkMode);
+    lastContent = content;
+    editorView.scrollDOM.scrollTop = scrollTop;
+    return;
+  }
 
   // 更新已存在的编辑器内容
   if (editorView) {
@@ -345,6 +415,20 @@ const debouncedUpdateContent = () => {
 
 // 监听数据变化，使用防抖优化性能
 watch(() => props.data, debouncedUpdateContent, { deep: true });
+
+// 监听格式化模式变化，需要重建编辑器（因为行号 gutter 不同）
+watch(() => props.bodyFormatted, () => {
+  if (editorView && editorRef.value) {
+    const scrollTop = editorView.scrollDOM.scrollTop;
+    const isDarkMode = document.documentElement.classList.contains(DARK_CLASS);
+    editorView.destroy();
+    // 使用原始数据重建，createEditor 内部会根据 bodyFormatted 决定是否格式化
+    const content = rawContent || props.data || '';
+    editorView = createEditor(editorRef.value, content, props.readOnly, isDarkMode);
+    lastContent = content;
+    editorView.scrollDOM.scrollTop = scrollTop;
+  }
+});
 
 // 监听主题变化
 watch(

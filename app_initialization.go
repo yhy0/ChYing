@@ -377,6 +377,9 @@ func (a *App) StepInitializationComplete() Result {
 	// 启动事件循环
 	go a.startEventLoop()
 
+	// 后台自动检查版本更新
+	go a.autoCheckForUpdates()
+
 	progress.Success = true
 	logging.Logger.Infoln("✓ 系统初始化完成，ChYing 已准备就绪")
 

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-version"
 	"github.com/logrusorgru/aurora"
+	"github.com/pkg/browser"
 	"github.com/shirou/gopsutil/process"
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/conf/file"
@@ -18,6 +21,8 @@ import (
 	"github.com/yhy0/ChYing/pkg/gadgets/fuzz"
 	"github.com/yhy0/ChYing/pkg/utils"
 	"github.com/yhy0/logging"
+
+	reqv3 "github.com/imroc/req/v3"
 )
 
 /**
@@ -273,4 +278,105 @@ func (a *App) ClearVulnerabilities() Result {
 // OpenConfigDir 打开配置目录
 func (a *App) OpenConfigDir() error {
 	return utils.OpenFolder(file.ChyingDir)
+}
+
+// githubRelease GitHub Release API 响应结构
+type githubRelease struct {
+	TagName     string `json:"tag_name"`
+	HTMLURL     string `json:"html_url"`
+	Body        string `json:"body"`
+	PublishedAt string `json:"published_at"`
+}
+
+// CheckForUpdates 检查版本更新
+func (a *App) CheckForUpdates() Result {
+	updateInfo, err := checkGitHubRelease()
+	if err != nil {
+		logging.Logger.Warnf("版本检查失败: %v", err)
+		return Result{Error: fmt.Sprintf("版本检查失败: %v", err)}
+	}
+	return Result{Data: updateInfo}
+}
+
+// GetCurrentVersion 获取当前版本号
+func (a *App) GetCurrentVersion() string {
+	return conf.Version
+}
+
+// autoCheckForUpdates 自动检查版本更新（后台静默执行）
+func (a *App) autoCheckForUpdates() {
+	// 延迟 3 秒，等待前端完全加载
+	time.Sleep(3 * time.Second)
+
+	updateInfo, err := checkGitHubRelease()
+	if err != nil {
+		logging.Logger.Warnf("自动版本检查失败: %v", err)
+		return
+	}
+
+	if updateInfo.HasUpdate {
+		logging.Logger.Infof("发现新版本: %s (当前: %s)", updateInfo.LatestVersion, updateInfo.CurrentVersion)
+		if wailsApp != nil {
+			wailsApp.Event.Emit("UpdateAvailable", updateInfo)
+		}
+	} else {
+		logging.Logger.Infof("当前已是最新版本: %s", updateInfo.CurrentVersion)
+	}
+}
+
+// checkGitHubRelease 请求 GitHub API 获取最新 Release 并对比版本
+func checkGitHubRelease() (*UpdateInfo, error) {
+	client := reqv3.C().SetTimeout(10 * time.Second).SetUserAgent("ChYing-UpdateChecker")
+
+	resp, err := client.R().Get("https://api.github.com/repos/yhy0/CHYing/releases/latest")
+	if err != nil {
+		return nil, fmt.Errorf("请求 GitHub API 失败: %w", err)
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("GitHub API 返回状态码: %d", resp.StatusCode)
+	}
+
+	var release githubRelease
+	if err := json.Unmarshal(resp.Bytes(), &release); err != nil {
+		return nil, fmt.Errorf("解析 GitHub Release 响应失败: %w", err)
+	}
+
+	if release.TagName == "" {
+		return nil, fmt.Errorf("GitHub Release 中未找到版本标签")
+	}
+
+	// 清理版本号前缀 v
+	latestTag := strings.TrimPrefix(release.TagName, "v")
+	currentTag := strings.TrimPrefix(conf.Version, "v")
+
+	latestVer, err := version.NewVersion(latestTag)
+	if err != nil {
+		return nil, fmt.Errorf("解析最新版本号 '%s' 失败: %w", release.TagName, err)
+	}
+
+	currentVer, err := version.NewVersion(currentTag)
+	if err != nil {
+		return nil, fmt.Errorf("解析当前版本号 '%s' 失败: %w", conf.Version, err)
+	}
+
+	updateInfo := &UpdateInfo{
+		HasUpdate:      latestVer.GreaterThan(currentVer),
+		CurrentVersion: conf.Version,
+		LatestVersion:  release.TagName,
+		ReleaseURL:     release.HTMLURL,
+		ReleaseNotes:   release.Body,
+		PublishedAt:    release.PublishedAt,
+	}
+
+	return updateInfo, nil
+}
+
+// OpenURL 在系统默认浏览器中打开 URL
+func (a *App) OpenURL(url string) Result {
+	if err := browser.OpenURL(url); err != nil {
+		logging.Logger.Errorf("打开 URL 失败: %v", err)
+		return Result{Error: fmt.Sprintf("打开 URL 失败: %v", err)}
+	}
+	return Result{Data: "OK"}
 }

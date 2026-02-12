@@ -428,19 +428,34 @@ func onRequestCallback(req *http.Request, ctx *martian.Context) error {
 	}
 
 	// Body 已完整读取到内存，移除 chunked 编码标记，避免 DumpRequestOut 输出 chunk 格式
+	// 需要同时检查 req.TransferEncoding 字段和 Header 中的 Transfer-Encoding，
+	// 因为在某些代理场景下，Go 的 HTTP 解析器可能只设置其中一个
+	isChunked := false
 	if req.TransferEncoding != nil {
 		for _, te := range req.TransferEncoding {
 			if strings.EqualFold(te, "chunked") {
-				req.TransferEncoding = nil
-				req.ContentLength = int64(len(requestBodyBytes))
-				// 同时更新 Header
-				req.Header.Del("Transfer-Encoding")
-				if len(requestBodyBytes) > 0 {
-					req.Header.Set("Content-Length", strconv.Itoa(len(requestBodyBytes)))
-				}
+				isChunked = true
 				break
 			}
 		}
+	}
+	if !isChunked && strings.EqualFold(req.Header.Get("Transfer-Encoding"), "chunked") {
+		isChunked = true
+	}
+	if isChunked {
+		req.TransferEncoding = nil
+		req.ContentLength = int64(len(requestBodyBytes))
+		req.Header.Del("Transfer-Encoding")
+		if len(requestBodyBytes) > 0 {
+			req.Header.Set("Content-Length", strconv.Itoa(len(requestBodyBytes)))
+		}
+	}
+
+	// 确保 ContentLength 与实际 body 长度一致，
+	// 避免 DumpRequestOut 因 ContentLength 为 0/-1 而自动使用 chunked 编码输出
+	if len(requestBodyBytes) > 0 && req.ContentLength <= 0 {
+		req.ContentLength = int64(len(requestBodyBytes))
+		req.Header.Set("Content-Length", strconv.Itoa(len(requestBodyBytes)))
 	}
 
 	// 2. 生成初始请求dump

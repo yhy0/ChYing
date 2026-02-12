@@ -3,7 +3,10 @@ package main
 import (
 	"embed"
 	_ "embed"
+	"fmt"
 
+	"github.com/pkg/browser"
+	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/mitmproxy"
 	"github.com/yhy0/ChYing/pkg/db"
 	"github.com/yhy0/logging"
@@ -96,6 +99,13 @@ func main() {
 			if window := wailsApp.Window.Current(); window != nil {
 				window.OpenDevTools()
 			}
+		})
+
+	// 添加帮助菜单
+	helpMenu := menu.AddSubmenu("帮助")
+	helpMenu.Add("检查更新").
+		OnClick(func(ctx *application.Context) {
+			go menuCheckForUpdates()
 		})
 
 	wailsApp.Menu.Set(menu)
@@ -192,3 +202,41 @@ func EventNotification() {
 }
 
 // FileSelection 已移动到 app_window.go
+
+// menuCheckForUpdates 菜单栏触发的版本检查
+func menuCheckForUpdates() {
+	updateInfo, err := checkGitHubRelease()
+	if err != nil {
+		logging.Logger.Warnf("菜单检查更新失败: %v", err)
+		wailsApp.Dialog.Error().
+			SetTitle("检查更新失败").
+			SetMessage(fmt.Sprintf("无法检查更新: %v", err)).
+			Show()
+		return
+	}
+
+	if !updateInfo.HasUpdate {
+		wailsApp.Dialog.Info().
+			SetTitle("检查更新").
+			SetMessage(fmt.Sprintf("当前版本 %s 已是最新版本！", conf.Version)).
+			Show()
+		return
+	}
+
+	// 发现新版本，弹出确认对话框
+	dialog := wailsApp.Dialog.Question().
+		SetTitle("发现新版本").
+		SetMessage(fmt.Sprintf("当前版本: %s\n最新版本: %s\n\n是否前往 GitHub 下载最新版本？", updateInfo.CurrentVersion, updateInfo.LatestVersion))
+
+	yesBtn := dialog.AddButton("前往下载").SetAsDefault()
+	yesBtn.OnClick(func() {
+		if err := browser.OpenURL(updateInfo.ReleaseURL); err != nil {
+			logging.Logger.Errorf("打开下载页面失败: %v", err)
+		}
+	})
+
+	noBtn := dialog.AddButton("稍后再说").SetAsCancel()
+	_ = noBtn
+
+	dialog.Show()
+}

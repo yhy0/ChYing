@@ -18,12 +18,14 @@ require (
 	github.com/go-rod/rod v0.116.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
+	github.com/hashicorp/go-version v1.8.0
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/imroc/req/v3 v3.57.0
 	github.com/ipinfo/go/v2 v2.10.0
 	github.com/klauspost/compress v1.18.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/panjf2000/ants/v2 v2.11.4
+	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/dsl v0.8.12
 	github.com/projectdiscovery/gologger v1.1.67
@@ -127,7 +129,6 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/hashicorp/go-version v1.8.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/haxii/fastproxy v0.6.1 // indirect
 	github.com/hdm/jarm-go v0.0.7 // indirect
@@ -175,7 +176,6 @@ require (
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.23 // indirect
 	github.com/pjbgf/sha1cd v0.5.0 // indirect
-	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
 	github.com/projectdiscovery/fastdialer v0.5.3 // indirect

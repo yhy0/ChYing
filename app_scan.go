@@ -30,6 +30,16 @@ func (a *App) Dashboard() []*Msg {
 	return msg
 }
 
+// GetTotalRequests 获取请求总数
+func (a *App) GetTotalRequests() int64 {
+	if db.GlobalDB == nil {
+		return 0
+	}
+	var count int64
+	db.GlobalDB.Table("http_histories").Count(&count)
+	return count
+}
+
 // GetTargetInfo 获取目标信息
 func (a *App) GetTargetInfo(host string) *Msg {
 	return getMsg(host)

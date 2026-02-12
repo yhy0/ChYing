@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, provide, computed, watch } from 'vue';
+import { ref, provide, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useVulnerabilityStore } from '../../store';
+import { Events } from "@wailsio/runtime";
+// @ts-ignore
+import { GetTotalRequests } from "../../../bindings/github.com/yhy0/ChYing/app.js";
 import ProjectHeader from './ProjectHeader.vue';
 import ProjectSiteMapIntegrated from './tabs/ProjectSiteMapIntegrated.vue';
 import ProjectVulnerabilitiesTab from './tabs/ProjectVulnerabilitiesTab.vue';
@@ -50,6 +53,27 @@ watch([vulnerabilitiesCount, hostsCount], ([vulCount, hostCount]) => {
   selectedProject.value.issuesFound = vulCount;
   selectedProject.value.hosts = hostCount;
 }, { immediate: true });
+
+// 获取请求总数并监听实时更新
+onMounted(() => {
+  // 从后端获取初始请求总数
+  GetTotalRequests()
+    .then((count: number) => {
+      selectedProject.value.totalRequests = count || 0;
+    })
+    .catch((err: any) => {
+      console.error('获取请求总数失败:', err);
+    });
+
+  // 监听 HttpHistory 事件，每有新请求就递增计数
+  Events.On("HttpHistory", () => {
+    selectedProject.value.totalRequests++;
+  });
+});
+
+onBeforeUnmount(() => {
+  Events.Off("HttpHistory");
+});
 
 // 安全问题数据从后端获取，初始为空数组
 const securityIssues = ref<SecurityIssue[]>([]);

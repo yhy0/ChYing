@@ -56,6 +56,22 @@ const handleProxyStarted = (event: any) => {
   }
 };
 
+// 处理版本更新事件
+const handleUpdateAvailable = (event: any) => {
+  const data = event.data;
+  if (data && data.hasUpdate) {
+    showGlobalNotification(
+      t('settings.update_available_msg', { version: data.latestVersion }),
+      'info'
+    );
+    store.addNotification({
+      type: 'info',
+      title: t('settings.update_available'),
+      message: `${t('settings.latest_version')}: ${data.latestVersion}\n${t('settings.current_version')}: ${data.currentVersion}\n${data.releaseUrl || ''}`
+    });
+  }
+};
+
 // Event Bus Handler Functions
 const handleSendToRepeater = (payload: { sourceItem: import('./types').ProxyHistoryItem }) => {
   console.log('App.vue: Event SEND_TO_REPEATER_REQUESTED received', payload);
@@ -82,6 +98,7 @@ onMounted(async () => {
 
   // 注册 Wails 后端事件监听器
   Events.On("ProxyStarted", handleProxyStarted);
+  Events.On("UpdateAvailable", handleUpdateAvailable);
 
   // 注册 eventBus 事件监听器
   eventBus.on(SEND_TO_REPEATER_REQUESTED, handleSendToRepeater);
@@ -125,6 +142,7 @@ onUnmounted(() => {
 
   // 取消注册 Wails 后端事件监听器
   Events.Off("ProxyStarted");
+  Events.Off("UpdateAvailable");
 
   // 取消注册 eventBus 事件监听器
   eventBus.off(SEND_TO_REPEATER_REQUESTED, handleSendToRepeater);

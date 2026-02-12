@@ -95,6 +95,16 @@ type MemoryInfo struct {
 	NumGoroutine int `json:"numGoroutine"`
 }
 
+// UpdateInfo 版本更新信息
+type UpdateInfo struct {
+	HasUpdate      bool   `json:"hasUpdate"`
+	CurrentVersion string `json:"currentVersion"`
+	LatestVersion  string `json:"latestVersion"`
+	ReleaseURL     string `json:"releaseUrl"`
+	ReleaseNotes   string `json:"releaseNotes"`
+	PublishedAt    string `json:"publishedAt"`
+}
+
 // Msg 消息结构体
 type Msg struct {
 	Target       string         `json:"target"`

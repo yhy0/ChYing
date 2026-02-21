@@ -32,8 +32,6 @@ const vulnerabilityStats = computed(() => {
 });
 
 onMounted(() => {
-  console.log('漏洞组件初始化，从 store 获取数据');
-  
   // 设置超时，如果 store 中有数据或者等待一段时间后停止加载状态
   setTimeout(() => {
     isLoading.value = false;

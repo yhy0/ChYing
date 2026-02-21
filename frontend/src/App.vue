@@ -74,16 +74,14 @@ const handleUpdateAvailable = (event: any) => {
 
 // Event Bus Handler Functions
 const handleSendToRepeater = (payload: { sourceItem: import('./types').ProxyHistoryItem }) => {
-  console.log('App.vue: Event SEND_TO_REPEATER_REQUESTED received', payload);
-  const newTabId = store.addRepeaterTabFromEventPayload(payload); 
+  const newTabId = store.addRepeaterTabFromEventPayload(payload);
   if (newTabId) {
     router.push('/app/repeater');
   }
 };
 
 const handleSendToIntruder = (payload: { sourceItem: import('./types').ProxyHistoryItem | import('./types').RepeaterTab }) => {
-  console.log('App.vue: Event SEND_TO_INTRUDER_REQUESTED received', payload);
-  const newTabId = store.addIntruderTabFromEventPayload(payload); 
+  const newTabId = store.addIntruderTabFromEventPayload(payload);
   if (newTabId) {
     router.push('/app/intruder');
   }
@@ -93,8 +91,6 @@ const handleSendToIntruder = (payload: { sourceItem: import('./types').ProxyHist
 onMounted(async () => {
   // 初始化 store 中的通知状态
   store.setUnreadCount?.(0);
-
-  console.log('App.vue: Mounting and setting up event listeners.');
 
   // 注册 Wails 后端事件监听器
   Events.On("ProxyStarted", handleProxyStarted);
@@ -138,8 +134,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  console.log('App.vue: Unmounting and tearing down event listeners.');
-
   // 取消注册 Wails 后端事件监听器
   Events.Off("ProxyStarted");
   Events.Off("UpdateAvailable");

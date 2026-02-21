@@ -156,7 +156,6 @@ const toggleFilter = () => {
 
 // 刷新数据（实际上数据是实时从后端推送的）
 const refreshData = () => {
-  console.log('扫描日志数据来自实时推送，无需手动刷新');
 };
 
 // 清空日志（带跨窗口同步）
@@ -185,8 +184,6 @@ const exportLogs = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
-    console.log('已导出', logsToExport.length, '条扫描日志');
   } catch (error) {
     console.error('导出日志失败:', error);
   }
@@ -232,14 +229,12 @@ const handleStorageChange = (e: StorageEvent) => {
     i18n.global.locale.value = newLang;
     document.querySelector('html')?.setAttribute('lang', newLang);
       }
-    
-    console.log("ScanLogView - handleStorageChange", e.key, e.newValue);
+
     // 处理扫描日志数据同步
   if (e.key === 'scan-log-data' && e.newValue) {
     try {
       const scanLogData = JSON.parse(e.newValue);
-      console.log('ScanLogView - 接收到跨窗口扫描日志数据:', scanLogData);
-      
+
       // 直接调用 store 的方法来处理扫描消息
       if (scanLogData.type === 'add') {
         scanLogStore.addScanLog(scanLogData.data);
@@ -258,10 +253,6 @@ onMounted(() => {
 
   // 清理过期数据（保留最近7天）
   scanLogStore.cleanupOldLogs();
-
-  // 输出存储使用情况
-  const storageInfo = scanLogStore.getStorageInfo();
-  console.log('扫描日志存储信息:', storageInfo);
 
   // 监听localStorage变化（跨窗口主题同步）
   window.addEventListener('storage', handleStorageChange);

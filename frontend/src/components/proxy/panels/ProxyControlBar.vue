@@ -17,7 +17,6 @@ const proxyListener = ref('');
 onMounted(() => {
   // 获取默认的爆破字典文件路径
   GetConfig().then((result: any) => {
-    console.log('获取配置:', result);
     try {
       // 解析JSON字符串
       const config = JSON.parse(result);

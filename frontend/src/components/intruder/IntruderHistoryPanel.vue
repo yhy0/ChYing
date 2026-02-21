@@ -181,7 +181,6 @@ watch(() => props.selectedResult, (newResult) => {
 const handleSelectItem = (item: HttpTrafficItem) => {
   const originalResult = getOriginalResult(item);
   if (originalResult) {
-    console.log('选中结果项:', originalResult.id);
     emit('select-result', originalResult);
   } else {
     console.error('无法获取原始结果数据');

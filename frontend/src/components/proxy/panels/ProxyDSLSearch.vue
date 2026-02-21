@@ -263,14 +263,12 @@ const selectExample = (query: string) => {
 const handleInputFocus = () => {
   showSuggestions.value = true;
   updateSuggestions();
-  console.log('输入框获得焦点，显示建议:', showSuggestions.value, '建议数量:', suggestions.value.length);
 };
 
 // 输入事件
 const handleInput = () => {
   showSuggestions.value = true;
   updateSuggestions();
-  console.log('输入事件触发，显示建议:', showSuggestions.value, '建议数量:', suggestions.value.length);
 };
 
 // 输入框失去焦点事件
@@ -278,7 +276,6 @@ const handleInputBlur = () => {
   // 延迟关闭建议，以便可以点击建议
   setTimeout(() => {
     showSuggestions.value = false;
-    console.log('输入框失去焦点，隐藏建议');
   }, 300); // 增加延迟时间，确保有足够时间点击
 };
 

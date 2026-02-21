@@ -198,13 +198,10 @@ watch(() => projectStore.siteMapData, (newSiteMapData) => {
   if (newSiteMapData && newSiteMapData.length > 0) {
     // 从站点地图数据中提取主机列表
     const hosts = newSiteMapData.map(node => node.name);
-    // console.log('发现站点地图根节点数量:', newSiteMapData.length);
-    // console.log('提取到的主机列表:', hosts);
-    
+
     // 确保提取的是有效的主机名
     const validHosts = hosts.filter(host => host && typeof host === 'string' && host.length > 0);
-    // console.log('有效的主机列表:', validHosts);
-    
+
     // 调用父组件注入的函数更新主机数据
     if (validHosts.length > 0) {
       updateSiteMapHosts(validHosts);

@@ -174,15 +174,9 @@ const addToHistory = (request: string, response: string | null, server_duration_
 const sendRequest = async () => {
   isLoading.value = true;
   selectedHistoryId.value = null; // 重置选择的历史记录
-  console.log('Sending request:', props.tab.request);
-  console.log('URL:', requestUrl.value);
-  console.log('h:', history.value);
-  console.log('s:', selectedHistoryId.value);
 
   RawRequest(props.tab.request, requestUrl.value, props.tab.id).then(result => {
-    console.log(result);
     if (result && result.error !== "") {
-      console.log(result.error)
       updateResponse("error: " + result.error);
       // 添加到历史记录
       addToHistory(props.tab.request, "error: " + result.error, result.data?.server_duration_ms || 0);

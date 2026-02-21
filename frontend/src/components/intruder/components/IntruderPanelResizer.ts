@@ -58,17 +58,6 @@ export function useIntruderPanelResizer() {
     
     // 添加拖拽中的样式
     document.body.classList.add('dragging');
-    
-    console.log('开始拖拽操作：', {
-      initialX: initialX.value,
-      initialLeftWidth: initialLeftWidth.value,
-      isDragging: isDragging.value,
-      panels: {
-        container: containerRef.value,
-        left: leftPanel.value,
-        right: rightPanel.value
-      }
-    });
   };
 
   // 拖拽过程
@@ -113,11 +102,6 @@ export function useIntruderPanelResizer() {
     
     // 恢复正常鼠标样式
     document.body.classList.remove('dragging');
-    
-    console.log('拖拽操作结束，最终宽度：', {
-      leftWidth: `${leftPanelWidth.value}%`,
-      rightWidth: `${100 - leftPanelWidth.value}%`
-    });
   };
 
   // 清理事件监听器
@@ -125,8 +109,6 @@ export function useIntruderPanelResizer() {
     document.removeEventListener('mousemove', handleMouseMove, { capture: true });
     document.removeEventListener('mouseup', stopResize, { capture: true });
     document.body.classList.remove('dragging');
-    
-    console.log('已清理拖拽事件监听器');
   };
 
   // 组件卸载时自动清理

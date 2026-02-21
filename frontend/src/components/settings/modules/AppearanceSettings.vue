@@ -54,7 +54,6 @@ const setAndStoreCustomFontSize = (value: number) => {
   document.body.style.display = '';
   
   localStorage.setItem('app-custom-font-size', value.toString());
-  console.log(`设置自定义字体大小为: ${value}px (${remSize}rem) 并已保存`);
 };
 
 // 应用自定义字体大小

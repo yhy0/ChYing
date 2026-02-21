@@ -216,7 +216,6 @@ Connection: close
     const tab = tabs.value.find(tab => tab.id === tabId);
     if (tab) {
       // 转换 AttackResult 为 IntruderResult
-      console.log('result', result.id)
       const intruderResult: IntruderResult = {
         id: Number(result.id || 0),
         payload: result.payload,
@@ -398,7 +397,6 @@ Connection: close
     if (!tab) return;
     
     // 因为这个方法不完整，我们在这里不执行任何操作
-    console.log('开始攻击', tabId);
   }
 
   // 类型转换辅助函数

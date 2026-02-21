@@ -207,7 +207,7 @@ export function useTabsManagement<T extends BaseTab, G extends TabGroup = TabGro
       try {
         document.body.removeChild(menuElement.value);
       } catch (e) {
-        console.log('Menu already removed');
+        console.error('Menu already removed');
       }
       menuElement.value = null;
     }
@@ -258,11 +258,6 @@ export function useTabsManagement<T extends BaseTab, G extends TabGroup = TabGro
     emitChangeTabColor: (tabId: string, color: string) => void
   ) => {
     let html = `<style>${getMenuStyles()}</style>`;
-
-    // 分组数据检查
-    if (reactiveGroups.value.length === 0) {
-      console.log('提示：当前没有分组，可以通过右键菜单创建新分组');
-    }
 
     // 分组部分 - 只有当启用分组时才显示
     if (opts.enableGroups && emitChangeTabGroup && emitCreateGroup) {
@@ -672,8 +667,6 @@ export function useTabsManagement<T extends BaseTab, G extends TabGroup = TabGro
         
         // 如果分组不同，且提供了改变分组的回调，则执行跨分组拖放
         if (draggedGroupId !== targetGroupId && emitChangeTabGroup) {
-          console.log(`Moving tab from group ${draggedGroupId} to group ${targetGroupId}`);
-          
           // 先更改分组
           emitChangeTabGroup(draggedTabId.value, targetGroupId);
           
@@ -741,7 +734,6 @@ export function useTabsManagement<T extends BaseTab, G extends TabGroup = TabGro
         const sourceGroupId = (draggedTab as any).groupId;
         // 只有当源分组和目标分组不同时才更改
         if (sourceGroupId !== targetGroupId) {
-          console.log(`Moving tab from group ${sourceGroupId} to ${targetGroupId}`);
           // 触发分组更改
           emitChangeTabGroup(draggedTabId.value, targetGroupId);
           

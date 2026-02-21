@@ -81,7 +81,6 @@ watch(() => props.selectedNode, (newNode) => {
   // 更新当前主机值
   if (newNode && newNode.nodeType === 'host') {
     currentHost.value = newNode.name;
-    console.log(currentHost.value);
   } else if (newNode) {
     // 如果是其他类型节点，尝试从URL中提取主机名
     const hostFromUrl = newNode.fullUrl?.split('/')[2];

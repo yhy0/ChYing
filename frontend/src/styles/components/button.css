@@ -1,43 +1,5 @@
 /* 统一按钮组件样式 */
 
-/* 按钮基础变量 */
-:root {
-  --btn-primary: #4f46e5;
-  --btn-primary-hover: #4338ca;
-  --btn-primary-active: #3730a3;
-  --btn-secondary: #f3f4f6;
-  --btn-secondary-hover: #e5e7eb;
-  --btn-secondary-active: #d1d5db;
-  --btn-danger: #ef4444;
-  --btn-danger-hover: #dc2626;
-  --btn-danger-active: #b91c1c;
-  --btn-success: #10b981;
-  --btn-success-hover: #059669;
-  --btn-success-active: #047857;
-  --btn-warning: #f59e0b;
-  --btn-warning-hover: #d97706;
-  --btn-warning-active: #b45309;
-}
-
-/* 暗色主题变量 */
-.dark {
-  --btn-primary: #6366f1;
-  --btn-primary-hover: #4f46e5;
-  --btn-primary-active: #4338ca;
-  --btn-secondary: #282838;
-  --btn-secondary-hover: #363646;
-  --btn-secondary-active: #424254;
-  --btn-danger: #ef4444;
-  --btn-danger-hover: #dc2626;
-  --btn-danger-active: #b91c1c;
-  --btn-success: #10b981;
-  --btn-success-hover: #059669;
-  --btn-success-active: #047857;
-  --btn-warning: #f59e0b;
-  --btn-warning-hover: #d97706;
-  --btn-warning-active: #b45309;
-}
-
 /* 基础按钮样式 - 纯液态玻璃质感（无颜色） */
 .btn {
   display: flex;
@@ -383,44 +345,7 @@
 }
 
 .btn-clear:hover {
-  color: var(--btn-danger);
-}
-
-/* 脉冲按钮 - 带波动效果 */
-.btn-pulse {
-  position: relative;
-}
-
-.btn-pulse::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: transparent;
-  border-radius: inherit;
-  z-index: -1;
-  box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
-  animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
-}
-
-@keyframes pulse {
-  to {
-    box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
-  }
-}
-
-/* 悬浮按钮 - 带上升效果（保留位移，这是特殊效果按钮） */
-.btn-float {
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-}
-
-.btn-float:hover {
-  transform: translateY(-4px);
-  box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.2),
-    0 0 30px rgba(99, 102, 241, 0.2);
+  color: var(--btn-danger-bg);
 }
 
 /* 禁用状态 */

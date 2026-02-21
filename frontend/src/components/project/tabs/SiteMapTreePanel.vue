@@ -50,13 +50,12 @@ onMounted(() => {
   }
 
   // 主动获取初始数据
-  console.log('主动获取Dashboard数据');
   Dashboard()
     .then((result: any) => {
       if (result && Array.isArray(result)) {
         processDashboardData(result);
       } else {
-        console.log('获取到的数据格式不正确:', result);
+        // Data format incorrect, skip
       }
     })
     .catch((error: any) => {
@@ -87,7 +86,6 @@ onMounted(() => {
     
     // 如果没有有效目标，则不更新
     if (targets.length === 0) {
-      console.log('无效的目标数据');
       return;
     }
     
@@ -193,11 +191,8 @@ const addSiteMapChildNodes = (rootNode: SiteMapNode, targetHost: string, urls: s
 
 // 处理Dashboard数据并转换为站点地图格式
 const processDashboardData = (result: any) => {
-  console.log('处理Dashboard数据:', result);
-  
   // 检查数据结构
   if (!result || result.length === 0) {
-    console.log('Dashboard数据为空');
     return;
   }
   
@@ -365,23 +360,16 @@ const selectNode = (node: SiteMapNode) => {
   
   // 首先发送节点选择事件，传递空数据，让UI立即更新
   emit('node-selected', node, "", "");
-  
-  console.log('选择节点:', node.name, node.path, node.fullUrl);
-  
+
   // 如果是文件节点或者有明确路径的节点，尝试获取请求响应数据
   if (node.nodeType === 'file' || (node.path !== '/' && node.path.length > 1)) {
     // 准备请求的参数，使用节点的fullUrl作为key
     const url = node.fullUrl;
-    
-    console.log('尝试获取请求响应数据:', url);
-    
+
     // 调用GetHistoryDumpIndex获取请求响应数据
     GetHistoryDumpIndex(url).then((HTTPBody: any) => {
-      console.log('获取到请求响应:', HTTPBody);
-      
       if (HTTPBody === null) {
         // 如果没有数据，发送空数据
-        console.log('没有找到请求响应数据');
         emit('node-selected', node, "", "");
         return;
       }
@@ -396,7 +384,6 @@ const selectNode = (node: SiteMapNode) => {
       if (typeof response === 'object') response = JSON.stringify(response, null, 2);
       
       // 发送节点和请求响应数据
-      console.log('发送请求响应数据');
       emit('node-selected', node, request, response);
     }).catch((error: Error) => {
       console.error('获取HTTP请求响应失败:', error);
@@ -404,7 +391,6 @@ const selectNode = (node: SiteMapNode) => {
     });
   } else {
     // 如果是根节点或目录节点，只发送节点信息
-    console.log('根节点或目录节点，不获取请求响应');
     emit('node-selected', node, "", "");
   }
 };

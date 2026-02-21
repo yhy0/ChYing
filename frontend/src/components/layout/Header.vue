@@ -49,12 +49,9 @@ const loadProxyConfig = async () => {
 const launchChrome = () => {
   isLaunchingBrowser.value = true;
   
-  console.log('启动Chrome浏览器，代理地址:', proxyUrl.value);
-  
   // 调用后端函数启动Chrome浏览器
   OpenChromeBrowser(proxyUrl.value)
     .then(() => {
-      console.log('Chrome浏览器启动成功');
       showChromeModal.value = false;
     })
     .catch((error: Error) => {
@@ -76,9 +73,6 @@ const openChromeModal = async () => {
 // 打开Claude Agent窗口
 const openClaudeAgent = () => {
   NewClaudeAgentWindow([])  // 传递空数组表示不带流量 ID
-    .then(() => {
-      console.log('Claude Agent窗口已打开');
-    })
     .catch((error: Error) => {
       console.error('打开Claude Agent窗口失败:', error);
     });
@@ -87,9 +81,6 @@ const openClaudeAgent = () => {
 // 打开配置目录
 const openConfigDirectory = () => {
   OpenConfigDir()
-    .then(() => {
-      console.log('配置目录已打开');
-    })
     .catch((error: Error) => {
       console.error('打开配置目录失败:', error);
     });

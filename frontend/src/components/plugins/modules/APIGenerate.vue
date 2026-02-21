@@ -23,7 +23,6 @@ function generateApi() {
   show.value = true;
   
   PredictionApi(api.value).then((res: any) => {
-    console.log('API 生成结果:', res);
     apiGenerator.value = res;
     show.value = false;
   }).catch((err: any) => {
@@ -35,10 +34,7 @@ function generateApi() {
 
 // 复制结果到剪贴板
 function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text).then(() => {
-    // 可以添加提示，但这里简化处理
-    console.log('已复制到剪贴板');
-  }).catch(err => {
+  navigator.clipboard.writeText(text).catch(err => {
     console.error('复制失败:', err);
   });
 }

@@ -273,12 +273,9 @@ const toggleCheck = async () => {
 const fetchTestResults = async () => {
   try {
     const response = await GetAuthorizationTestResults();
-    console.log('AuthorizationChecker - 获取测试结果:', response);
-    
     if (response && Array.isArray(response)) { // 假设后端直接返回 TestResult[]
       // 确保响应式更新 - 创建新数组而不是直接赋值
       const newResults = [...response];
-      console.log('AuthorizationChecker - 更新测试结果 (数组格式):', newResults.length, '条记录');
       testResults.value = newResults;
 
       if (testResults.value.length > lastResultsCount.value) {
@@ -289,7 +286,6 @@ const fetchTestResults = async () => {
     } else if (response && response.data && Array.isArray(response.data)) { // 兼容旧的包裹格式
       // 确保响应式更新 - 创建新数组而不是直接赋值
       const newResults = [...response.data];
-      console.log('AuthorizationChecker - 更新测试结果 (包裹格式):', newResults.length, '条记录');
       testResults.value = newResults;
       
       if (testResults.value.length > lastResultsCount.value) {
@@ -298,14 +294,9 @@ const fetchTestResults = async () => {
         lastResultsCount.value = testResults.value.length;
       }
     }
-    
-    console.log('AuthorizationChecker - 当前测试结果:', testResults.value.length, '条');
-    console.log('AuthorizationChecker - 过滤后结果:', filteredResults.value.length, '条');
-    console.log('AuthorizationChecker - 适配后结果:', adaptedResults.value.length, '条');
-    
+
     // 强制触发重新渲染
     tableRenderKey.value++;
-    console.log('AuthorizationChecker - 表格渲染key更新为:', tableRenderKey.value);
   } catch (error) {
     console.error("获取测试结果失败:", error);
     showNotification(t('modules.plugins.authorization_checker.notifications.operation_failed', { error }), 'error'); // 避免过于频繁的错误提示
@@ -335,7 +326,6 @@ const saveRules = async (showSavedNotification = true) => {
       rules: rules.value,
       filterCondition: filterCondition
     };
-    console.log(dataToSave);
     await SaveAuthorizationRules(dataToSave);
     if (showSavedNotification) {
       showNotification(t('modules.plugins.authorization_checker.notifications.config_saved'), 'success');

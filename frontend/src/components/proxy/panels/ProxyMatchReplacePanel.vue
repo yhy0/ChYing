@@ -70,11 +70,8 @@ const getRuleTypeLabel = (type: RuleType) => {
 const loadRules = async () => {
   isLoading.value = true;
   try {
-    console.log("loadRules....");
     // 调用后端接口获取规则列表
     const response = await GetMatchReplaceRules();
-    console.log("response.....");
-    console.log(response);
 
     // 检查是否有错误
     if (response.error) {
@@ -91,9 +88,7 @@ const loadRules = async () => {
     emit('notify', t('modules.matchReplace.loadError', { error: String(error) }));
   } finally {
     isLoading.value = false;
-    console.log("loadRules finally");
   }
-  console.log("loadRules finally......");
 };
 
 // 保存规则
@@ -163,10 +158,6 @@ const deleteRule = async (ruleId: number) => {
 
 // 应用规则
 const applyRules = async () => {
-  console.log("Applying rules with:", {
-    rulesCount: rules.value.length
-  });
-
   try {
     // 调用后端接口应用规则
     const response = await ApplyMatchReplaceRules({
@@ -179,7 +170,6 @@ const applyRules = async () => {
       throw new Error(response.error);
     }
 
-    console.log("应用规则成功:", response.data);
     return true;
   } catch (error) {
     console.error('Failed to apply match replace rules:', error);

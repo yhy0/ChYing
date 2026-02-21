@@ -146,12 +146,9 @@ const router = createRouter({
 });
 
 // 添加路由守卫来处理未匹配的路由
-router.beforeEach((to, from, next) => {
-  console.log("---1---", to, from)
-  console.log("---2---", to.matched)
+router.beforeEach((to, _from, next) => {
   // 如果路由不存在，重定向到首页
   if (!to.matched.length) {
-    console.warn(`Route not found: ${to.path}, redirecting to /`);
     next('/');
   } else {
     next();

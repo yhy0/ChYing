@@ -227,7 +227,6 @@ const copyLastOutput = async () => {
   if (!outputToCopy) return;
   try {
     await navigator.clipboard.writeText(outputToCopy);
-    console.log('Copied!'); 
   } catch (err) {
     console.error('Failed to copy text: ', err);
   }

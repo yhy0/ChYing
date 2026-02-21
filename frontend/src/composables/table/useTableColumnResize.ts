@@ -46,7 +46,6 @@ export function useTableColumnResize(options: UseTableColumnResizeOptions) {
   const handleResizeStart = (event: MouseEvent, columnId: string) => {
     event.preventDefault();
     event.stopPropagation();
-    console.log('handleResizeStart', event, columnId);
     isResizing.value = true;
     resizingColumnId.value = columnId;
     startX.value = event.clientX;
@@ -88,7 +87,6 @@ export function useTableColumnResize(options: UseTableColumnResizeOptions) {
 
   // 处理列调整结束
   const handleResizeEnd = () => {
-    console.log('handleResizeEnd triggered');
     if (!isResizing.value) return;
     
     isResizing.value = false;
@@ -129,7 +127,6 @@ export function useTableColumnResize(options: UseTableColumnResizeOptions) {
         console.error('Failed to parse saved column widths', e);
       }
     }
-    console.log(`[${tableId}] Initial columnWidths after onMounted:`, JSON.parse(JSON.stringify(columnWidths.value)));
   });
 
   // 在组件销毁时清理

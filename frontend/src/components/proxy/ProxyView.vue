@@ -112,8 +112,6 @@ onMounted(() => {
 
   // 获取所有历史记录
   GetHistoryAll().then((res: any) => {
-    console.log('Received history data:', res);
-    
     // 只有在历史记录为空时才加载，避免重复加载
     if (store.proxyHistory.length === 0 && res && res.length > 0) {
       res.forEach((item: HttpHistoryData) => {
@@ -153,13 +151,11 @@ onMounted(() => {
       return;
     }
     const { id, color } = markerData;
-    console.log('Updating item color:', id, color);
     store.setProxyItemColor(id, color);
   });
 
   // 设置第一项为默认选中（如果有数据）
   if (store.proxyHistory.length > 0 && !selectedItem.value) {
-    console.log('Setting initial selected item:', store.proxyHistory[0]);
     selectItem(store.proxyHistory[0]);
   }
 
@@ -260,7 +256,6 @@ const selectItem = (item: ProxyHistoryItem) => {
 
   // 获取请求和响应数据
   GetHistoryDump(Number(item.id)).then((HTTPBody: any) => {
-    console.log('HTTPBody:', HTTPBody);
     if (selectedItem.value && selectedItem.value.id === item.id) {
       selectedItem.value.request = HTTPBody.request_raw;
       selectedItem.value.response = HTTPBody.response_raw;
@@ -276,7 +271,7 @@ const selectItem = (item: ProxyHistoryItem) => {
       });
     }
   }).catch((err: any) => {
-    console.log('Error getting history dump:', err);
+    console.error('Error getting history dump:', err);
     if (selectedItem.value && selectedItem.value.id === item.id) {
       selectedItem.value.isLoading = false;
     }
@@ -310,7 +305,7 @@ watch(
               selectedItem.value.response = HTTPBody.response_raw;
             }
           }).catch((err: any) => {
-            console.log('Error getting history dump:', err);
+            console.error('Error getting history dump:', err);
           });
         }
       }
@@ -325,23 +320,16 @@ const interceptPanelRef = ref<InstanceType<typeof ProxyInterceptPanel>>();
 // 拦截开关
 const toggleInterception = () => {
   const newStatus = !proxyInterceptEnabled.value;
-  
-  console.log('Toggling intercept mode:', { 
-    current: proxyInterceptEnabled.value, 
-    new: newStatus 
-  });
 
   // 如果是关闭拦截，先放行所有队列中的请求
   if (!newStatus && interceptPanelRef.value) {
-    console.log('Intercept is being disabled, forwarding all queued items...');
     interceptPanelRef.value.forwardAllAndClear();
   }
 
   // 调用后端拦截API
   SetProxyInterceptMode(newStatus).then(() => {
     proxyInterceptEnabled.value = newStatus;
-    console.log('Intercept status changed successfully:', newStatus);
-    
+
     const message = newStatus
       ? (t('modules.proxy.controls.intercept_on') || '拦截已开启')
       : (t('modules.proxy.controls.intercept_off') || '拦截已关闭，所有队列项目已放行');

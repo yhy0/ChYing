@@ -2,7 +2,6 @@
 import { message } from "./message";
 
 export function copyList(data: string[]) {
-    console.log(data);
     const apiList = data.join("\n"); // 将 API 列表转换为字符串
     navigator.clipboard.writeText(apiList).then(() => {
         message.success("已复制到剪贴板");

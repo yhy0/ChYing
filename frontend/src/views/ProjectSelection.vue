@@ -79,8 +79,6 @@ const loadLocalProjects = async () => {
       source: 'local'
     }));
 
-    console.log('本地项目加载成功:', localProjects.value);
-
     // 如果有本地项目，自动选择打开模式
     if (localProjects.value.length > 0) {
       projectAction.value = 'open';
@@ -160,9 +158,7 @@ const createTempProject = async () => {
     
     const tempDbName = `temp-${timestamp}`;
     const tempProjectName = `temp-${timestamp}`;
-    
-    console.log('创建临时项目:', tempProjectName, '数据库文件:', `${tempDbName}.db`);
-    
+
     await CreateLocalProject(tempDbName, tempProjectName);
     
     return { projectId: tempDbName, projectName: tempProjectName };
@@ -228,10 +224,7 @@ async function handleNext() {
     await callInitStep(StepInitializationComplete, [], "正在完成初始化...", 100);
     
     const projectResult = await GetProject();
-    if (projectResult && Object.keys(projectResult).length > 0) {
-      console.log('项目数据加载成功:', projectResult);
-    }
-    
+
     setTimeout(() => {
       updateProgressStep(100, '初始化完成，正在跳转...');
       setTimeout(() => {

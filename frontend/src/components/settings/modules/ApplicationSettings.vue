@@ -11,8 +11,7 @@ const defaultProjectPath = ref('/Users/Documents/Projects');
 
 // 处理文件路径浏览
 const handleBrowse = () => {
-  // 实际应用中应该调用系统文件选择器
-  console.log('Browse for folder...');
+  // TODO: 实际应用中应该调用系统文件选择器
 };
 </script>
 

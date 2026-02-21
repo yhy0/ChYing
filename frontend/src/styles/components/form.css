@@ -30,26 +30,6 @@
   overflow: hidden;
 }
 
-/* 表单元素液态光泽效果 */
-.form-group input::before,
-.form-group select::before,
-.form-group textarea::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 30%,
-    rgba(255, 255, 255, 0.6) 50%,
-    rgba(255, 255, 255, 0.4) 70%,
-    transparent 100%);
-  pointer-events: none;
-  opacity: 0.8;
-}
-
 /* 对话框内的表单元素 - 增强透明度和一致性 */
 .dialog .form-group input,
 .dialog .form-group select,

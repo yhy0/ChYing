@@ -49,7 +49,6 @@ const selectedProject = ref<ProjectDetails>({
 
 // 使用 watch 监听计算属性的变化，更新 selectedProject
 watch([vulnerabilitiesCount, hostsCount], ([vulCount, hostCount]) => {
-  console.log('数据更新 - 漏洞数:', vulCount, '主机数:', hostCount);
   selectedProject.value.issuesFound = vulCount;
   selectedProject.value.hosts = hostCount;
 }, { immediate: true });

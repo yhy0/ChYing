@@ -50,7 +50,6 @@ const algorithms = [
 onMounted(() => {
   // 获取默认的爆破字典文件路径
   GetConfig().then((result: any) => {
-    console.log('获取配置:', result);
     try {
       // 解析JSON
       const config = JSON.parse(result);
@@ -69,7 +68,6 @@ onMounted(() => {
   Events.On("Percentage", (percentage: any) => {
     if (percentage && percentage.data !== undefined) {
       bruteProgress.value = percentage.data;
-      console.log('爆破进度:', bruteProgress.value);
     }
   });
 });
@@ -121,7 +119,6 @@ watch(() => jwtParts.value.payload, (newPayload) => {
 const decodeJwt = () => {
   // 基本的解码已经在计算属性中完成了
   // 这里可以添加更多逻辑，如提示解码成功等
-  console.log('JWT解码完成');
 };
 
 // 重新签名 JWT（当 header、payload 或 secret 变化时调用）
@@ -320,7 +317,6 @@ const copyResult = () => {
   }, null, 2);
 
   navigator.clipboard.writeText(resultText)
-    .then(() => console.log('JWT解析结果已复制到剪贴板'))
     .catch(err => console.error('复制失败:', err));
 };
 
@@ -330,7 +326,6 @@ const handleBrowse = () => {
     // 调用后端的文件选择对话框
     FileSelection().then((result: any) => {
       secretKeyPath.value = result;
-      console.log('选择的文件路径:', result);
     }).catch((err: any) => {
       console.error('打开文件对话框失败:', err);
     });

@@ -36,8 +36,7 @@ const responseData = ref<string>('');
 const fetchRequestDetail = async (id: number): Promise<RequestScanDetail | null> => {
   try {
     const result = await GetRequestScanPBody(id);
-    console.log('ScanLogPanel - fetchRequestDetail result:', result);
-    
+
     // 检查返回结果的结构
     if (result && result.data) {
       return result.data;
@@ -56,35 +55,28 @@ const fetchRequestDetail = async (id: number): Promise<RequestScanDetail | null>
 
 // 监听选中项变化
 watch(() => props.selectedItem, async (newItem) => {
-  console.log('ScanLogPanel - selectedItem 变化:', newItem);
-  
   if (newItem) {
     // 如果已有数据，直接使用
     if (newItem.request && newItem.response) {
-      console.log('ScanLogPanel - 使用已有的请求响应数据');
       requestData.value = newItem.request;
       responseData.value = newItem.response;
     } else {
       // 按需加载请求响应详情
-      console.log('ScanLogPanel - 开始获取请求响应详情，ID:', newItem.id);
       const detail = await fetchRequestDetail(newItem.id);
-      
+
       if (detail) {
-        console.log('ScanLogPanel - 成功获取请求响应详情:', detail);
         requestData.value = (detail as any).request_raw || '';
         responseData.value = (detail as any).response_raw || '';
-        
+
         // 同时更新原始item的数据，避免重复请求
         newItem.request = (detail as any).request_raw || '';
         newItem.response = (detail as any).response_raw || '';
       } else {
-        console.log('ScanLogPanel - 未能获取到请求响应详情');
         requestData.value = '';
         responseData.value = '';
       }
     }
   } else {
-    console.log('ScanLogPanel - 清空请求响应数据');
     requestData.value = '';
     responseData.value = '';
   }
@@ -107,13 +99,11 @@ const handleSetColor = (item: ScanLogItem, color: string) => {
 
 // 更新请求数据
 const updateRequestData = (data: string) => {
-  console.log('ScanLogPanel - 更新请求数据:', data.length, '字符');
   requestData.value = data;
 };
 
 // 更新响应数据
 const updateResponseData = (data: string) => {
-  console.log('ScanLogPanel - 更新响应数据:', data.length, '字符');
   responseData.value = data;
 };
 

@@ -39,7 +39,7 @@ export default defineConfig({
   // 使用更明确的规则定义快捷方式
   rules: [
     ['theme-transition', { 'transition-property': 'color, background-color, border-color', 'transition-duration': '200ms' }],
-    ['tab-active', { 'background-color': '#282838', 'color': 'white', 'border-left-width': '2px', 'border-color': '#4f46e5' }],
+    ['tab-active', { 'background-color': 'var(--color-bg-card, #282838)', 'color': 'white', 'border-left-width': '2px', 'border-color': 'var(--color-primary, #4f46e5)' }],
     ['font-maple', { 'font-family': 'Maple Mono, monospace' }]
   ],
   theme: {
@@ -66,18 +66,6 @@ export default defineConfig({
     }
   },
   safelist: [
-    'bg-primary',
-    'text-primary',
-    'bg-secondary',
-    'text-secondary',
-    'bg-accent',
-    'text-accent',
-    'bg-darkbg',
-    'bg-darksurface',
-    'bg-lightbg',
-    'bg-lightsurface',
-    'dark:bg-darkbg',
-    'dark:bg-darksurface',
     'scrollbar-thin',
     'theme-transition',
     'tab-active',
@@ -88,39 +76,21 @@ export default defineConfig({
     {
       layer: 'default',
       getCSS: () => `
-        /* 定义 Maple Mono 字体 */
-        @font-face {
-          font-family: 'Maple Mono';
-          src: url('/fonts/MapleMono-Medium.woff2') format('woff2');
-          font-weight: 500;
-          font-style: normal;
-          font-display: swap;
-        }
-        
-        /* 修改默认字体应用 */
-        body {
-          font-family: 'Maple Mono', system-ui, -apple-system, sans-serif;
-        }
-        
-        code, pre, .font-mono {
-          font-family: 'Maple Mono', monospace;
-        }
-        
         .scrollbar-thin::-webkit-scrollbar {
           width: 6px;
           height: 6px;
         }
         .scrollbar-thin::-webkit-scrollbar-track {
-          background-color: var(--un-theme-darkbg, #1e1e2e);
+          background-color: var(--color-bg-secondary, #1e1e2e);
         }
         .scrollbar-thin::-webkit-scrollbar-thumb {
-          background-color: var(--un-theme-gray-600, #4b5563);
+          background-color: var(--color-border, #4b5563);
           border-radius: 9999px;
         }
-        
+
         /* 深色模式下的标签样式 */
         .dark .tab-active {
-          background-color: #282838;
+          background-color: var(--color-bg-card, #282838);
         }
       `
     }

@@ -77,7 +77,6 @@ const restoreState = () => {
         const maxAge = 60 * 60 * 1000; // 1小时
 
         if (stateAge > maxAge) {
-          console.log('拦截状态过期，使用默认状态');
           sessionStorage.removeItem(INTERCEPT_STATE_KEY);
           return;
         }
@@ -92,12 +91,6 @@ const restoreState = () => {
         interceptSequence.value = state.interceptSequence || 0;
         editedRequestData.value = state.editedRequestData || '';
         editedResponseData.value = state.editedResponseData || '';
-
-        console.log('拦截状态已恢复:', {
-          totalItems: state.interceptQueue?.length || 0,
-          validItems: validQueue.length,
-          selectedId: state.selectedInterceptId
-        });
       }
     }
   } catch (error) {
@@ -186,8 +179,6 @@ const setupEventListeners = () => {
     const interceptId = eventData.id;
     const requestData = eventData.data;
     
-    console.log('Received InterceptRequest:', { interceptId, requestDataLength: requestData?.length });
-
     // 数据验证
     if (!interceptId || !requestData || requestData.trim() === '') {
       console.warn('Invalid InterceptRequest data:', { interceptId, hasRequestData: !!requestData });
@@ -202,19 +193,15 @@ const setupEventListeners = () => {
     }
 
     // 解析请求信息 - 改进URL解析逻辑
-    console.log('Parsing request data, first 500 chars:', requestData.substring(0, 500));
 
     const lines = requestData.split('\n');
     const firstLine = lines[0] || '';
-    console.log('First line of request:', firstLine);
 
     // 更强健的HTTP请求行解析
     const requestLineParts = firstLine.trim().split(' ');
     const method = requestLineParts[0] || 'UNKNOWN';
     let fullPath = requestLineParts[1] || '/';
     const httpVersion = requestLineParts[2] || 'HTTP/1.1';
-
-    console.log('Parsed request line:', { method, fullPath, httpVersion });
 
     // 初始化变量
     let host = '';
@@ -230,7 +217,6 @@ const setupEventListeners = () => {
         port = urlObj.port || (urlObj.protocol === 'https:' ? '443' : '80');
         path = urlObj.pathname + urlObj.search;
         protocol = urlObj.protocol.replace(':', '');
-        console.log('Parsed full URL from request line:', { host, port, path, protocol });
       } catch (e) {
         console.warn('Failed to parse URL from request line:', e);
       }
@@ -242,7 +228,6 @@ const setupEventListeners = () => {
       const hostLine = lines.find((line: string) => line.toLowerCase().startsWith('host:'));
       if (hostLine) {
         const hostValue = hostLine.substring(5).trim(); // 移除 "Host:" 前缀
-        console.log('Found Host header:', hostValue);
         if (hostValue.includes(':')) {
           const parts = hostValue.split(':');
           host = parts[0];
@@ -256,7 +241,6 @@ const setupEventListeners = () => {
         }
       } else {
         console.warn('No Host header found in request data');
-        console.log('All lines:', lines.slice(0, 10)); // 打印前10行用于调试
       }
       
       // 使用请求行中的路径
@@ -270,10 +254,6 @@ const setupEventListeners = () => {
 
     const url = host ? `${protocol}://${host}${port !== '80' && port !== '443' ? ':' + port : ''}${path}` : path;
 
-    console.log('Final parsed request info:', { method, host, port, path, url });
-
-    console.log('Parsed request info:', { method, host, port, path, url });
-    
     // 增加序号
     interceptSequence.value++;
     
@@ -302,8 +282,6 @@ const setupEventListeners = () => {
     
     // 保存状态
     saveState();
-    
-    console.log('Request intercepted and added to queue:', interceptId, 'Sequence:', interceptSequence.value);
   });
   
   // 监听响应拦截
@@ -321,14 +299,6 @@ const setupEventListeners = () => {
     const requestData = eventData.request;
     const responseData = eventData.response;
 
-    console.log('Received InterceptResponse:', {
-      interceptId,
-      requestLength: requestData?.length,
-      responseLength: responseData?.length,
-      currentQueueLength: interceptQueue.value.length,
-      currentQueueIds: interceptQueue.value.map(item => ({ id: item.id, type: item.type }))
-    });
-
     // 数据验证
     if (!interceptId || !requestData || !responseData) {
       console.warn('Invalid InterceptResponse data:', {
@@ -345,9 +315,7 @@ const setupEventListeners = () => {
     const status = statusMatch ? parseInt(statusMatch[1]) : 0;
     
         // 查找对应的已发送请求项目
-    console.log('Response intercepted, looking for corresponding sent request item');
-    
-    let existingIndex = interceptQueue.value.findIndex(item => 
+    let existingIndex = interceptQueue.value.findIndex(item =>
       item.id === interceptId && item.status === 'sent'
     );
     
@@ -364,9 +332,7 @@ const setupEventListeners = () => {
       
       // 使用Vue的响应式更新
       interceptQueue.value.splice(existingIndex, 1, updatedItem);
-      
-      console.log('Updated sent request item to response phase:', interceptId, 'Status:', status);
-      
+
       // 如果这个项目当前被选中，更新编辑器中的数据
       if (selectedInterceptId.value === interceptId) {
         editedRequestData.value = existingItem.request; // 使用已发送的请求数据
@@ -377,8 +343,7 @@ const setupEventListeners = () => {
       // - 只开启了响应拦截
       // - 请求没有被拦截
       // - 请求已经被自动放行
-      console.log('No corresponding sent request found, creating standalone response intercept for:', interceptId);
-      
+
       // 解析请求信息创建独立的响应拦截项目
       const requestLines = requestData.split('\n').filter((line: string) => line.trim() !== '');
       const requestFirstLine = requestLines[0] || '';
@@ -423,8 +388,7 @@ const setupEventListeners = () => {
       };
     
       interceptQueue.value.push(interceptItem);
-      console.log('Created standalone response intercept item:', interceptId, 'Status:', status);
-      
+
       // 只有在当前没有选中项时才自动选中新创建的独立响应项
       if (!selectedInterceptId.value) {
         selectedInterceptId.value = interceptId;
@@ -592,16 +556,8 @@ const forwardIntercept = () => {
   const interceptId = selectedIntercept.value.id;
   const isRequestPhase = selectedIntercept.value.type === 'request';
 
-  console.log('Forward intercept:', {
-    interceptId,
-    type: selectedIntercept.value.type,
-    requestDataLength: editedRequestData.value?.length,
-    responseDataLength: editedResponseData.value?.length
-  });
-
   if (isRequestPhase) {
     // 请求阶段：使用编辑后的请求数据
-    console.log('Forwarding request with data:', editedRequestData.value.substring(0, 300) + '...');
 
     // 如果请求数据被修改，更新队列中的显示信息
     if (editedRequestData.value !== selectedIntercept.value.request) {
@@ -609,8 +565,6 @@ const forwardIntercept = () => {
     }
 
     ForwardProxyInterceptData(interceptId, editedRequestData.value, "forward").then(() => {
-      console.log('Request forwarded successfully, waiting for response...');
-      
       // 更新项目状态为"已发送，等待响应"，而不是移除
       const itemIndex = interceptQueue.value.findIndex(item => item.id === interceptId);
       if (itemIndex !== -1) {
@@ -621,10 +575,8 @@ const forwardIntercept = () => {
           request: editedRequestData.value, // 保存最终发送的请求数据
           timestamp: new Date().toISOString() // 更新时间戳
         };
-
-        console.log('Updated request item status to sent:', interceptId);
       }
-      
+
       // 保存状态
       saveState();
       
@@ -635,11 +587,8 @@ const forwardIntercept = () => {
     });
   } else {
     // 响应阶段：使用编辑后的响应数据
-    console.log('Forwarding response with data:', editedResponseData.value.substring(0, 300) + '...');
 
     ForwardProxyInterceptData(interceptId, editedResponseData.value, "forward").then(() => {
-      console.log('Response forwarded successfully, transaction complete');
-      
       // 从队列中移除已完成的项目
       interceptQueue.value = interceptQueue.value.filter(item => item.id !== interceptId);
 
@@ -680,11 +629,7 @@ const dropIntercept = () => {
   const interceptId = selectedIntercept.value.id;
   const interceptType = selectedIntercept.value.type;
 
-  console.log('Drop intercept:', { interceptId, type: interceptType });
-  
   ForwardProxyInterceptData(interceptId, "", "drop").then(() => {
-    console.log('Intercept dropped successfully:', interceptId);
-    
     // 从队列中移除已丢弃的项目
     interceptQueue.value = interceptQueue.value.filter(item => item.id !== interceptId);
 
@@ -730,21 +675,14 @@ const clearQueue = () => {
 
 // 放行所有队列中的请求并清空队列（拦截关闭时调用）
 const forwardAllAndClear = () => {
-  console.log('Forwarding all intercepted items and clearing queue...');
-  
   // 记录要放行的项目数量
   const totalItems = interceptQueue.value.length;
   if (totalItems === 0) {
-    console.log('No items in queue to forward');
     return;
   }
-  
-  console.log(`Forwarding ${totalItems} items from intercept queue`);
-  
+
   // 为每个拦截项目发送放行指令
   const forwardPromises = interceptQueue.value.map(item => {
-    console.log(`Forwarding item: ${item.id} (${item.type})`);
-    
     // 根据类型使用对应的数据
     const dataToSend = item.type === 'request' ? item.request : 
                       item.response || item.request;
@@ -759,9 +697,7 @@ const forwardAllAndClear = () => {
   Promise.allSettled(forwardPromises).then((results) => {
     const successful = results.filter(r => r.status === 'fulfilled').length;
     const failed = results.filter(r => r.status === 'rejected').length;
-    
-    console.log(`Forwarded ${successful} items successfully, ${failed} failed`);
-    
+
     // 清空队列
     clearQueue();
     
@@ -841,14 +777,6 @@ const updateInterceptItemFromRequestData = (interceptId: string, requestData: st
       request: requestData, // 更新请求数据
       timestamp: new Date().toISOString() // 更新时间戳
     };
-
-    console.log('Updated intercept item with modified request data:', {
-      id: interceptId,
-      method: method,
-      url: url,
-      host: host,
-      path: path
-    });
 
     // 保存状态
     saveState();
@@ -935,7 +863,6 @@ watch([interceptQueue, selectedInterceptId, editedRequestData, editedResponseDat
 
 // 组件激活时（标签页切换到拦截面板）
 onActivated(() => {
-  console.log('拦截面板激活，恢复状态...');
   restoreState();
   setupEventListeners();
   window.addEventListener('keydown', handleKeyDown);
@@ -943,13 +870,11 @@ onActivated(() => {
 
 // 组件失活时（切换到其他标签页）
 onDeactivated(() => {
-  console.log('拦截面板失活，保存状态...');
   saveState();
   window.removeEventListener('keydown', handleKeyDown);
 });
 
 onMounted(() => {
-  console.log('拦截面板挂载，初始化...');
   restoreState();
   setupEventListeners();
   window.addEventListener('keydown', handleKeyDown);
@@ -961,7 +886,6 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  console.log('拦截面板卸载，清理资源...');
   saveState();
   window.removeEventListener('keydown', handleKeyDown);
 

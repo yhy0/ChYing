@@ -31,7 +31,6 @@ export default defineConfig({
             '@codemirror/lang-json',
             '@codemirror/lang-xml',
             '@codemirror/lang-html',
-            '@codemirror/lang-javascript',
             '@codemirror/theme-one-dark',
             '@codemirror/highlight',
             '@lezer/common',

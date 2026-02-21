@@ -39,15 +39,11 @@ const handleSelectResult = utils.withErrorHandling((result: IntruderResult) => {
   
   const adaptedResult = utils.intruderResultToAttackResult(result);
   resultsManager.selectResult(adaptedResult);
-  
-  console.log('result', result.id)
+
   // 获取详细的请求和响应数据
   if (store.activeTab?.value) {
-    console.log(`获取攻击详情: tabId=${store.activeTab.value.id}, resultId=${result.id}`);
-    
     // 从Wails后端获取详细数据
     GetAttackDump(store.activeTab.value.id, result.id).then(HTTPBody => {
-      console.log('获取到HTTP详细信息:', HTTPBody);
       request.value = HTTPBody["request_raw"] || '';
       response.value = HTTPBody["response_raw"] || '';
       
@@ -91,7 +87,6 @@ const startAttack = utils.withErrorHandling(async (tabId: string) => {
   // 启动攻击 - 调用 Wails 函数
   try {
     // 清空之前的结果，重置标签页状态
-    console.log('清空标签页结果:', tab.id);
     tab.results = [];
     
     // 确保结果面板不显示旧数据
@@ -110,25 +105,14 @@ const startAttack = utils.withErrorHandling(async (tabId: string) => {
         ...set,
         id: index + 1 // 确保id从1开始连续递增
       }));
-    
-    console.log('Payload 数据:', payloads);
-    
+
     const attackType = tab.attackType;
     const requestCount = attackController.calculateTotalRequests(tab);
     tab.progress.total = requestCount;
     
     // 序列化payloads对象为JSON字符串
     const payloadsJson = JSON.stringify(payloads);
-    
-    console.log('攻击参数:', {
-      tabId: tab.id,
-      url: tab.target.url,
-      request: fullRequest,
-      payloads: payloadsJson,
-      attackType: attackType,
-      requestCount: requestCount
-    });
-    console.log(payloadsJson)
+
     // 修改: 调用后端函数时，添加 tab.id 参数
     Intruder(tab.target.url, fullRequest, payloadsJson, attackType, requestCount, tab.id);
   } catch (error) {
@@ -145,7 +129,6 @@ const stopAttack = utils.withErrorHandling((tabId: string) => {
   if (!tab) return;
   
   attackController.stopAttack(tab);
-  console.log('攻击已停止:', tab.name);
 }, '停止攻击');
 
 // 分组模态框状态
@@ -174,12 +157,10 @@ const wrapSelectionWithPayloadMarker = () => {
   
   // 使用工具函数获取完整请求
   const fullRequest = store.activeTab.value.target.fullRequest;
-  
-  console.log('fullRequest', fullRequest)
+
   // 获取用户文本选择范围
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') {
-    console.log('没有选中任何文本');
     return;
   }
   
@@ -273,8 +254,6 @@ onMounted(() => {
   // 修改: 监听 Attack-Data 事件，并根据 tabId 匹配对应的标签页
   // Wails v3: result 是 WailsEvent 对象，result.data 是后端发送的 AttackData 对象
   Events.On("Attack-Data", result => {
-    console.log("接收到攻击数据:", result);
-    
     // 后端发送的是 AttackData{Name, UUID, Len} 单个对象
     const attackData = result.data;
     if (!attackData || !attackData.uuid) {
@@ -291,9 +270,7 @@ onMounted(() => {
       console.warn("未找到匹配的标签页:", tabId);
       return;
     }
-    
-    console.log("找到匹配的标签页:", matchedTab.name, "ID:", tabId);
-    
+
     // 清空该标签页的结果数据，避免重复
     matchedTab.results = [];
     
@@ -303,16 +280,13 @@ onMounted(() => {
     // 保存 UUID 和数据长度
     const uuidKey = attackData.uuid;
     const dataLength = attackData.len;
-    
-    console.log("UUID:", uuidKey, "数据长度:", dataLength);
-    
+
     // 先尝试移除之前可能存在的同名事件监听器，避免重复
     try {
       Events.Off(uuidKey);
       registeredEventKeys.value.delete(uuidKey);
-      console.log(`已移除之前的 ${uuidKey} 事件监听器`);
     } catch (error) {
-      console.log(`没有找到之前的 ${uuidKey} 事件监听器或移除失败`);
+      // Listener may not exist, which is fine
     }
     
     // 跟踪新注册的事件监听器
@@ -321,8 +295,6 @@ onMounted(() => {
     // 监听特定 UUID 的结果数据
     // Wails v3: resultData 是 WailsEvent 对象，resultData.data 是后端发送的 IntruderRes 对象
     Events.On(uuidKey, resultData => {
-      console.log(`接收到标签页 ${tabId} 的结果数据:`, resultData);
-      
       // 后端发送的是 *IntruderRes 单个对象
       const resultItem = resultData.data;
       if (!resultItem) {
@@ -372,13 +344,11 @@ onBeforeUnmount(() => {
   // 移除所有 Wails 事件监听器
   try {
     Events.Off("Attack-Data");
-    console.log("已移除 Attack-Data 事件监听器");
-    
+
     // 清理所有动态注册的 UUID 事件监听器
     registeredEventKeys.value.forEach(key => {
       try {
         Events.Off(key);
-        console.log(`已移除 ${key} 事件监听器`);
       } catch (e) {
         console.warn(`移除 ${key} 事件监听器失败:`, e);
       }

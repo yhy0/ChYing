@@ -256,8 +256,6 @@ export function useHttpTrafficTable<T extends HttpTrafficItem>(
     defaultWidths: getDefaultWidths.value
   });
 
-  console.log(`[${tableId}] columnWidths before table init:`, JSON.parse(JSON.stringify(columnWidths.value)));
-  console.log(`[${tableId}] getDefaultWidths for table init:`, JSON.parse(JSON.stringify(getDefaultWidths.value)));
   const table = useVueTable({
     get data() {
       return items.value;

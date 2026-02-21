@@ -58,13 +58,10 @@ const fetchMemoryUsage = async () => {
 const handleVulnerabilityMessage = (payload: { data: VulnerabilityMessage[] }) => {
   // 直接调用 store 的方法来处理漏洞消息
   vulnerabilityStore.handleVulnerabilityMessages(payload);
-  console.log('Footer - 处理漏洞消息:', payload);
 };
 
 // 处理请求扫描消息，更新扫描日志 store 并同步到其他窗口
 const handleRequestScanMessage = (payload: { data: RequestScanMsg | RequestScanMsg[] }) => {
-  console.log('Footer - 接收到后端扫描消息:', payload);
-
   // 更新当前窗口的 store
   scanLogStore.handleRequestScanMessages(payload);
 
@@ -115,7 +112,6 @@ onMounted(async () => {
   // 清理旧的 localStorage 漏洞数据（已迁移到数据库）
   try {
     localStorage.removeItem('vulnerabilities');
-    console.log('已清理 localStorage 中的旧漏洞数据');
   } catch (e) {
     console.warn('清理 localStorage 失败:', e);
   }
@@ -155,7 +151,6 @@ const eventLogs = ref([
 const toggleScanLog = async () => {
   try {
     NewScanLogWindow();
-    console.log('扫描日志窗口已创建');
   } catch (error) {
     console.error('创建扫描日志窗口失败:', error);
     // 出错时降级处理：显示原来的弹窗
@@ -167,10 +162,8 @@ const toggleScanLog = async () => {
 const toggleVulnerabilityWindow = async () => {
   try {
     NewVulnerabilityWindow();
-    console.log('漏洞窗口已创建');
   } catch (error) {
     console.error('创建漏洞窗口失败:', error);
-    console.log('无法创建漏洞窗口，请检查后端服务');
   }
 };
 

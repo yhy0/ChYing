@@ -20,7 +20,6 @@ const loadScanLogsFromStorage = (): ScanLogItem[] => {
     if (stored) {
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed)) {
-        console.log('从 localStorage 恢复扫描日志数据:', parsed.length, '条');
         return parsed;
       }
     }
@@ -38,7 +37,6 @@ const loadFilterFromStorage = (): ScanLogFilter => {
     const stored = localStorage.getItem(SCAN_LOG_FILTER_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      console.log('从 localStorage 恢复过滤器设置:', parsed);
       return {
         moduleTypes: parsed.moduleTypes || [],
         searchKeyword: parsed.searchKeyword || '',
@@ -66,7 +64,6 @@ const saveScanLogsToStorage = (logs: ScanLogItem[]) => {
     const maxStorageCount = 1000;
     const logsToSave = logs.length > maxStorageCount ? logs.slice(0, maxStorageCount) : logs;
     localStorage.setItem(SCAN_LOG_STORAGE_KEY, JSON.stringify(logsToSave));
-    console.log('扫描日志数据已保存到 localStorage:', logsToSave.length, '条');
   } catch (error) {
     console.error('保存扫描日志数据失败:', error);
   }
@@ -78,7 +75,6 @@ const saveScanLogsToStorage = (logs: ScanLogItem[]) => {
 const saveFilterToStorage = (filterData: ScanLogFilter) => {
   try {
     localStorage.setItem(SCAN_LOG_FILTER_STORAGE_KEY, JSON.stringify(filterData));
-    console.log('过滤器设置已保存到 localStorage');
   } catch (error) {
     console.error('保存过滤器设置失败:', error);
   }
@@ -114,26 +110,22 @@ export const useScanLogStore = defineStore('scanLog', () => {
   // 过滤后的日志
   const filteredLogs = computed(() => {
     let filtered = scanLogs.value;
-    console.log('filteredLogs计算 - 原始数据:', filtered.length, filtered);
-    console.log('当前过滤器:', filter.value);
 
     if (filter.value.moduleTypes.length > 0) {
-      filtered = filtered.filter(log => 
+      filtered = filtered.filter(log =>
         filter.value.moduleTypes.includes(log.moduleName)
       );
-      console.log('模块类型过滤后:', filtered.length);
     }
 
     if (filter.value.statusCodes && filter.value.statusCodes.length > 0) {
-      filtered = filtered.filter(log => 
+      filtered = filtered.filter(log =>
         filter.value.statusCodes!.includes(log.status)
       );
-      console.log('状态码过滤后:', filtered.length);
     }
 
     if (filter.value.searchKeyword && filter.value.searchKeyword.trim()) {
       const keyword = filter.value.searchKeyword.toLowerCase();
-      filtered = filtered.filter(log => 
+      filtered = filtered.filter(log =>
         log.url.toLowerCase().includes(keyword) ||
         log.moduleName.toLowerCase().includes(keyword) ||
         log.title.toLowerCase().includes(keyword) ||
@@ -142,17 +134,14 @@ export const useScanLogStore = defineStore('scanLog', () => {
         (log.vulnerability && log.vulnerability.toLowerCase().includes(keyword)) ||
         (log.description && log.description.toLowerCase().includes(keyword))
       );
-      console.log('关键词过滤后:', filtered.length);
     }
 
     if (filter.value.targetHost && filter.value.targetHost.trim()) {
-      filtered = filtered.filter(log => 
+      filtered = filtered.filter(log =>
         log.host.includes(filter.value.targetHost!)
       );
-      console.log('目标主机过滤后:', filtered.length);
     }
 
-    console.log('最终过滤结果:', filtered.length, filtered);
     return filtered;
   });
 
@@ -175,8 +164,7 @@ export const useScanLogStore = defineStore('scanLog', () => {
     }
 
     const scanLogItem: ScanLogItem = convertRequestMsgToScanLogItem(actualMsg);
-    console.log("------", scanLogItem)
-    
+
     // 检查是否已存在，避免重复添加
     const existingIndex = scanLogs.value.findIndex(log => log.id === scanLogItem.id);
     if (existingIndex !== -1) {
@@ -186,8 +174,7 @@ export const useScanLogStore = defineStore('scanLog', () => {
       // 添加新项 - 使用splice确保响应式
       scanLogs.value.unshift(scanLogItem);
     }
-    console.log("---scanLogs---", scanLogs.value)
-    
+
     // 强制触发响应式更新
     scanLogs.value = [...scanLogs.value];
 
@@ -229,7 +216,6 @@ export const useScanLogStore = defineStore('scanLog', () => {
     // 同时清除 localStorage 中的数据
     try {
       localStorage.removeItem(SCAN_LOG_STORAGE_KEY);
-      console.log('已清除 localStorage 中的扫描日志数据');
     } catch (error) {
       console.error('清除 localStorage 扫描日志数据失败:', error);
     }
@@ -300,7 +286,6 @@ export const useScanLogStore = defineStore('scanLog', () => {
     
     const removedCount = initialCount - scanLogs.value.length;
     if (removedCount > 0) {
-      console.log(`清理了 ${removedCount} 条过期扫描日志（7天前）`);
       saveScanLogsToStorage(scanLogs.value);
     }
   };
@@ -353,8 +338,6 @@ export const useScanLogStore = defineStore('scanLog', () => {
  * 将 RequestScanMsg 转换为 ScanLogItem
  */
 function convertRequestMsgToScanLogItem(requestMsg: RequestScanMsg): ScanLogItem {
-  console.log('Processing RequestScanMsg:', requestMsg);
-  
   // 从 target 解析 host 和其他URL信息
   let host = '';
   let url = requestMsg.target || '';
@@ -442,6 +425,5 @@ function convertRequestMsgToScanLogItem(requestMsg: RequestScanMsg): ScanLogItem
     response: undefined
   };
 
-  console.log('Converted ScanLogItem:', scanLogItem);
   return scanLogItem;
 } 

@@ -226,9 +226,7 @@ const handleAddRule = (ruleType: string, config: Record<string, any>) => {
     type: ruleType,
     config: config || {}
   };
-  
-  console.log('添加新规则:', newRule);
-  
+
   // 避免在 currentPayloadSetProcessing.value 可能为 null 时使用展开语法
   if (!currentPayloadSetProcessing.value) return;
   
@@ -239,8 +237,7 @@ const handleAddRule = (ruleType: string, config: Record<string, any>) => {
   
   // 创建更新后的规则数组
   const updatedRules = [...currentRules, newRule];
-  console.log('更新后的规则列表:', updatedRules);
-  
+
   // 更新计算属性
   currentPayloadSetProcessing.value = {
     rules: updatedRules,
@@ -338,8 +335,6 @@ const handleMoveRuleDown = (index: number) => {
 
 // 处理规则更新
 const handleProcessingRulesUpdate = (rules: Array<ProcessingRule>) => {
-  console.log('收到规则更新:', rules);
-  
   // 确保 rules 是数组
   const safeRules = Array.isArray(rules) ? rules : [];
   
@@ -358,14 +353,6 @@ const handleProcessingRulesUpdate = (rules: Array<ProcessingRule>) => {
       characterSet: 'UTF-8'
     }
   };
-  
-  // 安全地记录日志
-  console.log('PayloadSet 处理后:', 
-    props.payloadSets && 
-    activePayloadSetIndex.value >= 0 && 
-    activePayloadSetIndex.value < props.payloadSets.length ?
-    props.payloadSets[activePayloadSetIndex.value]?.processing :
-    'No valid payload set');
 };
 
 // 更新payload sets，确保类型兼容性

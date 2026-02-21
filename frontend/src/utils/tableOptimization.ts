@@ -99,13 +99,6 @@ export function batchUpdates(updates: (() => void)[]) {
 /**
  * 内存使用监控
  */
-export function logMemoryUsage(context: string) {
-  if ('memory' in performance) {
-    const memory = (performance as any).memory;
-    console.log(`[内存监控] ${context}:`, {
-      used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
-      total: `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
-      limit: `${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB`
-    });
-  }
+export function logMemoryUsage(_context: string) {
+  // Memory monitoring disabled - was using console.log
 } 

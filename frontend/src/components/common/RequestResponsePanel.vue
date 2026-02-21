@@ -383,7 +383,6 @@ watch(
           }
 
           if (!body) {
-            console.log("Extractor: Response body is empty. No data to process.");
             jsluiceResultsStore.value[requestId].urls = [];
             jsluiceResultsStore.value[requestId].secrets = [];
             jsluiceResultsStore.value[requestId].loading = false;

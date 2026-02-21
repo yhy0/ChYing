@@ -80,16 +80,12 @@ const hostNode = computed(() => {
 
 // 监听请求和响应数据变化
 watch(() => [props.requestData, props.responseData], ([newRequest, newResponse]) => {
-  console.log('接收到请求数据:', newRequest?.substring(0, 50));
-  console.log('接收到响应数据:', newResponse?.substring(0, 50));
-
   request.value = newRequest || '';
   response.value = newResponse || '';
 }, { immediate: true });
 
 // 监听节点变化
 watch(() => props.selectedNode, (node) => {
-  console.log('节点变化:', node?.name, node?.path);
   if (!node) {
     request.value = '';
     response.value = '';

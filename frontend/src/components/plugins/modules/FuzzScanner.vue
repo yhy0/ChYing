@@ -112,7 +112,6 @@ function fuzz() {
     message.success(target + " 开始扫描");
 
     Fuzz(target, formValue.value.checkboxGroupValue, formValue.value.path.toString().trim()).then((result: string) => {
-      console.log(result);
       isScanning.value = false;
 
       if (result === "") {
@@ -351,7 +350,6 @@ onMounted(() => {
   // 监听扫描进度
   // Wails v3: Percentage 是 WailsEvent 对象，Percentage.data 是后端发送的 float64 值
   Events.On("Percentage", (Percentage: any) => {
-    console.log(Percentage.data);
     percentage.value = Percentage.data;
   });
 });

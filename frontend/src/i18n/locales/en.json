@@ -820,6 +820,10 @@
       },
       "in_development": "This plugin is under development...",
       "coming_soon": "Coming soon!",
+      "pop_out": "Pop out to window",
+      "pop_out_all": "Pop out all plugins to window",
+      "popped_out": "Popped out to window",
+      "independent_window": "Independent Window",
       "api_generate": {
         "title": "API Generator",
         "input": "Input API Description",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick, h } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted, onActivated, onBeforeUnmount, nextTick, h } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { Events } from '@wailsio/runtime';
 import RequestResponsePanel from '../../common/RequestResponsePanel.vue';
 import HttpTrafficTable from '../../common/HttpTrafficTable.vue';
 import type { HttpTrafficItem, HttpTrafficColumn } from '../../../types';
@@ -702,6 +703,10 @@ const stopVerticalResize = () => {
 
 onMounted(() => {
   loadRules();
+  // 监听跨窗口规则更新事件
+  Events.On('auth:rules-updated', () => {
+    loadRules();
+  });
   // 初始化时设置一个合理的下半区高度
   nextTick(() => {
     if (layoutContainerRef.value) {
@@ -713,6 +718,15 @@ onMounted(() => {
        }
     }
   });
+});
+
+// keep-alive 激活时刷新规则数据
+onActivated(() => {
+  loadRules();
+});
+
+onBeforeUnmount(() => {
+  Events.Off('auth:rules-updated');
 });
 </script>
 

@@ -23,6 +23,7 @@ var (
 	scanWindow    *application.WebviewWindow
 	vulnWindow    *application.WebviewWindow
 	claudeWindow  *application.WebviewWindow
+	pluginWindows = make(map[string]*application.WebviewWindow)
 	browserCancel context.CancelFunc
 )
 
@@ -145,6 +146,116 @@ func (a *App) NewClaudeAgentWindow(trafficIds []int64) {
 		claudeWindow = nil // 清空引用
 	})
 	claudeWindow.Show()
+}
+
+// pluginDisplayName 返回插件的显示名称
+func pluginDisplayName(pluginId string) string {
+	names := map[string]string{
+		"jwt":          "JWT 分析器",
+		"fuzz":         "目录扫描",
+		"auth":         "越权检测",
+		"apigen":       "API 生成器",
+		"sqlinjection": "SQL 注入",
+		"xss":          "XSS",
+	}
+	if name, ok := names[pluginId]; ok {
+		return name
+	}
+	return pluginId
+}
+
+// NewPluginWindow 创建/聚焦插件独立窗口
+func (a *App) NewPluginWindow(pluginId string) {
+	// 如果窗口已存在，聚焦它
+	if w, ok := pluginWindows[pluginId]; ok && w != nil {
+		w.Show()
+		w.Focus()
+		return
+	}
+
+	w := wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name:            fmt.Sprintf("Plugin-%s", pluginId),
+		Title:           pluginDisplayName(pluginId),
+		DevToolsEnabled: true,
+		Mac: application.MacWindow{
+			Backdrop:                application.MacBackdropLiquidGlass,
+			InvisibleTitleBarHeight: 25,
+			LiquidGlass: application.MacLiquidGlass{
+				Style:        application.LiquidGlassStyleLight,
+				Material:     application.NSVisualEffectMaterialAuto,
+				CornerRadius: 20.0,
+				TintColor:    nil,
+			},
+		},
+		Width:  1100,
+		Height: 850,
+		URL:    fmt.Sprintf("/#/plugin/%s", pluginId),
+	})
+
+	// 注册窗口关闭事件
+	w.RegisterHook(events.Common.WindowClosing, func(e *application.WindowEvent) {
+		delete(pluginWindows, pluginId)
+		wailsApp.Event.Emit("plugin:window-closed", pluginId)
+	})
+
+	pluginWindows[pluginId] = w
+	w.Show()
+}
+
+// ClosePluginWindow 关闭指定插件窗口
+func (a *App) ClosePluginWindow(pluginId string) {
+	if w, ok := pluginWindows[pluginId]; ok && w != nil {
+		w.Close()
+	}
+}
+
+// IsPluginWindowOpen 查询插件窗口是否打开
+func (a *App) IsPluginWindowOpen(pluginId string) bool {
+	_, ok := pluginWindows[pluginId]
+	return ok
+}
+
+// NewPluginsWindow 创建/聚焦整个插件系统的独立窗口（包含所有插件 tab）
+func (a *App) NewPluginsWindow() {
+	const key = "__all__"
+	if w, ok := pluginWindows[key]; ok && w != nil {
+		w.Show()
+		w.Focus()
+		return
+	}
+
+	w := wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name:            "Plugins-All",
+		Title:           "插件",
+		DevToolsEnabled: true,
+		Mac: application.MacWindow{
+			Backdrop:                application.MacBackdropLiquidGlass,
+			InvisibleTitleBarHeight: 25,
+			LiquidGlass: application.MacLiquidGlass{
+				Style:        application.LiquidGlassStyleLight,
+				Material:     application.NSVisualEffectMaterialAuto,
+				CornerRadius: 20.0,
+				TintColor:    nil,
+			},
+		},
+		Width:  1200,
+		Height: 900,
+		URL:    "/#/plugin/all",
+	})
+
+	w.RegisterHook(events.Common.WindowClosing, func(e *application.WindowEvent) {
+		delete(pluginWindows, key)
+		wailsApp.Event.Emit("plugins:window-closed")
+	})
+
+	pluginWindows[key] = w
+	w.Show()
+}
+
+// IsPluginsWindowOpen 查询整个插件系统独立窗口是否打开
+func (a *App) IsPluginsWindowOpen() bool {
+	_, ok := pluginWindows["__all__"]
+	return ok
 }
 
 // WebUnPack 解包Web资源

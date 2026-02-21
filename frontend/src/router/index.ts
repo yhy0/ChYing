@@ -6,6 +6,7 @@ import ProjectSelection from '../views/ProjectSelection.vue';
 import ScanLogView from '../views/ScanLogView.vue';
 import VulnerabilityView from '../views/VulnerabilityView.vue';
 import ClaudeAgentView from '../views/ClaudeAgentView.vue';
+import PluginWindowView from '../views/PluginWindowView.vue';
 
 // 导入模块组件
 import ProjectView from '../components/project/ProjectView.vue';
@@ -46,6 +47,14 @@ const routes: RouteRecordRaw[] = [
     path: '/claude-agent',
     name: 'ClaudeAgent',
     component: ClaudeAgentView
+  },
+
+  // 插件独立窗口（无布局，用于新窗口）
+  {
+    path: '/plugin/:pluginId',
+    name: 'PluginWindow',
+    component: PluginWindowView,
+    props: true
   },
   
   // 主应用布局及其子路由

@@ -191,6 +191,9 @@ func (a *App) SaveAuthorizationRules(rules mitmproxy.AuthorizationRules) Result 
 		}
 	}
 
+	// 通知所有窗口规则已更新
+	wailsApp.Event.Emit("auth:rules-updated")
+
 	return Result{
 		Data: "Authorization rules saved successfully",
 	}

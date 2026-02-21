@@ -820,6 +820,10 @@
       },
       "in_development": "此插件正在开发中...",
       "coming_soon": "即将推出！",
+      "pop_out": "弹出到独立窗口",
+      "pop_out_all": "弹出全部插件到独立窗口",
+      "popped_out": "已弹出到独立窗口",
+      "independent_window": "独立窗口",
       "api_generate": {
         "title": "API 生成器",
         "input": "输入 API 描述",

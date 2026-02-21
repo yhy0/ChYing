@@ -6,6 +6,7 @@ import FuzzScanner from './modules/FuzzScanner.vue';
 import APIGenerate from './modules/APIGenerate.vue';
 import DevModule from './modules/DevModule.vue';
 import AuthorizationChecker from './modules/AuthorizationChecker.vue';
+import OastModule from './modules/OastModule.vue';
 import { NewPluginWindow, IsPluginWindowOpen, NewPluginsWindow, IsPluginsWindowOpen } from '../../../bindings/github.com/yhy0/ChYing/app.js';
 import { Events } from '@wailsio/runtime';
 
@@ -67,6 +68,12 @@ const plugins = [
     name: t('modules.plugins.xss.title'),
     icon: 'bx-code-block',
     color: 'text-purple-500'
+  },
+  {
+    id: 'oast',
+    name: t('modules.plugins.oast.title', 'OAST'),
+    icon: 'bx-broadcast',
+    color: 'text-cyan-500'
   }
 ];
 
@@ -202,6 +209,7 @@ onUnmounted(() => {
         <FuzzScanner v-else-if="activePlugin === 'fuzz'" />
         <AuthorizationChecker v-else-if="activePlugin === 'auth'" />
         <APIGenerate v-else-if="activePlugin === 'apigen'" />
+        <OastModule v-else-if="activePlugin === 'oast'" />
         <DevModule v-else :moduleId="activePlugin" />
       </keep-alive>
     </div>

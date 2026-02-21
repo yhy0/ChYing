@@ -8,6 +8,7 @@ import FuzzScanner from '../components/plugins/modules/FuzzScanner.vue';
 import APIGenerate from '../components/plugins/modules/APIGenerate.vue';
 import DevModule from '../components/plugins/modules/DevModule.vue';
 import AuthorizationChecker from '../components/plugins/modules/AuthorizationChecker.vue';
+import OastModule from '../components/plugins/modules/OastModule.vue';
 import PluginsView from '../components/plugins/PluginsView.vue';
 
 const route = useRoute();
@@ -24,6 +25,7 @@ const pluginMeta: Record<string, { nameKey: string; icon: string; color: string 
   apigen: { nameKey: 'modules.plugins.api_generate.title', icon: 'bx-code-alt', color: 'text-purple-500' },
   sqlinjection: { nameKey: 'modules.plugins.sqlinjection.title', icon: 'bx-data', color: 'text-amber-500' },
   xss: { nameKey: 'modules.plugins.xss.title', icon: 'bx-code-block', color: 'text-purple-500' },
+  oast: { nameKey: 'modules.plugins.oast.title', icon: 'bx-broadcast', color: 'text-cyan-500' },
 };
 
 const currentPlugin = computed(() => pluginMeta[pluginId.value]);
@@ -81,6 +83,7 @@ onUnmounted(() => {
       <FuzzScanner v-else-if="pluginId === 'fuzz'" />
       <AuthorizationChecker v-else-if="pluginId === 'auth'" />
       <APIGenerate v-else-if="pluginId === 'apigen'" />
+      <OastModule v-else-if="pluginId === 'oast'" />
       <DevModule v-else :moduleId="pluginId" />
     </div>
   </div>

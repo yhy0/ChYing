@@ -157,6 +157,7 @@ func pluginDisplayName(pluginId string) string {
 		"apigen":       "API 生成器",
 		"sqlinjection": "SQL 注入",
 		"xss":          "XSS",
+		"oast":         "OAST",
 	}
 	if name, ok := names[pluginId]; ok {
 		return name

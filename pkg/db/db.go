@@ -159,12 +159,16 @@ func InitSQL(project string, DBType string) {
 		return
 	}
 
-	err = GlobalDB.AutoMigrate(&Request{}, &Response{}, &HTTPHistory{}, &SCopilot{}, &IPInfo{}, &ScanTarget{}, &Vulnerability{}, &ClaudeSession{})
+	err = GlobalDB.AutoMigrate(&Request{}, &Response{}, &HTTPHistory{}, &SCopilot{}, &IPInfo{}, &ScanTarget{}, &Vulnerability{}, &ClaudeSession{}, &OASTProvider{})
 
 	if err != nil {
 		logging.Logger.Errorf("db AutoMigrate err: %v", err)
 		return
 	}
+
+	// 初始化内置 OAST Provider
+	SeedDefaultOASTProviders()
+
 	logging.Logger.Infoln("Sql Connection Established.")
 }
 

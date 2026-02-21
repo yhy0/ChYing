@@ -151,45 +151,51 @@ jobs:
           # Get current tag
           current_tag=$(git describe --tags --abbrev=0)
 
-          # Try to get tag annotation message
-          tag_message=$(git tag -l --format='%(contents)' "$current_tag" 2>/dev/null || echo "")
+          # Get previous tag
+          previous_tag=$(git tag --sort=-creatordate | grep -v "^${current_tag}$" | head -n 1)
 
-          if [ -n "$tag_message" ] && [ "$tag_message" != "" ]; then
-            # Use tag annotation as release notes
-            echo "$tag_message" > release_notes.txt
+          echo "# Release $current_tag" > release_notes.txt
+          echo "" >> release_notes.txt
+
+          # Include tag annotation if present
+          tag_message=$(git tag -l --format='%(contents)' "$current_tag" 2>/dev/null | sed '/^$/d' || echo "")
+          if [ -n "$tag_message" ]; then
+            echo "$tag_message" >> release_notes.txt
+            echo "" >> release_notes.txt
+          fi
+
+          echo "## Changes" >> release_notes.txt
+          echo "" >> release_notes.txt
+
+          # Get commit list between previous tag and current tag
+          if [ -n "$previous_tag" ]; then
+            commits=$(git log --pretty=format:"%H" ${previous_tag}..${current_tag})
           else
-            # Fallback: generate from commits if no tag annotation
-            previous_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+            commits=$(git log --pretty=format:"%H" ${current_tag})
+          fi
 
-            echo "# Release $current_tag" > release_notes.txt
-            echo "" >> release_notes.txt
-            echo "## Changes" >> release_notes.txt
-            echo "" >> release_notes.txt
+          if [ -n "$commits" ]; then
+            for commit_hash in $commits; do
+              subject=$(git log -1 --pretty=format:"%s" $commit_hash)
+              body=$(git log -1 --pretty=format:"%b" $commit_hash)
 
-            # Get commit list with full message (subject + body)
-            if [ -n "$previous_tag" ]; then
-              commits=$(git log --pretty=format:"%H" ${previous_tag}..${current_tag})
-            else
-              commits=$(git log --pretty=format:"%H" ${current_tag})
-            fi
+              echo "- [$subject](https://github.com/${{ github.repository }}/commit/${commit_hash})" >> release_notes.txt
 
-            if [ -n "$commits" ]; then
-              for commit_hash in $commits; do
-                subject=$(git log -1 --pretty=format:"%s" $commit_hash)
-                body=$(git log -1 --pretty=format:"%b" $commit_hash)
-                short_hash=$(git log -1 --pretty=format:"%h" $commit_hash)
+              if [ -n "$body" ]; then
+                # Indent body lines under the commit entry
+                echo "$body" | sed 's/^/  /' >> release_notes.txt
+              fi
 
-                echo "### [$subject](https://github.com/${{ github.repository }}/commit/${commit_hash})" >> release_notes.txt
-                echo "" >> release_notes.txt
+              echo "" >> release_notes.txt
+            done
+          else
+            echo "First release" >> release_notes.txt
+          fi
 
-                if [ -n "$body" ]; then
-                  echo "$body" >> release_notes.txt
-                  echo "" >> release_notes.txt
-                fi
-              done
-            else
-              echo "First release" >> release_notes.txt
-            fi
+          # Add compare link
+          if [ -n "$previous_tag" ]; then
+            echo "---" >> release_notes.txt
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${previous_tag}...${current_tag}" >> release_notes.txt
           fi
 
           echo "Release notes:"

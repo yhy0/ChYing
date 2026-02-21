@@ -22,7 +22,7 @@ require (
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/imroc/req/v3 v3.57.0
 	github.com/ipinfo/go/v2 v2.10.0
-	github.com/klauspost/compress v1.18.3
+	github.com/klauspost/compress v1.18.4
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/panjf2000/ants/v2 v2.11.4
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
@@ -59,8 +59,8 @@ require (
 	github.com/ysmood/gson v0.7.3
 	go.uber.org/ratelimit v0.3.1
 	golang.org/x/exp v0.0.0-20260112195511-716be5621a96
-	golang.org/x/net v0.49.0
-	golang.org/x/text v0.33.0
+	golang.org/x/net v0.50.0
+	golang.org/x/text v0.34.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
@@ -132,7 +132,7 @@ require (
 	github.com/go-dedup/text v0.0.0-20170907015346-8bb1b95e3cb7 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.7.0 // indirect
-	github.com/go-git/go-git/v5 v5.16.4 // indirect
+	github.com/go-git/go-git/v5 v5.16.5 // indirect
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
@@ -170,7 +170,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kataras/jwt v0.1.17 // indirect
-	github.com/kevinburke/ssh_config v1.4.0 // indirect
+	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
@@ -229,7 +229,7 @@ require (
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
-	github.com/refraction-networking/utls v1.8.1 // indirect
+	github.com/refraction-networking/utls v1.8.2 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/xid v1.6.0 // indirect
@@ -286,12 +286,12 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	goftp.io/server/v2 v2.0.1 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/term v0.39.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251222181119-0a764e51fe1b // indirect

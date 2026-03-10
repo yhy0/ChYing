@@ -157,6 +157,46 @@ tasks:
     cmds:
       - 'echo "Skipping codesign (not available on {{OS}}). Sign the .app on macOS before distribution."'
 
+  create:dmg:
+    summary: Creates a `.dmg` installer from the `.app` bundle
+    deps:
+      - task: package
+    cmds:
+      - >-
+        create-dmg
+        --volname "ChYing"
+        --volicon "build/darwin/icons.icns"
+        --background "build/darwin/dmg-background.png"
+        --window-size 800 600
+        --window-pos 200 100
+        --icon-size 120
+        --icon "{{.APP_NAME}}.app" 220 470
+        --app-drop-link 580 470
+        --hide-extension "{{.APP_NAME}}.app"
+        --no-internet-enable
+        "{{.BIN_DIR}}/{{.APP_NAME}}.dmg"
+        "{{.BIN_DIR}}/{{.APP_NAME}}.app"
+
+  create:dmg:universal:
+    summary: Creates a `.dmg` installer from the universal `.app` bundle
+    deps:
+      - task: package:universal
+    cmds:
+      - >-
+        create-dmg
+        --volname "ChYing"
+        --volicon "build/darwin/icons.icns"
+        --background "build/darwin/dmg-background.png"
+        --window-size 800 600
+        --window-pos 200 100
+        --icon-size 120
+        --icon "{{.APP_NAME}}.app" 220 470
+        --app-drop-link 580 470
+        --hide-extension "{{.APP_NAME}}.app"
+        --no-internet-enable
+        "{{.BIN_DIR}}/{{.APP_NAME}}.dmg"
+        "{{.BIN_DIR}}/{{.APP_NAME}}.app"
+
   run:
     cmds:
       - mkdir -p "{{.BIN_DIR}}/{{.APP_NAME}}.dev.app/Contents/MacOS"

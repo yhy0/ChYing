@@ -40,13 +40,13 @@ jobs:
           - os: macos-15
             goos: darwin
             goarch: amd64
-            artifact_name: ChYing-macos-amd64.zip
+            artifact_name: ChYing-macos-amd64
             build_task: darwin:package
           # macOS ARM64 (Apple Silicon)
           - os: macos-latest
             goos: darwin
             goarch: arm64
-            artifact_name: ChYing-macos-arm64.zip
+            artifact_name: ChYing-macos-arm64
             build_task: darwin:package
 
     runs-on: ${{ matrix.os }}
@@ -108,6 +108,31 @@ jobs:
         run: |
           wails3 task ${{ matrix.build_task }}
 
+      - name: Install create-dmg
+        if: matrix.goos == 'darwin'
+        run: brew install create-dmg
+
+      - name: Create macOS DMG and ZIP
+        if: matrix.goos == 'darwin'
+        shell: bash
+        run: |
+          # 使用 create-dmg 创建美化版 DMG 安装包（自定义背景、拖拽安装布局）
+          create-dmg \
+            --volname "ChYing" \
+            --volicon "build/darwin/icons.icns" \
+            --background "build/darwin/dmg-background.png" \
+            --window-size 800 600 \
+            --window-pos 200 100 \
+            --icon-size 120 \
+            --icon "chying.app" 220 470 \
+            --app-drop-link 580 470 \
+            --hide-extension "chying.app" \
+            --no-internet-enable \
+            "bin/${{ matrix.artifact_name }}.dmg" \
+            "bin/chying.app"
+          # 创建 ZIP 包（包含 .app bundle）
+          cd bin && zip -r "${{ matrix.artifact_name }}.zip" *.app && cd ..
+
       - name: Prepare Release Files
         id: prepare
         shell: bash
@@ -116,8 +141,8 @@ jobs:
           if [ "${{ matrix.goos }}" = "windows" ]; then
             cp bin/*.exe "release/${{ matrix.artifact_name }}"
           elif [ "${{ matrix.goos }}" = "darwin" ]; then
-            cp -r bin/*.app release/
-            cd release && zip -r "${{ matrix.artifact_name }}" *.app && rm -rf *.app && cd ..
+            cp "bin/${{ matrix.artifact_name }}.dmg" release/
+            cp "bin/${{ matrix.artifact_name }}.zip" release/
           else
             cp bin/* "release/${{ matrix.artifact_name }}"
           fi
@@ -126,7 +151,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: release/${{ matrix.artifact_name }}
+          path: release/
           retention-days: 1
 
   release:

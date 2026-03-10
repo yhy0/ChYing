@@ -318,57 +318,61 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 // Initialize a default tab if none exists
 onMounted(async () => {
-  // 从数据库加载持久化的 tabs 和 groups
-  try {
-    const result = await LoadRepeaterState();
-    if (result && !result.error && result.data) {
-      const data = result.data as { tabs: any[]; groups: any[] };
-      if (data.groups && data.groups.length > 0) {
-        store.repeaterGroups.splice(0, store.repeaterGroups.length, ...data.groups.map((g: any) => ({
-          id: g.id,
-          name: g.name,
-          color: g.color,
-        })));
-      }
-      if (data.tabs && data.tabs.length > 0) {
-        // 找到最大的 tab 计数器（从 name 中解析 # 后面的数字）
-        let maxCounter = 0;
-        const restoredTabs: RepeaterTab[] = data.tabs.map((t: any) => {
-          const match = t.name.match(/^#\s*(\d+)/);
-          if (match) {
-            const num = parseInt(match[1], 10);
-            if (num > maxCounter) maxCounter = num;
+  // 仅在 store 中没有 tabs 时才从数据库加载（首次启动）
+  // 如果 store 已有 tabs，说明是页面切换回来或 addRepeaterTabFromEventPayload 刚添加了新 tab，
+  // 此时不能从数据库覆盖，否则会丢失未持久化的新 tab
+  if (store.repeaterTabs.length === 0) {
+    try {
+      const result = await LoadRepeaterState();
+      if (result && !result.error && result.data) {
+        const data = result.data as { tabs: any[]; groups: any[] };
+        if (data.groups && data.groups.length > 0) {
+          store.repeaterGroups.splice(0, store.repeaterGroups.length, ...data.groups.map((g: any) => ({
+            id: g.id,
+            name: g.name,
+            color: g.color,
+          })));
+        }
+        if (data.tabs && data.tabs.length > 0) {
+          // 找到最大的 tab 计数器（从 name 中解析 # 后面的数字）
+          let maxCounter = 0;
+          const restoredTabs: RepeaterTab[] = data.tabs.map((t: any) => {
+            const match = t.name.match(/^#\s*(\d+)/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              if (num > maxCounter) maxCounter = num;
+            }
+            return {
+              id: t.id,
+              name: t.name,
+              color: t.color,
+              groupId: t.group_id || null,
+              request: t.request || defaultRequest,
+              response: t.response || null,
+              isActive: t.is_active || false,
+              isRunning: false,
+              modified: false,
+              history: [],
+              serverDurationMs: t.server_duration_ms || 0,
+              method: t.method || 'GET',
+              url: t.url || '',
+            };
+          });
+
+          // 确保至少有一个 tab 是激活的
+          if (!restoredTabs.some(tab => tab.isActive) && restoredTabs.length > 0) {
+            restoredTabs[0].isActive = true;
           }
-          return {
-            id: t.id,
-            name: t.name,
-            color: t.color,
-            groupId: t.group_id || null,
-            request: t.request || defaultRequest,
-            response: t.response || null,
-            isActive: t.is_active || false,
-            isRunning: false,
-            modified: false,
-            history: [],
-            serverDurationMs: t.server_duration_ms || 0,
-            method: t.method || 'GET',
-            url: t.url || '',
-          };
-        });
 
-        // 确保至少有一个 tab 是激活的
-        if (!restoredTabs.some(tab => tab.isActive) && restoredTabs.length > 0) {
-          restoredTabs[0].isActive = true;
-        }
-
-        store.repeaterTabs.splice(0, store.repeaterTabs.length, ...restoredTabs);
-        if (maxCounter >= store.repeaterTabCounter) {
-          store.repeaterTabCounter = maxCounter + 1;
+          store.repeaterTabs.splice(0, store.repeaterTabs.length, ...restoredTabs);
+          if (maxCounter >= store.repeaterTabCounter) {
+            store.repeaterTabCounter = maxCounter + 1;
+          }
         }
       }
+    } catch {
+      // 加载失败时忽略，使用默认状态
     }
-  } catch {
-    // 加载失败时忽略，使用默认状态
   }
 
   if (tabs.value.length === 0) {

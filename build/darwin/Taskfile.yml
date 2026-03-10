@@ -172,6 +172,7 @@ tasks:
         --icon-size 120
         --icon "{{.APP_NAME}}.app" 220 470
         --app-drop-link 580 470
+        --add-file "如果提示损坏请看这里.txt" "build/darwin/dmg-readme.txt" 400 560
         --hide-extension "{{.APP_NAME}}.app"
         --no-internet-enable
         "{{.BIN_DIR}}/{{.APP_NAME}}.dmg"
@@ -192,6 +193,7 @@ tasks:
         --icon-size 120
         --icon "{{.APP_NAME}}.app" 220 470
         --app-drop-link 580 470
+        --add-file "如果提示损坏请看这里.txt" "build/darwin/dmg-readme.txt" 400 560
         --hide-extension "{{.APP_NAME}}.app"
         --no-internet-enable
         "{{.BIN_DIR}}/{{.APP_NAME}}.dmg"

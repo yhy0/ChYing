@@ -126,6 +126,7 @@ jobs:
             --icon-size 120 \
             --icon "chying.app" 220 470 \
             --app-drop-link 580 470 \
+            --add-file "如果提示损坏请看这里.txt" "build/darwin/dmg-readme.txt" 400 560 \
             --hide-extension "chying.app" \
             --no-internet-enable \
             "bin/${{ matrix.artifact_name }}.dmg" \
@@ -216,6 +217,16 @@ jobs:
           else
             echo "First release" >> release_notes.txt
           fi
+
+          # macOS installation note
+          echo "" >> release_notes.txt
+          echo "## macOS Installation" >> release_notes.txt
+          echo "" >> release_notes.txt
+          echo 'If macOS shows **"chying is damaged and can'\''t be opened"**, run the following command in Terminal:' >> release_notes.txt
+          echo "" >> release_notes.txt
+          echo '```bash' >> release_notes.txt
+          echo 'sudo xattr -cr /Applications/chying.app' >> release_notes.txt
+          echo '```' >> release_notes.txt
 
           # Add compare link
           if [ -n "$previous_tag" ]; then

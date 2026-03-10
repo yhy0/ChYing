@@ -687,7 +687,7 @@ func dumpResponseFromProcessedInfo(originalResp *http.Response, info *ProcessedR
 	sb.WriteString("\r\n")
 
 	// 准备头部进行写入
-	headersToDump := originalResp.Header.Clone()                         // 从原始响应的当前头部开始克隆
+	headersToDump := originalResp.Header.Clone()                         // 从原始响应的当前头部开始复制
 	headersToDump.Del("Content-Encoding")                                // 因为内容是解码的
 	headersToDump.Set("Content-Length", strconv.Itoa(len(info.Content))) // 设置为解码后内容的长度
 	if info.OriginalEncoding != "" && info.OriginalEncoding != "identity" {
@@ -785,7 +785,7 @@ func cloneResponseWithBody(r *http.Response, bodyBytes []byte) *http.Response {
 				r.Body.Close() // 关闭原始的reader
 				// 恢复原始响应的 Body，使其可以被再次读取
 				r.Body = io.NopCloser(bytes.NewBuffer(originalBodyBytes))
-				// 设置克隆响应的 Body
+				// 设置复制响应的 Body
 				r2.Body = io.NopCloser(bytes.NewBuffer(originalBodyBytes))
 			}
 		} else {

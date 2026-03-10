@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from 'vue';
 import { RequestResponsePanel } from '../common';
 import { useI18n } from 'vue-i18n';
 import { RawRequest } from "../../../bindings/github.com/yhy0/ChYing/app.js";
+import { SaveRepeaterTabHistory, LoadRepeaterTabHistory } from "../../../bindings/github.com/yhy0/ChYing/app.js";
 
 // 定义历史记录接口
 interface RequestHistory {
@@ -143,13 +144,13 @@ const updateResponse = (newData: string) => {
 const addToHistory = (request: string, response: string | null, server_duration_ms: number) => {
   const { method, url } = parseRequestHeadersForMethodAndUrl(request);
   const { statusCode, statusText } = extractStatusInfo(response);
-  
+
   // 更新服务器响应时间并添加日志
   emit('update-server-duration', server_duration_ms);
-  
+
   // 自增历史记录序列ID
   historyCounter.value++;
-  
+
   const historyItem: RequestHistory = {
     id: Date.now(),
     sequenceId: historyCounter.value,
@@ -165,9 +166,32 @@ const addToHistory = (request: string, response: string | null, server_duration_
 
   history.value = [historyItem, ...history.value];
   emit('update-history', history.value);
-  
+
   // 选中新添加的历史记录
   selectedHistoryId.value = historyItem.id;
+
+  // 保存历史记录到数据库（防抖）
+  debouncedSaveHistory();
+};
+
+// 防抖保存 history 到数据库
+let historySaveTimer: ReturnType<typeof setTimeout> | null = null;
+const debouncedSaveHistory = () => {
+  if (historySaveTimer) clearTimeout(historySaveTimer);
+  historySaveTimer = setTimeout(() => {
+    const historyData = history.value.map(item => ({
+      tab_id: props.tab.id,
+      sequence_id: item.sequenceId,
+      method: item.method,
+      url: item.url,
+      request: item.request,
+      response: item.response || '',
+      status_code: item.statusCode || 0,
+      status_text: item.statusText || '',
+      server_duration_ms: item.server_duration_ms || 0,
+    }));
+    SaveRepeaterTabHistory(props.tab.id, JSON.stringify(historyData)).catch(() => {});
+  }, 2000);
 };
 
 // 发送请求
@@ -271,11 +295,34 @@ const groupHistoryByDate = () => {
 };
 
 // 模拟初始化tab的history
-onMounted(() => {
-  if (!props.tab.history) {
-    history.value = [];
+onMounted(async () => {
+  if (!props.tab.history || props.tab.history.length === 0) {
+    // 从数据库加载 history
+    try {
+      const result = await LoadRepeaterTabHistory(props.tab.id);
+      if (result && !result.error && result.data) {
+        const dbHistory = result.data as any[];
+        if (dbHistory && dbHistory.length > 0) {
+          history.value = dbHistory.map((item: any) => ({
+            id: item.ID || item.id || Date.now() + Math.random(),
+            sequenceId: item.sequence_id || item.SequenceID || 0,
+            timestamp: item.CreatedAt ? new Date(item.CreatedAt).getTime() : Date.now(),
+            method: item.method || item.Method || 'GET',
+            url: item.url || item.URL || '',
+            request: item.request || item.Request || '',
+            response: item.response || item.Response || null,
+            statusCode: item.status_code || item.StatusCode || 0,
+            statusText: item.status_text || item.StatusText || '',
+            server_duration_ms: item.server_duration_ms || item.ServerDurationMs || 0,
+          }));
+          emit('update-history', history.value);
+        }
+      }
+    } catch {
+      // 加载失败时忽略
+    }
   }
-  
+
   // 初始化历史记录计数器，设置为当前历史记录的最大序列ID
   if (history.value.length > 0) {
     const maxSequenceId = Math.max(...history.value.map(item => item.sequenceId || 0));

@@ -339,5 +339,11 @@ func ReadJwtFile(jwtPath string) {
 			logging.Logger.Fatal(err)
 		}
 	}
-	JwtSecrets = strings.Split(string(jwt), "\n")
+	lines := strings.Split(string(jwt), "\n")
+	JwtSecrets = make([]string, 0, len(lines))
+	for _, line := range lines {
+		// 去除 \r 和尾部空白，但保留空行（空密码场景）
+		line = strings.TrimRight(line, "\r \t")
+		JwtSecrets = append(JwtSecrets, line)
+	}
 }

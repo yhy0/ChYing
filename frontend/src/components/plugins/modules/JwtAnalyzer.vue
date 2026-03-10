@@ -11,6 +11,7 @@ const { t } = useI18n();
 
 // JWT 解析器状态
 const jwtInput = ref('');
+const originalJwt = ref(''); // 用户输入的原始 JWT，验证/爆破时使用，不受自动重签影响
 const selectedAlgorithm = ref('HS256');
 const secretKey = ref('');
 const secretKeyPath = ref('');
@@ -233,7 +234,7 @@ const verificationStatus = ref<VerificationStatus>(null);
 
 // 验证JWT签名
 const verifyJwt = () => {
-  if (!jwtInput.value || !secretKey.value) {
+  if (!originalJwt.value || !secretKey.value) {
     verificationStatus.value = 'warning';
     verificationResult.value = t('modules.plugins.jwt_analyzer.enter_jwt_key');
     return;
@@ -242,7 +243,7 @@ const verifyJwt = () => {
   isVerifying.value = true;
 
   try {
-    Verify(jwtInput.value, secretKey.value).then((result: any) => {
+    Verify(originalJwt.value, secretKey.value).then((result: any) => {
       if (result.error !== "") {
         verificationStatus.value = 'error';
         verificationResult.value = t('modules.plugins.jwt_analyzer.verify_error');
@@ -262,18 +263,18 @@ const verifyJwt = () => {
 
 // 爆破JWT签名
 const bruteJwt = () => {
-  if (!jwtInput.value) {
+  if (!originalJwt.value) {
     return;
   }
   isVerifying.value = true;
   showProgress.value = true;
   bruteProgress.value = 0;
-  
-  Brute(jwtInput.value, secretKeyPath.value).then((result: any) => {
+
+  Brute(originalJwt.value, secretKeyPath.value).then((result: any) => {
     showProgress.value = false;
     if (result !== "") {
       secretKey.value = result
-      Verify(jwtInput.value, secretKey.value).then((result: any) => {
+      Verify(originalJwt.value, secretKey.value).then((result: any) => {
         if (result.error !== "") {
           verificationStatus.value = 'error';
           verificationResult.value = t('modules.plugins.jwt_analyzer.verify_error');
@@ -351,7 +352,7 @@ const toggleTooltip = (id: string | null) => {
           {{ t('modules.plugins.jwt_analyzer.jwt_token') }}
         </h3>
 
-        <textarea spellcheck="false" v-model="jwtInput"
+        <textarea spellcheck="false" v-model="jwtInput" @input="originalJwt = jwtInput"
           class="w-full h-32 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1e1e2e] focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-300 text-sm font-mono shadow-inner resize-none"
           :placeholder="t('modules.plugins.jwt_analyzer.paste_token')"></textarea>
       </div>

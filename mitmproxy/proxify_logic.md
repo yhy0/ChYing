@@ -343,7 +343,7 @@ func onResponse(resp *http.Response, ctx *martian.Context) error {
 }
 ```
 
-#### 辅助函数：克隆、解析、处理队列
+#### 辅助函数：复制、解析、处理队列
 
 ```go
 // cloneRequest 创建请求的副本

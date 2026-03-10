@@ -1,6 +1,8 @@
 
 y92tntavryv79ezl
 jsfund
+whyour-secret
+a-string-secret-at-least-256-bits-long
 !@#!@#!@#!@@#!@#
 !@#^&*
 #######

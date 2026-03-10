@@ -51,39 +51,39 @@ func passiveScanResponseProcessor(resp *http.Response) bool {
 		return false
 	}
 
-	// 为异步处理深度克隆响应对象
-	// 使用 cloneResponseWithBody(originalResponse, nil) 来确保body也被正确克隆和恢复
+	// 为异步处理深度复制响应对象
+	// 使用 cloneResponseWithBody(originalResponse, nil) 来确保body也被正确复制和恢复
 	respClone := cloneResponseWithBody(resp, nil)
-	if respClone == nil { // 如果克隆失败，记录错误并跳过
-		logging.Logger.Errorln("被动扫描：克隆响应对象失败，跳过处理")
+	if respClone == nil { // 如果复制失败，记录错误并跳过
+		logging.Logger.Errorln("被动扫描：复制响应对象失败，跳过处理")
 		return false
 	}
-	// 确保克隆出来的请求也是有效的
+	// 确保复制出来的请求也是有效的
 	clonedReq := respClone.Request
 	if clonedReq == nil {
-		logging.Logger.Errorln("被动扫描：克隆响应中的请求对象为nil，跳过处理")
+		logging.Logger.Errorln("被动扫描：复制响应中的请求对象为nil，跳过处理")
 		return false
 	}
 
 	go func(asyncResp *http.Response) {
-		// 在 goroutine 内部使用克隆的 asyncResp 和 asyncReq
+		// 在 goroutine 内部使用复制的 asyncResp 和 asyncReq
 		asyncReq := asyncResp.Request
 
-		// 检查主机是否在过滤列表中 (使用克隆的请求URL)
+		// 检查主机是否在过滤列表中 (使用复制的请求URL)
 		if Filter(asyncReq.URL.Host) {
 			logging.Logger.Debugln("被动扫描(async): 过滤了", asyncReq.URL.Host)
 			return
 		}
 
-		// 过滤一些干扰项 - 复用原来的逻辑 (使用克隆的请求URL)
+		// 过滤一些干扰项 - 复用原来的逻辑 (使用复制的请求URL)
 		if len(conf.GlobalConfig.Mitmproxy.Exclude) > 0 || !(len(conf.GlobalConfig.Mitmproxy.Exclude) == 1 && conf.GlobalConfig.Mitmproxy.Exclude[0] == "") {
 			if !util.RegexpStr(conf.GlobalConfig.Mitmproxy.Exclude, asyncReq.URL.Host) {
-				judgeAndDistribute(asyncReq, asyncResp) // 传递克隆的对象
+				judgeAndDistribute(asyncReq, asyncResp) // 传递复制的对象
 			}
 		} else {
-			judgeAndDistribute(asyncReq, asyncResp) // 传递克隆的对象
+			judgeAndDistribute(asyncReq, asyncResp) // 传递复制的对象
 		}
-	}(respClone) // 将克隆的响应传递给 goroutine
+	}(respClone) // 将复制的响应传递给 goroutine
 
 	// 返回 false 表示没有同步修改响应 (实际工作在goroutine中)
 	return false

@@ -386,7 +386,25 @@ func (a *App) StepInitializationComplete() Result {
 	if mcpPort <= 0 {
 		mcpPort = 9245
 	}
-	go mcpserver.StartHTTPServer(mcpPort)
+	mcpAddr, mcpErr := mcpserver.StartHTTPServer(mcpPort)
+	if mcpErr != nil {
+		logging.Logger.Warnf("MCP Server 启动失败: %v", mcpErr)
+		if wailsApp != nil {
+			wailsApp.Event.Emit("MCPStarted", map[string]interface{}{
+				"success": false,
+				"message": fmt.Sprintf("MCP 服务启动失败: %v", mcpErr),
+			})
+		}
+	} else {
+		logging.Logger.Infof("MCP Server 已启动，监听地址: %s", mcpAddr)
+		if wailsApp != nil {
+			wailsApp.Event.Emit("MCPStarted", map[string]interface{}{
+				"success": true,
+				"address": mcpAddr,
+				"message": fmt.Sprintf("MCP 服务已启动，监听地址: %s", mcpAddr),
+			})
+		}
+	}
 
 	progress.Success = true
 	logging.Logger.Infoln("✓ 系统初始化完成，ChYing 已准备就绪")

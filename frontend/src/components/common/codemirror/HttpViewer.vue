@@ -26,6 +26,7 @@ const emit = defineEmits<{
 
 const editorRef = ref<HTMLElement | null>(null);
 let editorView: EditorView | null = null;
+let isInitialCreation = true; // 标记是否为首次创建编辑器
 
 // 格式化相关状态
 let currentLineMapping: number[] | null = null;
@@ -286,10 +287,18 @@ const createEditor = (
     parent: element
   });
   
-  // 默认显示搜索面板
-  setTimeout(() => {
-    openSearchPanel(view);
-  }, 100);
+  // 仅首次创建编辑器时打开搜索面板，后续数据变化导致的重建不再打开
+  // 避免用户输入时焦点被搜索面板抢走
+  if (isInitialCreation) {
+    isInitialCreation = false;
+    setTimeout(() => {
+      openSearchPanel(view);
+      // openSearchPanel 会将焦点移到搜索输入框，需要将焦点还给编辑器
+      requestAnimationFrame(() => {
+        view.focus();
+      });
+    }, 100);
+  }
   
   return view;
 };
@@ -317,14 +326,23 @@ const updateContent = () => {
   // 如果内容没有变化，不处理
   if (content === lastContent) return;
 
-  // 如果处于格式化模式，数据变化时需要重建编辑器（因为行号映射可能变化）
-  if (props.bodyFormatted && editorView && editorRef.value) {
+  // 只有在格式化模式下且确实产生了格式化内容时才需要重建编辑器（行号映射变化）
+  // 如果 formatHttpBody 返回 null（没有可格式化的 body），不需要重建
+  if (props.bodyFormatted && isShowingFormatted && editorView && editorRef.value) {
     const scrollTop = editorView.scrollDOM.scrollTop;
+    const hasFocus = editorView.hasFocus;
+    const cursorPos = editorView.state.selection.main.head;
     const isDarkMode = document.documentElement.classList.contains('dark');
     editorView.destroy();
     editorView = createEditor(editorRef.value, content, props.readOnly, isDarkMode);
     lastContent = content;
     editorView.scrollDOM.scrollTop = scrollTop;
+    // 恢复焦点和光标位置
+    if (hasFocus) {
+      const safePos = Math.min(cursorPos, editorView.state.doc.length);
+      editorView.dispatch({ selection: { anchor: safePos } });
+      editorView.focus();
+    }
     return;
   }
 
@@ -336,17 +354,17 @@ const updateContent = () => {
       // 比如，只是换行符数量或类型不同 (\n vs \r\n)
       const normalizedCurrent = currentContent.replace(/\r\n/g, '\n');
       const normalizedContent = content.replace(/\r\n/g, '\n');
-      
+
       if (normalizedCurrent === normalizedContent) {
         // 内容实质相同，只是格式不同，直接更新缓存避免循环
         lastContent = currentContent;
         return;
       }
-      
+
       // 保存当前光标位置和滚动位置
       const selection = editorView.state.selection;
       const scrollTop = editorView.scrollDOM.scrollTop;
-      
+
       try {
         // 使用简单替换更新内容，避免复杂的差异计算
         editorView.dispatch({
@@ -360,7 +378,7 @@ const updateContent = () => {
             head: Math.min(selection.main.head, content.length)
           }
         });
-        
+
         // 恢复滚动位置
         editorView.scrollDOM.scrollTop = scrollTop;
       } catch (error) {
@@ -369,16 +387,20 @@ const updateContent = () => {
         if (editorRef.value) {
           editorView.destroy();
           editorView = createEditor(
-            editorRef.value, 
-            content, 
+            editorRef.value,
+            content,
             props.readOnly,
             document.documentElement.classList.contains('dark')
           );
         }
       }
-      
+
       // 缓存更新后的内容
       lastContent = editorView.state.doc.toString();
+    } else {
+      // 编辑器内容已经与 props.data 一致（如用户输入后 emit 回来的数据）
+      // 同步 lastContent 避免下次重复进入
+      lastContent = content;
     }
   }
 };
@@ -420,6 +442,7 @@ watch(() => props.data, debouncedUpdateContent, { deep: true });
 watch(() => props.bodyFormatted, () => {
   if (editorView && editorRef.value) {
     const scrollTop = editorView.scrollDOM.scrollTop;
+    const hasFocus = editorView.hasFocus;
     const isDarkMode = document.documentElement.classList.contains(DARK_CLASS);
     editorView.destroy();
     // 使用原始数据重建，createEditor 内部会根据 bodyFormatted 决定是否格式化
@@ -427,6 +450,9 @@ watch(() => props.bodyFormatted, () => {
     editorView = createEditor(editorRef.value, content, props.readOnly, isDarkMode);
     lastContent = content;
     editorView.scrollDOM.scrollTop = scrollTop;
+    if (hasFocus) {
+      editorView.focus();
+    }
   }
 });
 
@@ -438,13 +464,17 @@ watch(
       // 保存当前内容和光标位置
       const content = editorView.state.doc.toString();
       const scrollTop = editorView.scrollDOM.scrollTop;
-      
+      const hasFocus = editorView.hasFocus;
+
       // 销毁旧实例并创建新实例
       editorView.destroy();
       editorView = createEditor(editorRef.value, content, props.readOnly, isDark);
-      
-      // 恢复滚动位置
+
+      // 恢复滚动位置和焦点
       editorView.scrollDOM.scrollTop = scrollTop;
+      if (hasFocus) {
+        editorView.focus();
+      }
     }
   }
 );
@@ -469,12 +499,16 @@ onMounted(() => {
     mutations.forEach((mutation) => {
       if (mutation.attributeName === 'class') {
         const isDarkMode = document.documentElement.classList.contains('dark');
-        
+
         // 重新创建编辑器以应用新主题
         if (editorView && editorRef.value) {
           const content = editorView.state.doc.toString();
+          const hasFocus = editorView.hasFocus;
           editorView.destroy();
           editorView = createEditor(editorRef.value, content, props.readOnly, isDarkMode);
+          if (hasFocus) {
+            editorView.focus();
+          }
         }
       }
     });

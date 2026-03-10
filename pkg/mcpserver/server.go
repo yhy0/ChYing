@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/mark3labs/mcp-go/server"
@@ -37,7 +38,8 @@ func NewChYingMCPServer() *server.MCPServer {
 }
 
 // StartHTTPServer 启动 MCP HTTP SSE Server，仅绑定到 localhost
-func StartHTTPServer(port int) {
+// 返回监听地址，如果启动失败返回错误
+func StartHTTPServer(port int) (string, error) {
 	s := NewChYingMCPServer()
 	httpServer := server.NewStreamableHTTPServer(s)
 
@@ -47,7 +49,19 @@ func StartHTTPServer(port int) {
 	mux := http.NewServeMux()
 	mux.Handle("/mcp", httpServer)
 
-	if err := http.ListenAndServe(addr, mux); err != nil {
-		logging.Logger.Errorf("MCP server error: %v", err)
+	// 使用 net.Listen 先绑定端口，确认成功后再 Serve
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		logging.Logger.Errorf("MCP server listen error: %v", err)
+		return "", fmt.Errorf("MCP server listen error: %v", err)
 	}
+
+	// 启动成功，在新 goroutine 中 serve
+	go func() {
+		if err := http.Serve(listener, mux); err != nil {
+			logging.Logger.Errorf("MCP server error: %v", err)
+		}
+	}()
+
+	return addr, nil
 }

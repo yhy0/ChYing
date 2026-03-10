@@ -56,6 +56,28 @@ const handleProxyStarted = (event: any) => {
   }
 };
 
+// 处理 MCP 服务启动事件
+const handleMCPStarted = (event: any) => {
+  const data = event.data;
+  if (data) {
+    if (data.success) {
+      showGlobalNotification(data.message, 'success');
+      store.addNotification({
+        type: 'success',
+        title: 'MCP Server',
+        message: data.message
+      });
+    } else {
+      showGlobalNotification(data.message || 'MCP Server start failed', 'error');
+      store.addNotification({
+        type: 'error',
+        title: 'MCP Server',
+        message: data.message || 'MCP Server start failed'
+      });
+    }
+  }
+};
+
 // 处理版本更新事件
 const handleUpdateAvailable = (event: any) => {
   const data = event.data;
@@ -94,6 +116,7 @@ onMounted(async () => {
 
   // 注册 Wails 后端事件监听器
   Events.On("ProxyStarted", handleProxyStarted);
+  Events.On("MCPStarted", handleMCPStarted);
   Events.On("UpdateAvailable", handleUpdateAvailable);
 
   // 注册 eventBus 事件监听器
@@ -136,6 +159,7 @@ onMounted(async () => {
 onUnmounted(() => {
   // 取消注册 Wails 后端事件监听器
   Events.Off("ProxyStarted");
+  Events.Off("MCPStarted");
   Events.Off("UpdateAvailable");
 
   // 取消注册 eventBus 事件监听器

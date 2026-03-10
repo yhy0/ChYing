@@ -159,7 +159,7 @@ func InitSQL(project string, DBType string) {
 		return
 	}
 
-	err = GlobalDB.AutoMigrate(&Request{}, &Response{}, &HTTPHistory{}, &SCopilot{}, &IPInfo{}, &ScanTarget{}, &Vulnerability{}, &ClaudeSession{}, &OASTProvider{})
+	err = GlobalDB.AutoMigrate(&Request{}, &Response{}, &HTTPHistory{}, &SCopilot{}, &IPInfo{}, &ScanTarget{}, &Vulnerability{}, &ClaudeSession{}, &OASTProvider{}, &RepeaterTab{}, &RepeaterGroup{}, &RepeaterHistory{})
 
 	if err != nil {
 		logging.Logger.Errorf("db AutoMigrate err: %v", err)

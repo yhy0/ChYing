@@ -1,7 +1,6 @@
 package twj
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/sha512"
@@ -143,6 +142,27 @@ func GenerateSignature(jwtMsg string, jwtPath string) string {
 		return ""
 	}
 
+	// 从 header 解析算法
+	headerBytes, err := base64.RawURLEncoding.DecodeString(parts[0])
+	if err != nil {
+		Flag = false
+		return ""
+	}
+	var header struct {
+		Alg string `json:"alg"`
+	}
+	if err := json.Unmarshal(headerBytes, &header); err != nil {
+		Flag = false
+		return ""
+	}
+
+	hashFunc, ok := hmacHashFunc(header.Alg)
+	if !ok {
+		logging.Logger.Errorf("unsupported JWT algorithm: %s", header.Alg)
+		Flag = false
+		return ""
+	}
+
 	// 解码JWT签名部分
 	signature, err := base64.RawURLEncoding.DecodeString(parts[2])
 	if err != nil {
@@ -150,16 +170,21 @@ func GenerateSignature(jwtMsg string, jwtPath string) string {
 		return ""
 	}
 
+	signingInput := parts[0] + "." + parts[1]
 	n := len(file.JwtSecrets)
-	logging.Logger.Debugf("JWT brute force %s, load %d secrets", jwtMsg, n)
+	logging.Logger.Debugf("JWT brute force %s (alg=%s), load %d secrets", jwtMsg, header.Alg, n)
 
 	var wg sync.WaitGroup
 	ch := make(chan struct{}, 20)
 	var mu sync.Mutex
 	var res string
+	var found sync.Once
 
 	for i, s := range file.JwtSecrets {
-		if Stop {
+		mu.Lock()
+		stopped := Stop
+		mu.Unlock()
+		if stopped {
 			break
 		}
 
@@ -173,15 +198,17 @@ func GenerateSignature(jwtMsg string, jwtPath string) string {
 			float, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", float64(i+1)/float64(n)*100), 64)
 			Percentage <- float
 
-			hasher := hmac.New(sha256.New, []byte(s))
-			hasher.Write([]byte(parts[0] + "." + parts[1]))
+			hasher := hmac.New(hashFunc, []byte(s))
+			hasher.Write([]byte(signingInput))
 
-			if bytes.Equal(signature, hasher.Sum(nil)) {
-				mu.Lock()
-				res = s
-				Stop = true
-				mu.Unlock()
-				logging.Logger.Infof("[+]JWT brute Success %s, secret %d/%d: %s", jwtMsg, i+1, n, s)
+			if hmac.Equal(signature, hasher.Sum(nil)) {
+				found.Do(func() {
+					mu.Lock()
+					res = s
+					Stop = true
+					mu.Unlock()
+					logging.Logger.Infof("[+]JWT brute Success %s, secret %d/%d: %s", jwtMsg, i+1, n, s)
+				})
 			}
 		}(i, s)
 	}
@@ -190,4 +217,18 @@ func GenerateSignature(jwtMsg string, jwtPath string) string {
 	Stop = false
 	Flag = false
 	return res
+}
+
+// hmacHashFunc 根据 JWT 算法名返回对应的 hash.New 函数
+func hmacHashFunc(alg string) (func() hash.Hash, bool) {
+	switch alg {
+	case "HS256":
+		return sha256.New, true
+	case "HS384":
+		return sha512.New384, true
+	case "HS512":
+		return sha512.New, true
+	default:
+		return nil, false
+	}
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import RepeaterTabs from './RepeaterTabs.vue';
 import RepeaterTabPanel from './RepeaterTabPanel.vue';
@@ -7,6 +7,7 @@ import RepeaterModal from './RepeaterModal.vue';
 import { useModulesStore } from '../../store';
 import type { RepeaterTab, RepeaterGroup } from '../../types';
 import { generateUUID } from '../../utils';
+import { SaveRepeaterState, LoadRepeaterState, DeleteRepeaterTabData } from "../../../bindings/github.com/yhy0/ChYing/app.js";
 
 const { t } = useI18n();
 
@@ -149,12 +150,15 @@ const closeTab = (tabId: string) => {
   const index = tabs.value.findIndex(tab => tab.id === tabId);
   if (index !== -1) {
     tabs.value.splice(index, 1);
-    
+
     // If we closed the active tab, activate another one if available
     if (tabs.value.length > 0 && activeTab.value === null) {
       const newActiveIndex = Math.min(index, tabs.value.length - 1);
       tabs.value[newActiveIndex].isActive = true;
     }
+
+    // 从数据库删除该 tab 及其 history
+    DeleteRepeaterTabData(tabId).catch(() => {});
   }
 };
 
@@ -190,36 +194,42 @@ const sendToIntruder = () => {
 // Clone current tab
 const cloneTab = () => {
   if (!activeTab.value) return;
-  
+
+  // 先保存原始 tab 数据，再修改 isActive（避免 computed 失效导致 null）
+  const originalTab = activeTab.value;
+  const originalColor = originalTab.color;
+  const originalGroupId = originalTab.groupId;
+  const originalRequest = originalTab.request;
+  const originalMethod = originalTab.method || 'GET';
+  const originalUrl = originalTab.url;
+
   // Deactivate all existing tabs
   tabs.value.forEach(tab => {
     tab.isActive = false;
   });
-  
-  // Clone the active tab
-  const originalTab = activeTab.value;
+
   const newTabId = generateTabId();
-  
+
   // 获取当前计数器值并增加
   const currentCounter = store.repeaterTabCounter;
   store.repeaterTabCounter++;
-  
+
   const newTab: RepeaterTabWithHistory = {
     id: newTabId,
     name: `# ${currentCounter}`,
-    color: originalTab.color,
-    groupId: originalTab.groupId,
-    request: originalTab.request,
+    color: originalColor,
+    groupId: originalGroupId,
+    request: originalRequest,
     response: null, // Reset response
     isActive: true,
     isRunning: false,
     modified: false,
     history: [], // 新的空历史记录，不从原标签复制
     serverDurationMs: 0,
-    method: originalTab.method || 'GET',
-    url: originalTab.url,
+    method: originalMethod,
+    url: originalUrl,
   };
-  
+
   tabs.value.push(newTab);
 };
 
@@ -231,6 +241,37 @@ const updateHistory = (tabId: string, history: RequestHistory[]) => {
     (tab as RepeaterTabWithHistory).history = history;
   }
 };
+
+// 持久化相关：防抖保存 tabs 和 groups 到数据库
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+const debouncedSaveState = () => {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const tabsData = tabs.value.map((tab, index) => ({
+      id: tab.id,
+      name: tab.name,
+      color: tab.color,
+      group_id: tab.groupId || '',
+      request: tab.request || '',
+      response: tab.response || '',
+      method: tab.method || 'GET',
+      url: tab.url || '',
+      sort_order: index,
+      is_active: tab.isActive,
+      server_duration_ms: tab.serverDurationMs || 0,
+    }));
+    const groupsData = groups.value.map((group, index) => ({
+      id: group.id,
+      name: group.name,
+      color: group.color,
+      sort_order: index,
+    }));
+    SaveRepeaterState(JSON.stringify(tabsData), JSON.stringify(groupsData)).catch(() => {});
+  }, 2000);
+};
+
+// 标记是否已从数据库加载完成，避免加载过程中触发 watch 保存
+const loaded = ref(false);
 
 // 更新服务器响应时间
 const handleServerDurationUpdate = (duration: number, tabId: string) => {
@@ -276,12 +317,76 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 // Initialize a default tab if none exists
-onMounted(() => {
+onMounted(async () => {
+  // 从数据库加载持久化的 tabs 和 groups
+  try {
+    const result = await LoadRepeaterState();
+    if (result && !result.error && result.data) {
+      const data = result.data as { tabs: any[]; groups: any[] };
+      if (data.groups && data.groups.length > 0) {
+        store.repeaterGroups.splice(0, store.repeaterGroups.length, ...data.groups.map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          color: g.color,
+        })));
+      }
+      if (data.tabs && data.tabs.length > 0) {
+        // 找到最大的 tab 计数器（从 name 中解析 # 后面的数字）
+        let maxCounter = 0;
+        const restoredTabs: RepeaterTab[] = data.tabs.map((t: any) => {
+          const match = t.name.match(/^#\s*(\d+)/);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxCounter) maxCounter = num;
+          }
+          return {
+            id: t.id,
+            name: t.name,
+            color: t.color,
+            groupId: t.group_id || null,
+            request: t.request || defaultRequest,
+            response: t.response || null,
+            isActive: t.is_active || false,
+            isRunning: false,
+            modified: false,
+            history: [],
+            serverDurationMs: t.server_duration_ms || 0,
+            method: t.method || 'GET',
+            url: t.url || '',
+          };
+        });
+
+        // 确保至少有一个 tab 是激活的
+        if (!restoredTabs.some(tab => tab.isActive) && restoredTabs.length > 0) {
+          restoredTabs[0].isActive = true;
+        }
+
+        store.repeaterTabs.splice(0, store.repeaterTabs.length, ...restoredTabs);
+        if (maxCounter >= store.repeaterTabCounter) {
+          store.repeaterTabCounter = maxCounter + 1;
+        }
+      }
+    }
+  } catch {
+    // 加载失败时忽略，使用默认状态
+  }
+
   if (tabs.value.length === 0) {
     createTab();
   }
+
+  loaded.value = true;
   window.addEventListener('keydown', handleKeyDown);
 });
+
+// 监听 tabs 和 groups 变化，自动保存到数据库
+watch(() => [...tabs.value.map(t => ({ id: t.id, name: t.name, color: t.color, groupId: t.groupId, request: t.request, response: t.response, isActive: t.isActive, method: t.method, url: t.url, serverDurationMs: t.serverDurationMs }))], () => {
+  if (loaded.value) debouncedSaveState();
+}, { deep: true });
+
+watch(() => [...groups.value.map(g => ({ id: g.id, name: g.name, color: g.color }))], () => {
+  if (loaded.value) debouncedSaveState();
+}, { deep: true });
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown);

@@ -252,3 +252,82 @@ func (a *App) loadExistingProjectData() {
 	}
 	output.DataUpdated <- struct{}{}
 }
+
+// SaveRepeaterState 保存 Repeater 全部 tabs 和 groups
+func (a *App) SaveRepeaterState(tabsJSON string, groupsJSON string) Result {
+	var tabs []db.RepeaterTab
+	if err := json.Unmarshal([]byte(tabsJSON), &tabs); err != nil {
+		return Result{Error: fmt.Sprintf("解析 tabs JSON 失败: %v", err)}
+	}
+
+	var groups []db.RepeaterGroup
+	if err := json.Unmarshal([]byte(groupsJSON), &groups); err != nil {
+		return Result{Error: fmt.Sprintf("解析 groups JSON 失败: %v", err)}
+	}
+
+	if err := db.SaveRepeaterTabs(tabs); err != nil {
+		return Result{Error: fmt.Sprintf("保存 tabs 失败: %v", err)}
+	}
+
+	if err := db.SaveRepeaterGroups(groups); err != nil {
+		return Result{Error: fmt.Sprintf("保存 groups 失败: %v", err)}
+	}
+
+	return Result{Data: "ok"}
+}
+
+// LoadRepeaterState 加载 Repeater 全部 tabs 和 groups
+func (a *App) LoadRepeaterState() Result {
+	tabs, err := db.GetRepeaterTabs()
+	if err != nil {
+		return Result{Error: fmt.Sprintf("加载 tabs 失败: %v", err)}
+	}
+
+	groups, err := db.GetRepeaterGroups()
+	if err != nil {
+		return Result{Error: fmt.Sprintf("加载 groups 失败: %v", err)}
+	}
+
+	return Result{Data: map[string]interface{}{
+		"tabs":   tabs,
+		"groups": groups,
+	}}
+}
+
+// SaveRepeaterTabHistory 保存某个 tab 的请求历史
+func (a *App) SaveRepeaterTabHistory(tabID string, historyJSON string) Result {
+	var history []db.RepeaterHistory
+	if err := json.Unmarshal([]byte(historyJSON), &history); err != nil {
+		return Result{Error: fmt.Sprintf("解析 history JSON 失败: %v", err)}
+	}
+
+	// 确保所有 history 记录都关联到正确的 tabID
+	for i := range history {
+		history[i].TabID = tabID
+	}
+
+	if err := db.SaveRepeaterHistory(tabID, history); err != nil {
+		return Result{Error: fmt.Sprintf("保存 history 失败: %v", err)}
+	}
+
+	return Result{Data: "ok"}
+}
+
+// LoadRepeaterTabHistory 加载某个 tab 的请求历史
+func (a *App) LoadRepeaterTabHistory(tabID string) Result {
+	history, err := db.GetRepeaterHistory(tabID)
+	if err != nil {
+		return Result{Error: fmt.Sprintf("加载 history 失败: %v", err)}
+	}
+
+	return Result{Data: history}
+}
+
+// DeleteRepeaterTabData 删除某个 tab 及其关联数据
+func (a *App) DeleteRepeaterTabData(tabID string) Result {
+	if err := db.DeleteRepeaterTab(tabID); err != nil {
+		return Result{Error: fmt.Sprintf("删除 tab 数据失败: %v", err)}
+	}
+
+	return Result{Data: "ok"}
+}

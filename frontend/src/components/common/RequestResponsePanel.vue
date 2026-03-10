@@ -143,18 +143,12 @@ const stopResize = () => {
   document.body.classList.remove('dragging');
 };
 
-// 监听传入数据的变化
+// 监听传入数据的变化 - 仅用于通知编辑器刷新，不再调用 click() 避免焦点抢夺
 watch(
   () => [props.requestData, props.responseData],
   () => {
-    nextTick(() => {
-      if (requestViewer.value?.$el || responseViewer.value?.$el) {
-        setTimeout(() => {
-          requestViewer.value?.$el?.click?.();
-          responseViewer.value?.$el?.click?.();
-        }, 50);
-      }
-    });
+    // 数据变化时编辑器会通过自身的 watch(props.data) 自动更新
+    // 无需手动触发 click() 事件
   },
   { deep: true }
 );

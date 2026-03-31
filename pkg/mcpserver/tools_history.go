@@ -55,6 +55,9 @@ func getHttpHistoryTool() mcp.Tool {
 		mcp.WithNumber("offset",
 			mcp.Description("Number of records to skip (default 0)"),
 		),
+		mcp.WithString("session_id",
+			mcp.Description("Optional: filter by scan session ID"),
+		),
 	)
 }
 
@@ -62,6 +65,7 @@ func handleGetHttpHistory(ctx context.Context, req mcp.CallToolRequest) (*mcp.Ca
 	source := req.GetString("source", "all")
 	limit := req.GetInt("limit", 50)
 	offset := req.GetInt("offset", 0)
+	sessionID := req.GetString("session_id", "")
 
 	if limit > 500 {
 		limit = 500
@@ -74,7 +78,7 @@ func handleGetHttpHistory(ctx context.Context, req mcp.CallToolRequest) (*mcp.Ca
 		source = ""
 	}
 
-	histories, err := db.GetAllHistory(db.CurrentProjectName, source, limit, offset)
+	histories, err := db.GetAllHistory(db.CurrentProjectName, source, limit, offset, sessionID)
 	if err != nil {
 		return errorResult("failed to get history: %v", err), nil
 	}

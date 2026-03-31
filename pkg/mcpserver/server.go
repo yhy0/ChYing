@@ -34,16 +34,29 @@ func NewChYingMCPServer() *server.MCPServer {
 	// 工具类
 	s.AddTool(getCurrentProjectTool(), handleGetCurrentProject)
 
+	// Session 管理工具
+	s.AddTool(registerSessionTool(), handleRegisterSession)
+	s.AddTool(configureSessionTool(), handleConfigureSession)
+	s.AddTool(closeSessionTool(), handleCloseSession)
+
+	// 实时状态工具
+	s.AddTool(getScanStatusTool(), handleGetScanStatus)
+	s.AddTool(getNewFindingsSinceTool(), handleGetNewFindingsSince)
+
 	return s
 }
 
 // StartHTTPServer 启动 MCP HTTP SSE Server，仅绑定到 localhost
 // 返回监听地址，如果启动失败返回错误
-func StartHTTPServer(port int) (string, error) {
+func StartHTTPServer(port int, bindAddr ...string) (string, error) {
 	s := NewChYingMCPServer()
 	httpServer := server.NewStreamableHTTPServer(s)
 
-	addr := fmt.Sprintf("127.0.0.1:%d", port)
+	host := "127.0.0.1"
+	if len(bindAddr) > 0 && bindAddr[0] != "" {
+		host = bindAddr[0]
+	}
+	addr := fmt.Sprintf("%s:%d", host, port)
 	logging.Logger.Infof("MCP server listening on %s", addr)
 
 	mux := http.NewServeMux()

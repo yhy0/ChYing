@@ -13,11 +13,15 @@ import (
 func getHostsTool() mcp.Tool {
 	return mcp.NewTool("get_hosts",
 		mcp.WithDescription("Get all unique hostnames from the HTTP traffic history."),
+		mcp.WithString("session_id",
+			mcp.Description("Optional: filter by scan session ID"),
+		),
 	)
 }
 
 func handleGetHosts(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	hosts := db.GetHosts()
+	sessionID := req.GetString("session_id", "")
+	hosts := db.GetHostsBySession(sessionID)
 	return jsonResult(hosts), nil
 }
 
@@ -26,16 +30,24 @@ func handleGetHosts(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 func getStatisticsTool() mcp.Tool {
 	return mcp.NewTool("get_statistics",
 		mcp.WithDescription("Get project statistics including traffic count, host count, and vulnerability breakdown by level and type."),
+		mcp.WithString("session_id",
+			mcp.Description("Optional: filter by scan session ID"),
+		),
 	)
 }
 
 func handleGetStatistics(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	hosts := db.GetHosts()
+	sessionID := req.GetString("session_id", "")
+	hosts := db.GetHostsBySession(sessionID)
 
 	// 获取流量总数（使用 COUNT 查询避免加载全部记录到内存）
 	var trafficCount int64
 	if db.GlobalDB != nil {
-		db.GlobalDB.Model(&db.HTTPHistory{}).Where("project_id = ?", db.CurrentProjectName).Count(&trafficCount)
+		tq := db.GlobalDB.Model(&db.HTTPHistory{}).Where("project_id = ?", db.CurrentProjectName)
+		if sessionID != "" {
+			tq = tq.Where("session_id = ?", sessionID)
+		}
+		tq.Count(&trafficCount)
 	}
 
 	// 获取漏洞统计

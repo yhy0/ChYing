@@ -21,6 +21,9 @@ func getVulnerabilitiesTool() mcp.Tool {
 		mcp.WithNumber("offset",
 			mcp.Description("Number of records to skip (default 0)"),
 		),
+		mcp.WithString("session_id",
+			mcp.Description("Optional: filter by scan session ID"),
+		),
 	)
 }
 
@@ -28,6 +31,7 @@ func handleGetVulnerabilities(ctx context.Context, req mcp.CallToolRequest) (*mc
 	source := req.GetString("source", "all")
 	limit := req.GetInt("limit", 100)
 	offset := req.GetInt("offset", 0)
+	sessionID := req.GetString("session_id", "")
 
 	if limit > 500 {
 		limit = 500
@@ -40,7 +44,7 @@ func handleGetVulnerabilities(ctx context.Context, req mcp.CallToolRequest) (*mc
 		source = ""
 	}
 
-	vulns, err := db.GetAllVulnerabilities(db.CurrentProjectName, source, limit, offset)
+	vulns, err := db.GetAllVulnerabilities(db.CurrentProjectName, source, limit, offset, sessionID)
 	if err != nil {
 		return errorResult("failed to get vulnerabilities: %v", err), nil
 	}

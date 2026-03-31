@@ -414,6 +414,12 @@ func onRequestCallback(req *http.Request, ctx *martian.Context) error {
 
 	flowID := ctx.ID()
 
+	// 提取 session ID 并从请求中剥离（不转发给目标）
+	sessionID := req.Header.Get("X-ChYing-Session")
+	if sessionID != "" {
+		req.Header.Del("X-ChYing-Session")
+	}
+
 	// 1. 统一读取和缓存请求Body，避免后续重复读取导致的问题
 	var requestBodyBytes []byte
 	if req.Body != nil && req.Body != http.NoBody {
@@ -474,6 +480,7 @@ func onRequestCallback(req *http.Request, ctx *martian.Context) error {
 		FullUrl:   req.URL.String(),
 		Path:      req.URL.RequestURI(),
 		Timestamp: time.Now().Format(time.RFC3339Nano),
+		SessionID: sessionID,
 		// RequestRaw 字段已在 data.HTTPHistory 中移除
 	}
 	TempHistoryCache.Store(flowID, tempEntry)
@@ -647,6 +654,7 @@ func onResponseCallback(resp *http.Response, ctx *martian.Context) error {
 		Note:              "",        // ✅ 新增：备注（默认为空）
 		Timestamp:         tempEntry.Timestamp,
 		ResponseTimestamp: time.Now().Format(time.RFC3339Nano),
+		SessionID:         tempEntry.SessionID,
 	}
 
 	httpBody := &HTTPBody{

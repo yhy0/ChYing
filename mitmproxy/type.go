@@ -33,6 +33,7 @@ type HTTPHistory struct {
 	IP                string `json:"ip"`
 	Note              string `json:"note"`
 	Color             string `json:"color"`
+	SessionID         string `json:"session_id,omitempty"`
 	Timestamp         string `json:"timestamp,omitempty"`
 	ResponseTimestamp string `json:"response_timestamp,omitempty"`
 }

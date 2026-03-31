@@ -44,6 +44,9 @@ type HTTPHistory struct {
 	// 项目标识字段
 	ProjectID string `gorm:"index;default:'default'" json:"project_id"` // 项目ID，用于区分不同项目的数据
 
+	// Session 标识字段
+	SessionID string `gorm:"index;default:''" json:"session_id"` // 扫描会话ID，用于多Agent隔离
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -123,7 +126,12 @@ func ExistHistory(hid int64) bool {
 }
 
 // GetAllHistory 获取所有历史记录，支持项目ID过滤
-func GetAllHistory(projectID string, source string, limit, offset int) ([]*HTTPHistory, error) {
+func GetAllHistory(projectID string, source string, limit, offset int, sessionID ...string) ([]*HTTPHistory, error) {
+	var sid string
+	if len(sessionID) > 0 {
+		sid = sessionID[0]
+	}
+
 	// 使用 SQLite 数据库
 	var data []*HTTPHistory
 	query := GlobalDB.Model(&HTTPHistory{})
@@ -137,6 +145,11 @@ func GetAllHistory(projectID string, source string, limit, offset int) ([]*HTTPH
 	if source != "" && source != "all" {
 		query = query.Where("source = ?", source)
 	}
+
+	if sid != "" {
+		query = query.Where("session_id = ?", sid)
+	}
+
 	if limit > 0 {
 		query = query.Order("created_at DESC").Limit(limit).Offset(offset)
 	} else {
@@ -238,6 +251,38 @@ func UpdateMarker(hid int64, color string, note string) {
 		return
 	}
 	GlobalDB.Model(&HTTPHistory{}).Where("hid = ?", hid).Update("color", color).Update("note", note)
+}
+
+// GetNewHistorySince 获取指定时间之后的新历史记录
+func GetNewHistorySince(since time.Time, sessionID string) ([]*HTTPHistory, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+	var data []*HTTPHistory
+	query := GlobalDB.Model(&HTTPHistory{}).Where("created_at > ?", since)
+	if sessionID != "" {
+		query = query.Where("session_id = ?", sessionID)
+	}
+	query.Order("created_at ASC").Find(&data)
+	return data, nil
+}
+
+// GetHostsBySession 获取指定 session 的所有域名
+func GetHostsBySession(sessionID string) []string {
+	var hosts []string
+	if GlobalDB == nil {
+		return hosts
+	}
+	query := GlobalDB.Model(&HTTPHistory{}).Select("DISTINCT host")
+	if sessionID != "" {
+		query = query.Where("session_id = ?", sessionID)
+	}
+	var histories []*HTTPHistory
+	query.Find(&histories)
+	for _, h := range histories {
+		hosts = append(hosts, h.Host)
+	}
+	return hosts
 }
 
 // ClearAllHistory 清空所有历史记录数据

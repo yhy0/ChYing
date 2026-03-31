@@ -156,6 +156,7 @@ func EventNotification() {
 						Source:      "local",     // 标识为本地流量
 						SourceID:    "localhost", // 本地标识
 						NodeName:    "本地节点",      // 节点名称
+						SessionID:   _http.SessionID,
 					}
 
 					db.AddHistory(historyData)

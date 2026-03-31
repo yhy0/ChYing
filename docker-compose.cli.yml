@@ -1,0 +1,15 @@
+services:
+  chying:
+    build:
+      context: .
+      dockerfile: Dockerfile.cli
+    ports:
+      - "9080:9080"
+      - "9090:9090"
+    volumes:
+      - chying-data:/root/.config/ChYing
+    command: ["serve", "--proxy-port", "9080", "--mcp-port", "9090", "--bind", "0.0.0.0"]
+    restart: unless-stopped
+
+volumes:
+  chying-data:

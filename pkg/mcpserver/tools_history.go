@@ -108,6 +108,9 @@ func getTrafficByHostTool() mcp.Tool {
 		mcp.WithString("exclude_extensions",
 			mcp.Description("Comma-separated list of file extensions to exclude (e.g., 'js,css,png'). Set to 'none' to include all resources. Default excludes common static resources."),
 		),
+		mcp.WithString("session_id",
+			mcp.Description("Optional: filter by scan session ID"),
+		),
 	)
 }
 
@@ -116,6 +119,10 @@ func handleGetTrafficByHost(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	if err != nil {
 		return errorResult("host is required"), nil
 	}
+
+	// TODO: db.GetHistory does not support session_id filtering yet.
+	// Once supported, pass sessionID to filter results at the DB level.
+	_ = req.GetString("session_id", "")
 
 	histories := db.GetHistory([]string{host})
 

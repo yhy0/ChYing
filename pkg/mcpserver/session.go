@@ -60,7 +60,16 @@ func ConfigureSession(sessionID string, addTargets, removeTargets []string) (*Sc
 	if !ok {
 		return nil, false
 	}
-	session := val.(*ScanSession)
+	original := val.(*ScanSession)
+	// Copy-on-write: create a new session to avoid race conditions
+	session := &ScanSession{
+		SessionID:   original.SessionID,
+		Targets:     make([]string, len(original.Targets)),
+		Description: original.Description,
+		CreatedAt:   original.CreatedAt,
+		Active:      original.Active,
+	}
+	copy(session.Targets, original.Targets)
 
 	if len(removeTargets) > 0 {
 		removeSet := make(map[string]bool)
@@ -98,8 +107,15 @@ func CloseSession(sessionID string) bool {
 	if !ok {
 		return false
 	}
-	session := val.(*ScanSession)
-	session.Active = false
+	original := val.(*ScanSession)
+	// Copy-on-write: create a new session to avoid race conditions
+	session := &ScanSession{
+		SessionID:   original.SessionID,
+		Targets:     original.Targets,
+		Description: original.Description,
+		CreatedAt:   original.CreatedAt,
+		Active:      false,
+	}
 	sessionStore.Store(sessionID, session)
 	return true
 }

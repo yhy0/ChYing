@@ -20,9 +20,6 @@ func getTrafficDetailTool() mcp.Tool {
 		mcp.WithNumber("id",
 			mcp.Description("The database ID of the traffic entry. Available from query_by_dsl results."),
 		),
-		mcp.WithString("session_id",
-			mcp.Description("Optional: filter by scan session ID"),
-		),
 	)
 }
 
@@ -74,9 +71,6 @@ Examples:
 		mcp.WithString("dsl_query",
 			mcp.Required(),
 			mcp.Description("The DSL expression to query traffic"),
-		),
-		mcp.WithString("session_id",
-			mcp.Description("Optional: filter by scan session ID"),
 		),
 	)
 }

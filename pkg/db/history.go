@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/yhy0/logging"
+	"gorm.io/gorm"
 )
 
 /**
@@ -283,6 +284,142 @@ func GetHostsBySession(sessionID string) []string {
 		hosts = append(hosts, h.Host)
 	}
 	return hosts
+}
+
+// SearchHistory 搜索包含关键词的流量记录
+// searchIn: "url" | "request_body" | "response_body" | "all"
+func SearchHistory(projectID, keyword, searchIn string, limit int) ([]*HTTPHistory, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+	if keyword == "" {
+		return nil, fmt.Errorf("keyword is required")
+	}
+	if limit <= 0 {
+		limit = 50
+	}
+
+	likeKeyword := "%" + keyword + "%"
+
+	switch searchIn {
+	case "url":
+		var data []*HTTPHistory
+		GlobalDB.Model(&HTTPHistory{}).
+			Where("project_id = ? AND (full_url LIKE ? OR path LIKE ?)", projectID, likeKeyword, likeKeyword).
+			Order("created_at DESC").Limit(limit).Find(&data)
+		return data, nil
+
+	case "request_body":
+		// Join with requests table to search in request body
+		var data []*HTTPHistory
+		GlobalDB.Model(&HTTPHistory{}).
+			Joins("JOIN requests ON requests.request_id = http_histories.hid").
+			Where("http_histories.project_id = ? AND requests.request_raw LIKE ?", projectID, likeKeyword).
+			Order("http_histories.created_at DESC").Limit(limit).Find(&data)
+		return data, nil
+
+	case "response_body":
+		// Join with responses table to search in response body
+		var data []*HTTPHistory
+		GlobalDB.Model(&HTTPHistory{}).
+			Joins("JOIN responses ON responses.request_id = http_histories.hid").
+			Where("http_histories.project_id = ? AND responses.response_raw LIKE ?", projectID, likeKeyword).
+			Order("http_histories.created_at DESC").Limit(limit).Find(&data)
+		return data, nil
+
+	default: // "all"
+		var data []*HTTPHistory
+		GlobalDB.Model(&HTTPHistory{}).
+			Joins("LEFT JOIN requests ON requests.request_id = http_histories.hid").
+			Joins("LEFT JOIN responses ON responses.request_id = http_histories.hid").
+			Where("http_histories.project_id = ? AND (http_histories.full_url LIKE ? OR http_histories.path LIKE ? OR requests.request_raw LIKE ? OR responses.response_raw LIKE ?)",
+				projectID, likeKeyword, likeKeyword, likeKeyword, likeKeyword).
+			Order("http_histories.created_at DESC").Limit(limit).
+			Select("DISTINCT http_histories.*").Find(&data)
+		return data, nil
+	}
+}
+
+// GetDistinctPaths 获取去重的路径列表，按主机分组
+func GetDistinctPaths(projectID, host string) ([]string, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+	var paths []string
+	query := GlobalDB.Model(&HTTPHistory{}).Select("DISTINCT path")
+	if projectID != "" && projectID != "all" {
+		query = query.Where("project_id = ?", projectID)
+	}
+	if host != "" {
+		query = query.Where("host = ?", host)
+	}
+	query.Order("path ASC").Pluck("path", &paths)
+	return paths, nil
+}
+
+// GetTrafficStatistics 获取流量统计信息
+func GetTrafficStatistics(projectID string) (map[string]interface{}, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+
+	stats := make(map[string]interface{})
+
+	baseQuery := func() *gorm.DB {
+		q := GlobalDB.Model(&HTTPHistory{})
+		if projectID != "" && projectID != "all" {
+			q = q.Where("project_id = ?", projectID)
+		}
+		return q
+	}
+
+	// 总流量数
+	var totalTraffic int64
+	baseQuery().Count(&totalTraffic)
+	stats["traffic_count"] = totalTraffic
+
+	// 主机数
+	var hostCount int64
+	baseQuery().Select("COUNT(DISTINCT host)").Scan(&hostCount)
+	stats["host_count"] = hostCount
+
+	// 按方法统计
+	var methodStats []struct {
+		Method string `json:"method"`
+		Count  int64  `json:"count"`
+	}
+	baseQuery().Select("method, count(*) as count").Group("method").Find(&methodStats)
+	methodMap := make(map[string]int64)
+	for _, s := range methodStats {
+		methodMap[s.Method] = s.Count
+	}
+	stats["by_method"] = methodMap
+
+	// 按状态码统计
+	var statusStats []struct {
+		Status string `json:"status"`
+		Count  int64  `json:"count"`
+	}
+	baseQuery().Select("status, count(*) as count").Group("status").Find(&statusStats)
+	statusMap := make(map[string]int64)
+	for _, s := range statusStats {
+		statusMap[s.Status] = s.Count
+	}
+	stats["by_status"] = statusMap
+
+	// 按 content_type 统计
+	var ctStats []struct {
+		ContentType string `json:"content_type"`
+		Count       int64  `json:"count"`
+	}
+	baseQuery().Select("content_type, count(*) as count").Where("content_type != ''").Group("content_type").Order("count DESC").Limit(20).Find(&ctStats)
+	ctMap := make(map[string]int64)
+	for _, s := range ctStats {
+		ctMap[s.ContentType] = s.Count
+	}
+	stats["by_content_type"] = ctMap
+
+	return stats, nil
 }
 
 // ClearAllHistory 清空所有历史记录数据

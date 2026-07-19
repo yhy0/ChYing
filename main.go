@@ -4,6 +4,7 @@ import (
 	"embed"
 	_ "embed"
 	"fmt"
+	"os"
 
 	"github.com/pkg/browser"
 	"github.com/yhy0/ChYing/conf"
@@ -12,6 +13,7 @@ import (
 	"github.com/yhy0/logging"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -31,6 +33,9 @@ var wailsApp *application.App
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
 func main() {
+	appService := NewApp()
+	initialArgs := append([]string(nil), os.Args[1:]...)
+
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
@@ -41,14 +46,30 @@ func main() {
 		Description: "承影",
 		Icon:        appIcon,
 		Services: []application.Service{
-			application.NewService(&App{}),
+			application.NewService(appService),
 		},
+		SingleInstance: &application.SingleInstanceOptions{
+			UniqueID: "com.yhy0.chying.desktop",
+			ExitCode: 0,
+			OnSecondInstanceLaunch: func(data application.SecondInstanceData) {
+				args := data.Args
+				if len(args) > 0 {
+					args = args[1:]
+				}
+				appService.handleDesktopLaunchArgs(args)
+			},
+		},
+		OnShutdown: appService.markDesktopStopped,
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
+	})
+
+	wailsApp.Event.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
+		appService.startDesktopLaunchController(initialArgs)
 	})
 
 	// Create a new window with the necessary options.
@@ -156,7 +177,7 @@ func EventNotification() {
 						Source:      "local",     // 标识为本地流量
 						SourceID:    "localhost", // 本地标识
 						NodeName:    "本地节点",      // 节点名称
-						SessionID:   _http.SessionID,
+						ProjectID:   db.CurrentProjectName,
 					}
 
 					db.AddHistory(historyData)

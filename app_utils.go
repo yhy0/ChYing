@@ -222,7 +222,7 @@ func (a *App) startEventLoop() {
 					Source:      "local",
 					SourceID:    "localhost",
 					NodeName:    "本地节点",
-					ProjectID:   "default", // 暂时使用默认项目ID
+					ProjectID:   db.CurrentProjectName,
 				}
 
 				// 添加到数据库

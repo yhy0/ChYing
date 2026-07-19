@@ -74,48 +74,50 @@ watch(() => props.show, (newShow) => {
 </script>
 
 <template>
-  <div v-if="show" class="repeater-modal-backdrop" @click="close">
-    <div class="repeater-modal" @click.stop>
-      <div class="repeater-modal-header">
-        <h3>{{ title }}</h3>
-        <button class="repeater-modal-close" @click="close">
+  <div v-if="show" class="dialog-overlay" @click="close">
+    <div class="dialog-container dialog-sm" role="dialog" aria-modal="true" @click.stop>
+      <div class="dialog-header">
+        <h3 class="dialog-title">{{ title }}</h3>
+        <button class="btn btn-icon btn-icon-xs" @click="close" :aria-label="t('common.actions.close')">
           <i class="bx bx-x"></i>
         </button>
       </div>
-      <div class="repeater-modal-body">
-        <div class="repeater-form-group">
-          <label for="group-name-input" class="repeater-form-label">{{ t('modules.repeater.modal.name_label') }}</label>
+      <div class="dialog-content">
+        <div class="form-field">
+          <label for="group-name-input" class="form-label">{{ t('modules.repeater.modal.name_label') }}</label>
           <input
             id="group-name-input"
             type="text"
             v-model="inputName"
-            class="repeater-input w-full"
+            class="form-input"
             :placeholder="t('modules.repeater.modal.enter_name')"
             @keydown="handleKeyDown"
             spellcheck="false"
           />
         </div>
         
-        <div class="repeater-form-group">
-          <label class="repeater-form-label">{{ t('modules.repeater.modal.color_label') }}</label>
+        <div class="form-field">
+          <label class="form-label">{{ t('modules.repeater.modal.color_label') }}</label>
           <div class="repeater-color-options">
-            <div 
+            <button
               v-for="color in colorOptions" 
               :key="color.id"
+              type="button"
               class="repeater-color-option"
               :class="{ 'repeater-color-selected': selectedColor === color.value }"
+              :aria-pressed="selectedColor === color.value"
               @click="selectedColor = color.value"
             >
               <div class="repeater-color-swatch" :style="{ backgroundColor: color.value }"></div>
               <span class="repeater-color-label">{{ color.label }}</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
-      <div class="repeater-modal-footer">
-        <button class="btn btn-secondary mr-2" @click="close">{{ t('common.actions.cancel') }}</button>
+      <div class="dialog-footer">
+        <button class="btn btn-secondary btn-sm" @click="close">{{ t('common.actions.cancel') }}</button>
         <button 
-          class="btn btn-primary" 
+          class="btn btn-primary btn-sm" 
           @click="submit"
           :disabled="!inputName.trim()"
         >
@@ -140,6 +142,10 @@ watch(() => props.show, (newShow) => {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
 }
 
 .repeater-color-option:hover {

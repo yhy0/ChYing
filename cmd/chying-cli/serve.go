@@ -144,7 +144,7 @@ func cliEventNotification(pool *ants.Pool) {
 					Source:      "local",
 					SourceID:    "localhost",
 					NodeName:    "CLI",
-					SessionID:   _http.SessionID,
+					ProjectID:   db.CurrentProjectName,
 				}
 				db.AddHistory(historyData)
 

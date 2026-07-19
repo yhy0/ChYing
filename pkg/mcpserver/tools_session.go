@@ -12,7 +12,7 @@ import (
 
 func registerSessionTool() mcp.Tool {
 	return mcp.NewTool("register_session",
-		mcp.WithDescription("Register a new scan session for traffic isolation. Returns a session_id that should be sent as X-ChYing-Session header in proxied requests."),
+		mcp.WithDescription("Register a local MCP scan session for Repeater, Intruder, and target-bounded history queries. The session ID is never injected into proxied HTTP requests."),
 		mcp.WithString("targets",
 			mcp.Required(),
 			mcp.Description("JSON array of target hostnames, e.g. [\"target.com\", \"*.target.com\"]"),
@@ -39,7 +39,7 @@ func handleRegisterSession(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	}
 
 	description := req.GetString("description", "")
-	session := RegisterSession(targets, description)
+	session := RegisterSession(targets, description, db.CurrentProjectName)
 	return jsonResult(session), nil
 }
 

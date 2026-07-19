@@ -258,35 +258,35 @@ const isWordWrapEnabled = (id: string): boolean => {
           <template v-for="method in availableMethods" :key="`${method.id}-encode`">
             <button 
               v-if="method.encode" 
-              class="btn btn-action encode" 
-              :class="{ 'hash': method.isHash }" 
+              class="btn btn-xs decoder-action-btn decoder-action-encode"
+              :class="{ 'decoder-action-hash': method.isHash }"
               @click="insertAndRecalculate(method.id, 'encode')"
               :title="`${method.name} ${method.isHash ? 'Hash' : 'Encode'}`"
               :disabled="!props.tab"
             >
               {{ method.name }} {{ method.isHash ? '' : t('modules.decoder.encode') }}
             </button>
-            <div v-else-if="method.decode && !method.isHash" class="btn-placeholder"></div>
+            <div v-else-if="method.decode && !method.isHash" class="decoder-action-placeholder"></div>
           </template>
         </div>
         <div class="buttons-row">
           <template v-for="method in availableMethods" :key="`${method.id}-decode`">
             <button 
               v-if="method.decode" 
-              class="btn btn-action decode" 
+              class="btn btn-xs decoder-action-btn decoder-action-decode"
               @click="insertAndRecalculate(method.id, 'decode')"
               :title="`${method.name} Decode`"
               :disabled="!props.tab"
             >
               {{ method.name }} {{ t('modules.decoder.decode') }}
             </button>
-            <div v-else class="btn-placeholder"></div> 
+            <div v-else class="decoder-action-placeholder"></div>
           </template>
         </div>
       </div>
       <div class="global-actions-top">
             <button 
-          class="btn btn-secondary btn-copy"
+          class="btn btn-secondary btn-icon-sm btn-copy"
           @click="copyLastOutput"
           :disabled="!lastValidOutput || !props.tab"
           :title="t('modules.decoder.copy_output')"
@@ -294,7 +294,7 @@ const isWordWrapEnabled = (id: string): boolean => {
           <i class="bx bx-copy"></i>
             </button>
             <button 
-              class="btn btn-secondary btn-clear"
+              class="btn btn-secondary btn-icon-sm btn-clear"
               @click="clearAll"
           :disabled="!props.tab"
           :title="t('modules.decoder.clear_all')"
@@ -314,7 +314,7 @@ const isWordWrapEnabled = (id: string): boolean => {
         <h3 class="step-title">{{ t('modules.decoder.initial_input') }}</h3>
         <div class="step-actions">
           <button 
-            class="btn-icon tooltip-container"
+            class="btn btn-icon btn-icon-xs tooltip-container decoder-wrap-button"
             @click.stop="toggleWordWrap('initial')"
             :class="{ 'active': isWordWrapEnabled('initial') }"
           >
@@ -352,7 +352,7 @@ const isWordWrapEnabled = (id: string): boolean => {
           </h3>
           <div class="step-actions">
             <button 
-              class="btn-icon tooltip-container"
+              class="btn btn-icon btn-icon-xs tooltip-container decoder-wrap-button"
               @click.stop="toggleWordWrap(step.id)"
               :class="{ 'active': isWordWrapEnabled(step.id) }"
             >
@@ -416,20 +416,18 @@ const isWordWrapEnabled = (id: string): boolean => {
   gap: 0.5rem;
 }
 
-.btn-action, .btn-placeholder {
+.decoder-action-btn,
+.decoder-action-placeholder {
   flex: 1 1 0px; 
   min-width: 80px; 
   max-width: 150px; 
-  padding: 0.3rem 0.6rem;
-  font-size: 0.75rem;
-  border-radius: 4px;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.btn-placeholder {
+.decoder-action-placeholder {
   visibility: hidden; 
   border: 1px solid transparent; 
 }
@@ -534,63 +532,42 @@ const isWordWrapEnabled = (id: string): boolean => {
   white-space: pre-wrap;
 }
 
-.btn-action {
+.decoder-action-btn {
   border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.btn-action.encode {
-  background-color: var(--info-bg-light, #dbeafe);
-  color: var(--info-color, #2563eb);
-  border-color: var(--info-border, #bfdbfe);
+.decoder-action-encode {
+  background-color: var(--color-info-bg);
+  color: var(--color-info-text);
+  border-color: var(--color-info-border);
 }
 
-.btn-action.encode.hash {
-  background-color: var(--warning-bg-light, #fef3c7);
-  color: var(--warning-color, #d97706);
-  border-color: var(--warning-border, #fde68a);
+.decoder-action-encode.decoder-action-hash {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border-color: var(--color-warning-border);
 }
 
-.btn-action.encode:hover {
-  background-color: var(--info-bg-hover, #bfdbfe);
+.decoder-action-encode:hover {
+  background-color: color-mix(in srgb, var(--color-info-bg) 72%, var(--color-info) 28%);
 }
 
-.btn-action.encode.hash:hover {
-  background-color: var(--warning-bg-hover, #fde047);
+.decoder-action-encode.decoder-action-hash:hover {
+  background-color: color-mix(in srgb, var(--color-warning-bg) 72%, var(--color-warning) 28%);
 }
 
-.btn-action.decode {
-  background-color: var(--success-bg-light, #d1fae5);
-  color: var(--success-color, #059669);
-  border-color: var(--success-border, #a7f3d0);
+.decoder-action-decode {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+  border-color: var(--color-success-border);
 }
 
-.btn-action.decode:hover {
-  background-color: var(--success-bg-hover, #6ee7b7);
+.decoder-action-decode:hover {
+  background-color: color-mix(in srgb, var(--color-success-bg) 72%, var(--color-success) 28%);
 }
 
-.btn-action:disabled, .btn-secondary:disabled {
+.decoder-action-btn:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  padding: 0.5rem;
-  background-color: var(--secondary-btn-bg, #e5e7eb);
-  color: var(--secondary-btn-text, #374151);
-  border: 1px solid var(--secondary-btn-border, #d1d5db);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: var(--secondary-btn-bg-hover, #d1d5db);
-}
-
-.btn-secondary i {
-  font-size: 1.1rem;
 }
 
 .decoder-error-container {
@@ -641,32 +618,9 @@ const isWordWrapEnabled = (id: string): boolean => {
   gap: 0.5rem;
 }
 
-.btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  color: var(--text-color-light, #6b7280);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-icon:hover {
+.decoder-wrap-button.active {
   color: var(--primary-color, #4f46e5);
   background-color: var(--bg-hover, rgba(79, 70, 229, 0.1));
-}
-
-.btn-icon.active {
-  color: var(--primary-color, #4f46e5);
-  background-color: var(--bg-hover, rgba(79, 70, 229, 0.1));
-}
-
-.btn-icon i {
-  font-size: 0.95rem;
 }
 
 .tooltip-container {

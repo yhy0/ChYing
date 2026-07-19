@@ -18,11 +18,14 @@ const intruderConcurrency = 20
 
 // intruderResult 单个 Intruder 请求的结果
 type intruderResult struct {
-	ID      int64    `json:"id"`
-	Payload []string `json:"payload"`
-	Status  int      `json:"status"`
-	Length  int      `json:"length"`
-	TimeMs  int      `json:"time_ms"`
+	ID        int64    `json:"id"`
+	Payload   []string `json:"payload"`
+	Status    int      `json:"status"`
+	Length    int      `json:"length"`
+	TimeMs    int      `json:"time_ms"`
+	HistoryID int64    `json:"history_id,omitempty"`
+	Hid       int64    `json:"hid,omitempty"`
+	Error     string   `json:"error,omitempty"`
 }
 
 // --- run_intruder ---
@@ -59,6 +62,9 @@ Maximum 1000 request combinations. If exceeded, split into smaller batches.`),
 			mcp.Description("Attack type: 'sniper', 'battering-ram', 'pitchfork', or 'cluster-bomb'"),
 			mcp.Enum("sniper", "battering-ram", "pitchfork", "cluster-bomb"),
 		),
+		mcp.WithString("session_id",
+			mcp.Description("Optional scan session ID used to attribute every generated request to an agent task"),
+		),
 	)
 }
 
@@ -81,6 +87,11 @@ func handleRunIntruder(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallT
 	attackType, err := req.RequireString("attack_type")
 	if err != nil {
 		return errorResult("attack_type is required"), nil
+	}
+
+	projectID, sessionID, attributionErr := sessionAttribution(req.GetString("session_id", ""))
+	if attributionErr != nil {
+		return errorResult("%v", attributionErr), nil
 	}
 
 	// 解析 payloads JSON
@@ -120,9 +131,14 @@ func handleRunIntruder(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallT
 	}
 
 	// 同步执行所有请求
-	results := executeIntruderRequests(ctx, target, requests)
+	results := executeIntruderRequests(ctx, target, requests, projectID, sessionID)
 
-	return jsonResult(results), nil
+	return jsonResult(map[string]interface{}{
+		"project_id":    projectID,
+		"session_id":    sessionID,
+		"request_count": len(results),
+		"results":       results,
+	}), nil
 }
 
 // intruderRequest 表示一个待执行的 Intruder 请求
@@ -247,7 +263,7 @@ func generateClusterBombRequests(rawReq string, positions []string, payloadItems
 }
 
 // executeIntruderRequests 并发执行 Intruder 请求并收集结果
-func executeIntruderRequests(ctx context.Context, target string, requests []intruderRequest) []intruderResult {
+func executeIntruderRequests(ctx context.Context, target string, requests []intruderRequest, projectID, sessionID string) []intruderResult {
 	results := make([]intruderResult, len(requests))
 	sem := make(chan struct{}, intruderConcurrency)
 	var wg sync.WaitGroup
@@ -280,9 +296,13 @@ func executeIntruderRequests(ctx context.Context, target string, requests []intr
 
 			if err != nil {
 				logging.Logger.Debugf("intruder request %d failed: %v", r.ID, err)
+				res.Error = err.Error()
 			} else {
 				res.Status = resp.StatusCode
 				res.Length = resp.ContentLength
+				reference := saveRepeaterHistory(target, r.Request, resp, projectID, sessionID)
+				res.HistoryID = reference.ID
+				res.Hid = reference.Hid
 			}
 
 			results[idx] = res

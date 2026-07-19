@@ -304,7 +304,7 @@
   max-width: 700px;
 }
 
-.dialog-header {
+.rule-dialog .dialog-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -313,14 +313,14 @@
   background: var(--glass-bg-light);
 }
 
-.dialog-header h3 {
+.rule-dialog .dialog-header h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.dialog-close {
+.rule-dialog .dialog-close {
   background: none;
   border: none;
   color: var(--color-text-secondary);
@@ -331,18 +331,18 @@
   transition: var(--transition-fast);
 }
 
-.dialog-close:hover {
+.rule-dialog .dialog-close:hover {
   background: var(--glass-bg-medium);
   color: var(--color-text-primary);
 }
 
-.dialog-body {
+.rule-dialog .dialog-body {
   flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
 }
 
-.dialog-footer {
+.rule-dialog .dialog-footer {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
@@ -498,9 +498,9 @@
     margin: 1rem;
   }
   
-  .dialog-header,
-  .dialog-body,
-  .dialog-footer {
+  .rule-dialog .dialog-header,
+  .rule-dialog .dialog-body,
+  .rule-dialog .dialog-footer {
     padding: 1rem;
   }
 }
@@ -531,16 +531,16 @@
   border-color: var(--color-border);
 }
 
-.dark .dialog-header {
+.dark .rule-dialog .dialog-header {
   background: var(--color-bg-secondary);
   border-color: var(--color-border);
 }
 
-.dark .dialog-body {
+.dark .rule-dialog .dialog-body {
   background: var(--color-bg-primary);
 }
 
-.dark .dialog-footer {
+.dark .rule-dialog .dialog-footer {
   background: var(--color-bg-secondary);
   border-color: var(--color-border);
 }

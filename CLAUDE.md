@@ -32,9 +32,9 @@ wails3 task windows:package          # Windows（需 PRODUCTION=true）
 wails3 task linux:package            # Linux
 
 # 前端
-cd frontend && npm install           # 安装依赖
-cd frontend && npm run dev           # 前端独立开发
-cd frontend && npm run build         # 生产构建
+cd frontend && pnpm install           # 安装依赖
+cd frontend && pnpm run dev           # 前端独立开发
+cd frontend && pnpm run build         # 生产构建
 
 # 生成绑定（Go struct -> TypeScript）
 wails3 generate bindings -clean=true -ts

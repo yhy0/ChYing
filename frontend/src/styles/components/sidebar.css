@@ -153,6 +153,8 @@
 
 /* 导航模块项 */
 .glass-sidebar-module {
+  appearance: none;
+  font: inherit;
   position: relative;
   padding: 0.5rem;
   border-radius: var(--glass-radius-md);
@@ -166,6 +168,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.glass-sidebar-module:focus-visible {
+  outline: none;
+  border-color: var(--glass-border-strong);
+  box-shadow:
+    var(--glass-shadow-focus),
+    inset 0 0 0 1px var(--glass-border-strong);
 }
 
 /* 模块悬停效果 - 使用颜色/阴影变化避免布局偏移 */

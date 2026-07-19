@@ -227,6 +227,8 @@
   transform: translateY(-2px);
   position: relative;
   z-index: 2;
+  outline: 1px solid color-mix(in srgb, var(--tab-border-focus, #6366f1) 45%, transparent);
+  outline-offset: -1px;
 }
 
 /* 暗色主题下的活动标签 */
@@ -234,18 +236,6 @@
   background-color: var(--color-gray-800, #1f2937);
   border-top: 2px solid var(--tab-border-focus, #818cf8);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-/* 添加左侧边框指示器 */
-.tab.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background-color: var(--tab-border-focus, #6366f1);
-  border-radius: 2px 0 0 2px;
 }
 
 .tab-color {

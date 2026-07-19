@@ -1,14 +1,10 @@
-import { defineConfig, presetUno, presetAttributify, presetTypography, presetIcons, presetWebFonts, presetTagify } from 'unocss'
+import { defineConfig, presetUno, presetAttributify, presetTypography, presetWebFonts } from 'unocss'
 
 export default defineConfig({
   presets: [
     presetUno(), // 基础预设 - 最重要的核心功能
     presetAttributify(), // 属性模式支持
     presetTypography(), // 排版预设
-    presetIcons({
-      scale: 1.2,
-      warn: true,
-    }), // 图标预设
     presetWebFonts({
       provider: 'none', // 不从远程获取字体
       fonts: {
@@ -34,7 +30,6 @@ export default defineConfig({
         ],
       },
     }), // 网络字体
-    presetTagify(), // 标签模式支持
   ],
   // 使用更明确的规则定义快捷方式
   rules: [

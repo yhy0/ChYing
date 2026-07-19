@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use ChYing"
+  short_description: "自动打开 ChYing 桌面项目并安全连接 MCP 服务"
+  default_prompt: "Use $use-chying to open the ChYing project src-auto and return its ready MCP URL."

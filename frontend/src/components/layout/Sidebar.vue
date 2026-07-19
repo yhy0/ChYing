@@ -63,10 +63,11 @@ const switchModule = (moduleId: string) => {
     </div>
 
     <!-- 导航模块容器 -->
-    <div class="glass-sidebar-nav" :class="{ 'transitioning': isTransitioning }">
-      <div
+    <nav class="glass-sidebar-nav" :class="{ 'transitioning': isTransitioning }" aria-label="Main navigation">
+      <button
         v-for="module in modules"
         :key="module.id"
+        type="button"
         :class="[
           'glass-sidebar-module',
           {
@@ -74,6 +75,9 @@ const switchModule = (moduleId: string) => {
             'disabled': isTransitioning
           }
         ]"
+        :disabled="isTransitioning"
+        :aria-label="t(module.label)"
+        :aria-current="activeModule === module.id ? 'page' : undefined"
         @click="switchModule(module.id)"
       >
         <i
@@ -96,8 +100,8 @@ const switchModule = (moduleId: string) => {
           <!-- 箭头 -->
           <div class="glass-sidebar-tooltip-arrow"></div>
         </div>
-      </div>
-    </div>
+      </button>
+    </nav>
   </div>
 </template>
 

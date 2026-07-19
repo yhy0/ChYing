@@ -1,6 +1,19 @@
-/* Decoder 模块样式 - 使用全局变量，移除冗余的模块级变量 */
+/* Decoder 模块样式 - 使用全局变量，保留少量兼容别名 */
 
-
+:root {
+  --decoder-bg-secondary: var(--glass-bg-secondary);
+  --decoder-bg-secondary-hover: var(--glass-bg-hover);
+  --decoder-bg-tab-active: var(--glass-bg-primary);
+  --decoder-border: var(--glass-border);
+  --decoder-btn-primary: var(--color-primary);
+  --decoder-btn-primary-hover: var(--color-primary-hover);
+  --decoder-shadow-sm: var(--glass-shadow-sm);
+  --decoder-text-primary: var(--color-text-primary);
+  --decoder-text-secondary: var(--color-text-secondary);
+  --decoder-text-muted: var(--color-text-tertiary);
+  --decoder-action-warning: var(--color-warning);
+  --decoder-action-error: var(--color-danger);
+}
 
 /* ======= 布局组件 ======= */
 

@@ -5,6 +5,18 @@
   margin-bottom: var(--spacing-md);
 }
 
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .form-group label {
   display: block;
   font-size: var(--text-sm);
@@ -13,9 +25,19 @@
   margin-bottom: var(--spacing-xs);
 }
 
+.form-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.form-input,
+.form-select,
+.form-textarea {
   width: 100%;
   padding: var(--spacing-sm);
   border: 1px solid var(--glass-border-light);
@@ -28,6 +50,12 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+.form-textarea {
+  min-height: 5rem;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 /* 对话框内的表单元素 - 增强透明度和一致性 */
@@ -64,12 +92,14 @@
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
   outline: none;
   border-color: var(--glass-border-strong);
   background: var(--glass-bg-primary);
   box-shadow: var(--glass-shadow-focus);
-  transform: translateY(-2px) scale(1.01);
 }
 
 /* 表单帮助文本样式 */
@@ -77,6 +107,12 @@
   font-size: 0.75rem;
   color: var(--color-text-tertiary);
   margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
   line-height: 1.4;
 }
 
@@ -229,7 +265,6 @@ input:checked + .toggle-slider:before {
 
 /* 悬停和焦点状态 */
 .toggle-switch:hover .toggle-slider {
-  transform: scale(1.02);
   box-shadow:
     var(--glass-shadow-subtle),
     inset 0 2px 4px rgba(0, 0, 0, 0.1),

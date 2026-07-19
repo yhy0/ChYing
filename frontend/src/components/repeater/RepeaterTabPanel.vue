@@ -73,54 +73,103 @@ const extractStatusInfo = (responseStr: string | null): { statusCode: number, st
   return { statusCode: 0, statusText: 'Unknown' };
 };
 
-// 更强健的解析请求方法和URL的函数
-const parseRequestHeadersForMethodAndUrl = (requestStr: string) => {
-  // 先分离 headers 和 body
-  const parts = requestStr.split('\n\n');
-  const headers = parts[0] || '';
-  
-  // 解析第一行来获取方法和URL
-  const lines = headers.split('\n');
-  const firstLine = lines[0] || '';
-  const match = firstLine.match(/^(\w+)\s+(.+)\s+HTTP\/\d\.\d$/);
-  
-  if (match) {
-    const method = match[1];
-    let url = match[2];
-    
-    // 处理相对URL
-    if (!url.startsWith('http')) {
-      // 从headers提取host
-      const hostLine = lines.find(line => line.toLowerCase().startsWith('host:'));
-      
-      if (hostLine) {
-        const host = hostLine.split(':')[1]?.trim() || '';
-        url = `https://${host}${url.startsWith('/') ? '' : '/'}${url}`;
-      }
+const splitRawRequest = (requestStr: string) => {
+  const lineEnding = requestStr.includes('\r\n') ? '\r\n' : '\n';
+  const normalized = requestStr.replace(/\r\n/g, '\n');
+  const separatorIndex = normalized.indexOf('\n\n');
+  const headers = separatorIndex >= 0 ? normalized.slice(0, separatorIndex) : normalized;
+  const body = separatorIndex >= 0 ? normalized.slice(separatorIndex + 2) : '';
+  return {
+    lineEnding,
+    headers,
+    body,
+    hasBodySeparator: separatorIndex >= 0,
+    lines: headers.split('\n'),
+  };
+};
+
+const parseUrlValue = (value: string): URL | null => {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  try {
+    return new URL(trimmed);
+  } catch {
+    try {
+      return new URL(`http://${trimmed}`);
+    } catch {
+      return null;
     }
-    return { method, url };
   }
-  return { method: 'GET', url: '' };
+};
+
+const requestTargetFromUrl = (url: URL) => {
+  return `${url.pathname || '/'}${url.search || ''}`;
+};
+
+// 更强健的解析请求方法和 URL 的函数，兼容 CRLF、Host: host:port 和绝对 URL 请求行。
+const parseRequestHeadersForMethodAndUrl = (requestStr: string, fallbackUrl = '') => {
+  const { lines } = splitRawRequest(requestStr);
+  const firstLine = (lines[0] || '').trim();
+  const match = firstLine.match(/^([A-Za-z][\w-]*)\s+(\S*)\s+(HTTP\/\d(?:\.\d)?)$/i);
+  const method = match?.[1]?.toUpperCase() || 'GET';
+  const requestTarget = match?.[2] || '/';
+  const fallback = parseUrlValue(fallbackUrl);
+
+  if (/^https?:\/\//i.test(requestTarget)) {
+    const absolute = parseUrlValue(requestTarget);
+    if (absolute) {
+      return { method, url: absolute.toString() };
+    }
+  }
+
+  const hostLine = lines.find(line => line.toLowerCase().startsWith('host:'));
+  const host = hostLine ? hostLine.slice(hostLine.indexOf(':') + 1).trim() : '';
+  const path = requestTarget.startsWith('/') ? requestTarget : `/${requestTarget}`;
+
+  if (host) {
+    const protocol = fallback?.protocol || 'http:';
+    return { method, url: `${protocol}//${host}${path}` };
+  }
+
+  if (!fallback) {
+    return { method, url: '' };
+  }
+
+  return { method, url: `${fallback.protocol}//${fallback.host}${path}` };
+};
+
+const normalizeRequestForUrl = (requestStr: string, urlValue: string) => {
+  const url = parseUrlValue(urlValue);
+  if (!url) {
+    return requestStr;
+  }
+
+  const { lineEnding, body, hasBodySeparator, lines } = splitRawRequest(requestStr);
+  const firstLine = (lines[0] || '').trim();
+  const match = firstLine.match(/^([A-Za-z][\w-]*)\s+\S*\s+(HTTP\/\d(?:\.\d)?)$/i);
+  const method = match?.[1]?.toUpperCase() || requestMethod.value || 'GET';
+  const httpVersion = match?.[2]?.toUpperCase() || 'HTTP/1.1';
+  const nextLines = lines.length > 0 ? [...lines] : [`${method} / ${httpVersion}`];
+  nextLines[0] = `${method} ${requestTargetFromUrl(url)} ${httpVersion}`;
+
+  const hostIndex = nextLines.findIndex(line => line.toLowerCase().startsWith('host:'));
+  if (hostIndex >= 0) {
+    nextLines[hostIndex] = `Host: ${url.host}`;
+  } else {
+    nextLines.splice(1, 0, `Host: ${url.host}`);
+  }
+
+  return `${nextLines.join(lineEnding)}${hasBodySeparator || body ? `${lineEnding}${lineEnding}${body.replace(/\n/g, lineEnding)}` : `${lineEnding}${lineEnding}`}`;
 };
 
 // 当tab变化时更新请求方法和URL和历史记录
 watch(() => props.tab, (newTab, oldTab) => {
   // 确保新旧标签不同时才更新（避免重复渲染）
   if (!oldTab || newTab.id !== oldTab.id) {
-    // 优先使用传入的 method 和 url，如果没有则从请求头解析
-    if (newTab.method && newTab.url) {
-      requestMethod.value = newTab.method;
-      requestUrl.value = newTab.url;
-    } else {
-      const { method, url } = parseRequestHeadersForMethodAndUrl(newTab.request);
-      requestMethod.value = method;
-      // 只有在 tab 没有保存 URL 时才使用解析出的 URL
-      if (!newTab.url) {
-        requestUrl.value = url;
-      } else {
-        requestUrl.value = newTab.url;
-      }
-    }
+    const { method, url } = parseRequestHeadersForMethodAndUrl(newTab.request, newTab.url || '');
+    requestMethod.value = newTab.method || method;
+    requestUrl.value = url || newTab.url || '';
     history.value = newTab.history || [];
     selectedHistoryId.value = null;
   }
@@ -130,9 +179,12 @@ watch(() => props.tab, (newTab, oldTab) => {
 const updateRequest = (newData: string) => {
   emit('update-request', newData);
   
-  // 当请求数据更新时，只更新方法，不更新URL（保持用户手动设置的URL）
-  const { method } = parseRequestHeadersForMethodAndUrl(newData);
+  const { method, url } = parseRequestHeadersForMethodAndUrl(newData, requestUrl.value);
   requestMethod.value = method;
+  if (url && url !== requestUrl.value) {
+    requestUrl.value = url;
+    emit('update-url', url);
+  }
 };
 
 // 处理响应更新
@@ -199,19 +251,34 @@ const sendRequest = async () => {
   isLoading.value = true;
   selectedHistoryId.value = null; // 重置选择的历史记录
 
-  RawRequest(props.tab.request, requestUrl.value, props.tab.id).then(result => {
-    if (result && result.error !== "") {
-      updateResponse("error: " + result.error);
+  const normalizedRequest = normalizeRequestForUrl(props.tab.request, requestUrl.value);
+  if (normalizedRequest !== props.tab.request) {
+    emit('update-request', normalizedRequest);
+  }
+
+  const parsedTarget = parseUrlValue(requestUrl.value) || parseUrlValue(parseRequestHeadersForMethodAndUrl(normalizedRequest).url);
+  const target = parsedTarget ? `${parsedTarget.protocol}//${parsedTarget.host}` : requestUrl.value;
+
+  RawRequest(normalizedRequest, target, props.tab.id).then(result => {
+    const error = result?.error || '';
+
+    if (error) {
+      updateResponse("error: " + error);
       // 添加到历史记录
-      addToHistory(props.tab.request, "error: " + result.error, result.data?.server_duration_ms || 0);
+      addToHistory(normalizedRequest, "error: " + error, result?.data?.server_duration_ms || 0);
     } else if (result && result.data) {
       updateResponse(result.data.response_raw || "");
       // 添加到历史记录
-      addToHistory(props.tab.request, result.data.response_raw || "", result.data.server_duration_ms || 0);
+      addToHistory(normalizedRequest, result.data.response_raw || "", result.data.server_duration_ms || 0);
     } else {
       updateResponse("error: No response received");
-      addToHistory(props.tab.request, "error: No response received", 0);
+      addToHistory(normalizedRequest, "error: No response received", 0);
     }
+    isLoading.value = false;
+  }).catch(error => {
+    const message = error instanceof Error ? error.message : String(error);
+    updateResponse("error: " + message);
+    addToHistory(normalizedRequest, "error: " + message, 0);
     isLoading.value = false;
   })
 };
@@ -230,9 +297,22 @@ const updateMethodAndUrl = () => {
 // 更新URL
 const handleUrlChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  requestUrl.value = target.value;
+  const parsedUrl = parseUrlValue(target.value);
+  requestUrl.value = parsedUrl ? parsedUrl.toString() : target.value.trim();
   emit('update-url', requestUrl.value);
-  updateMethodAndUrl();
+
+  const normalizedRequest = normalizeRequestForUrl(props.tab.request, requestUrl.value);
+  if (normalizedRequest !== props.tab.request) {
+    updateRequest(normalizedRequest);
+  } else {
+    updateMethodAndUrl();
+  }
+};
+
+const handleUrlKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter') {
+    handleUrlChange(event);
+  }
 };
 
 // 选择历史记录项
@@ -247,9 +327,12 @@ const selectHistoryItem = (historyId: number) => {
   // 更新服务器响应时间
   emit('update-server-duration', item.server_duration_ms);
   
-  // 更新方法，但不更新URL（保持用户手动设置的URL）
-  const { method } = parseRequestHeadersForMethodAndUrl(item.request);
+  const { method, url } = parseRequestHeadersForMethodAndUrl(item.request, requestUrl.value);
   requestMethod.value = method;
+  if (url) {
+    requestUrl.value = url;
+    emit('update-url', url);
+  }
   
   // 更新选择的历史记录ID
   selectedHistoryId.value = historyId;
@@ -351,7 +434,8 @@ onMounted(async () => {
         type="text"
         class="repeater-input flex-1"
         :value="requestUrl"
-        @change="handleUrlChange"
+        @blur="handleUrlChange"
+        @keydown="handleUrlKeydown"
         placeholder="https://example.com/api/endpoint"
       />
       

@@ -128,14 +128,16 @@ ChYing 内置了一个 MCP (Model Context Protocol) 服务，允许 AI 助手直
 {
   "mcpServers": {
     "chying": {
-      "type": "sse",
-      "url": "http://127.0.0.1:9245/mcp"
+      "type": "http",
+      "url": "http://127.0.0.1:9090/mcp"
     }
   }
 }
 ```
 
-默认端口为 `9245`，可在 ChYing 配置文件中通过 `mcp_port` 字段修改。
+> **协议说明**：ChYing 实现的是 MCP 2025-03-26 spec 的 **Streamable HTTP** 传输（单 endpoint `/mcp`，由 `mcp-go` 的 `NewStreamableHTTPServer` 提供），不是更早的 SSE 双 endpoint 传输。所以 `"type"` 必须填 `"http"`（部分客户端写作 `"streamable-http"`），不能填 `"sse"` —— 后者会让客户端按废弃协议握手。
+
+默认端口为 `9090`（与 chying-cli 默认值一致），可在 ChYing 配置文件 `~/.config/ChYing/config.yaml` 中通过 `mcp_port` 字段修改。如启动时该端口被占用，ChYing 会自动尝试 `mcp_port + 1 .. mcp_port + 9`，实际监听地址在启动日志和前端 `MCPStarted` 事件中给出。
 
 ## Tools
 

@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends HttpTrafficItem">
-import { ref, computed, onMounted, watch, toRef } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getThemeColors } from '../../utils';
 import { FlexRender, type Cell } from '@tanstack/vue-table';
@@ -40,7 +40,9 @@ const colorMenuItemId = ref<number | null>(null);
 const availableColors = computed(() => getThemeColors());
 
 // 将 props.items 转换为响应式引用，确保数据变化时能正确更新
-const itemsRef = toRef(props, 'items');
+// 注：使用 computed 而非 toRef(props, 'items')，因为泛型组件下 toRef 的类型推断
+// 无法收窄为 Ref<T[]>（受 selectedItem/enableMultiSelect 条件 prop 类型影响）
+const itemsRef = computed(() => props.items);
 
 // 使用HTTP流量表格组合式API
 const {

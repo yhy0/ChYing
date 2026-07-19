@@ -2,9 +2,12 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { Events } from '@wailsio/runtime';
 // @ts-ignore
 import {
   GetProject,
+  GetDesktopRuntimeState,
+  OpenExistingProject,
   StartInitialization,
   StepBasicInitialization,
   StepConfigurationLoad,
@@ -184,6 +187,23 @@ const callInitStep = async (stepFunction: Function, args: any[], description: st
   await new Promise(resolve => setTimeout(resolve, 200));
 };
 
+const handleDesktopProjectProgress = (event: any) => {
+  const state = event?.data;
+  if (!state) return;
+
+  if (state.status === 'opening') {
+    isLoading.value = true;
+    updateProgressStep(state.progress || 0, state.message || t('pages.project.init_preparing'));
+  } else if (state.status === 'failed') {
+    isLoading.value = false;
+    loadingProgress.value = 0;
+    loadingStep.value = '';
+    showMessage(state.error || t('pages.project.operation_failed'), 'error');
+  } else if (state.status === 'ready') {
+    updateProgressStep(100, t('pages.project.init_done'));
+  }
+};
+
 // 处理下一步
 async function handleNext() {
   if (!canProceed.value || isLoading.value) return;
@@ -214,6 +234,18 @@ async function handleNext() {
         break;
     }
 
+    if (projectAction.value === 'open') {
+      const result = await OpenExistingProject(finalProjectName);
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+      await GetProject();
+      updateProgressStep(100, t('pages.project.init_done'));
+      isLoading.value = false;
+      await router.push('/app/project');
+      return;
+    }
+
     await callInitStep(StartInitialization, [finalProjectType, finalProjectName], t('pages.project.init_starting'), 15);
     await callInitStep(StepBasicInitialization, [], t('pages.project.init_base_components'), 25);
     await callInitStep(StepConfigurationLoad, [], t('pages.project.init_loading_config'), 35);
@@ -223,7 +255,7 @@ async function handleNext() {
     await callInitStep(StepProjectDataLoad, [finalProjectType, finalProjectName], t('pages.project.init_loading_data'), 90);
     await callInitStep(StepInitializationComplete, [], t('pages.project.init_completing'), 100);
     
-    const projectResult = await GetProject();
+    await GetProject();
 
     setTimeout(() => {
       updateProgressStep(100, t('pages.project.init_done'));
@@ -244,10 +276,27 @@ async function handleNext() {
 
 // 组件加载时初始化
 onMounted(async () => {
-  loadLocalProjects();
+  Events.On('DesktopProjectOpenProgress', handleDesktopProjectProgress);
+  await loadLocalProjects();
+
+  try {
+    const response = await GetDesktopRuntimeState();
+    const state: any = response?.data;
+    if (state?.status === 'opening') {
+      isLoading.value = true;
+      updateProgressStep(state.progress || 0, state.message || t('pages.project.init_preparing'));
+    } else if (state?.status === 'ready') {
+      await router.push('/app/project');
+    } else if (state?.status === 'failed') {
+      showMessage(state.error || t('pages.project.operation_failed'), 'error');
+    }
+  } catch (error) {
+    console.error('读取桌面运行状态失败:', error);
+  }
 });
 
 onUnmounted(() => {
+  Events.Off('DesktopProjectOpenProgress');
   isLoading.value = false;
 });
 </script>
@@ -308,7 +357,7 @@ onUnmounted(() => {
 
   <!-- 删除确认对话框 -->
   <Transition name="fade">
-    <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div v-if="showDeleteConfirm" class="dialog-overlay">
       <div class="delete-confirm-dialog">
         <div class="dialog-header">
           <div class="dialog-icon warning">
@@ -321,10 +370,10 @@ onUnmounted(() => {
           <p class="warning-text">{{ t('pages.project.delete_warning') }}</p>
         </div>
         <div class="dialog-actions">
-          <button class="cancel-btn" @click="closeDeleteConfirm" :disabled="isDeleting">
+          <button class="btn btn-secondary btn-sm cancel-btn" type="button" @click="closeDeleteConfirm" :disabled="isDeleting">
             {{ t('common.actions.cancel') }}
           </button>
-          <button class="confirm-btn danger" @click="confirmDeleteProject" :disabled="isDeleting">
+          <button class="btn btn-danger btn-sm confirm-btn danger" type="button" @click="confirmDeleteProject" :disabled="isDeleting">
             <i v-if="isDeleting" class="fas fa-spinner fa-spin"></i>
             <span v-else>{{ t('common.actions.delete') }}</span>
           </button>
@@ -352,12 +401,6 @@ onUnmounted(() => {
       <div class="sword-flying sword-flying-3"></div>
       <div class="sword-flying sword-flying-4"></div>
       <div class="sword-flying sword-flying-5"></div>
-      <!-- 剑气残影 -->
-      <div class="sword-afterimage sword-afterimage-1"></div>
-      <div class="sword-afterimage sword-afterimage-2"></div>
-      <div class="sword-afterimage sword-afterimage-3"></div>
-      <div class="sword-afterimage sword-afterimage-4"></div>
-      <div class="sword-afterimage sword-afterimage-5"></div>
       <!-- 垂直剑光 (保留部分作为辅助效果) -->
       <div class="sword-light sword-light-1"></div>
       <div class="sword-light sword-light-2"></div>
@@ -365,12 +408,6 @@ onUnmounted(() => {
       <!-- 斜向剑光 -->
       <div class="sword-diagonal sword-diagonal-1"></div>
       <div class="sword-diagonal sword-diagonal-2"></div>
-      <!-- 剑尖光点 -->
-      <div class="sword-spark sword-spark-1"></div>
-      <div class="sword-spark sword-spark-2"></div>
-      <div class="sword-spark sword-spark-3"></div>
-      <div class="sword-spark sword-spark-4"></div>
-      <div class="sword-spark sword-spark-5"></div>
       <!-- 剑气光晕 -->
       <div class="sword-glow sword-glow-1"></div>
       <div class="sword-glow sword-glow-2"></div>
@@ -380,17 +417,6 @@ onUnmounted(() => {
       <div class="sword-tip-flash sword-tip-flash-1"></div>
       <div class="sword-tip-flash sword-tip-flash-2"></div>
       <div class="sword-tip-flash sword-tip-flash-3"></div>
-    </div>
-
-    <!-- 背景装饰 - 承影剑光 (顶层 - 穿透内容) -->
-    <div class="background-decoration-top">
-      <!-- 顶层垂直剑光 -->
-      <div class="sword-light-top sword-light-top-1"></div>
-      <div class="sword-light-top sword-light-top-2"></div>
-      <div class="sword-light-top sword-light-top-3"></div>
-      <!-- 顶层斜向剑光 -->
-      <div class="sword-diagonal-top sword-diagonal-top-1"></div>
-      <div class="sword-diagonal-top sword-diagonal-top-2"></div>
     </div>
 
     <!-- 主内容区域 -->
@@ -421,7 +447,13 @@ onUnmounted(() => {
           </div>
 
           <div class="action-selector-compact">
-            <div class="action-option-compact" @click="projectAction = 'open'" :class="{ active: projectAction === 'open' }">
+            <button
+              type="button"
+              class="action-option-compact"
+              @click="projectAction = 'open'"
+              :class="{ active: projectAction === 'open' }"
+              :aria-pressed="projectAction === 'open'"
+            >
               <div class="action-sword-icon">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 20L7 17M20 4L11 13M11 13L8 16L4 20M11 13L14 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -433,11 +465,17 @@ onUnmounted(() => {
                 <p>{{ t('pages.project.open_existing_desc') }}</p>
               </div>
               <div class="action-radio">
-                <div class="radio-button" :class="{ checked: projectAction === 'open' }"></div>
+                <div class="radio-button" :class="{ checked: projectAction === 'open' }" aria-hidden="true"></div>
               </div>
-            </div>
+            </button>
 
-            <div class="action-option-compact" @click="projectAction = 'new'" :class="{ active: projectAction === 'new' }">
+            <button
+              type="button"
+              class="action-option-compact"
+              @click="projectAction = 'new'"
+              :class="{ active: projectAction === 'new' }"
+              :aria-pressed="projectAction === 'new'"
+            >
               <div class="action-sword-icon">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 3V21M3 12H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -449,11 +487,17 @@ onUnmounted(() => {
                 <p>{{ t('pages.project.create_new_desc') }}</p>
               </div>
               <div class="action-radio">
-                <div class="radio-button" :class="{ checked: projectAction === 'new' }"></div>
+                <div class="radio-button" :class="{ checked: projectAction === 'new' }" aria-hidden="true"></div>
               </div>
-            </div>
+            </button>
 
-            <div class="action-option-compact" @click="projectAction = 'temp'" :class="{ active: projectAction === 'temp' }">
+            <button
+              type="button"
+              class="action-option-compact"
+              @click="projectAction = 'temp'"
+              :class="{ active: projectAction === 'temp' }"
+              :aria-pressed="projectAction === 'temp'"
+            >
               <div class="action-sword-icon">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M13 3L4 14H12L11 21L20 10H12L13 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -464,9 +508,9 @@ onUnmounted(() => {
                 <p>{{ t('pages.project.start_temp_desc') }}</p>
               </div>
               <div class="action-radio">
-                <div class="radio-button" :class="{ checked: projectAction === 'temp' }"></div>
+                <div class="radio-button" :class="{ checked: projectAction === 'temp' }" aria-hidden="true"></div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -480,11 +524,21 @@ onUnmounted(() => {
                 <div class="project-count">{{ t('pages.project.project_count', { count: localProjects.length }) }}</div>
               </div>
 
-              <div class="project-list-ultra-compact" v-if="localProjects.length > 0">
+              <div
+                class="project-list-ultra-compact"
+                v-if="localProjects.length > 0"
+                role="listbox"
+                :aria-label="t('pages.project.select_project')"
+              >
                 <div v-for="project in localProjects" :key="project.id"
                      class="project-item-compact"
                      :class="{ selected: selectedProject?.id === project.id }"
-                     @click="selectedProject = project">
+                     role="option"
+                     tabindex="0"
+                     :aria-selected="selectedProject?.id === project.id"
+                     @click="selectedProject = project"
+                     @keydown.enter="selectedProject = project"
+                     @keydown.space.prevent="selectedProject = project">
                   <div class="project-sword-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4 20L7 17M20 4L11 13M11 13L8 16L4 20M11 13L14 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -502,14 +556,16 @@ onUnmounted(() => {
                   <div class="project-item-actions">
                     <button
                       class="delete-btn"
+                      type="button"
                       @click="openDeleteConfirm(project, $event)"
                       :title="t('common.actions.delete')"
+                      :aria-label="t('common.actions.delete')"
                     >
                       <i class="bx bx-trash"></i>
                     </button>
                   </div>
                   <div class="project-item-selector">
-                    <div class="radio-button" :class="{ checked: selectedProject?.id === project.id }"></div>
+                    <div class="radio-button" :class="{ checked: selectedProject?.id === project.id }" aria-hidden="true"></div>
                   </div>
                 </div>
               </div>

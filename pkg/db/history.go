@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/yhy0/logging"
@@ -50,6 +51,47 @@ type HTTPHistory struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+// GetSessionHistory returns traffic attributed to a session and can also read
+// pre-attribution rows from the same project database, bounded by session targets.
+// Legacy rows remain unchanged in ChYing; callers receive read-only references.
+func GetSessionHistory(projectID, source, sessionID string, targets []string, includeUnattributed bool, limit, offset int) ([]*HTTPHistory, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+	query := GlobalDB.Model(&HTTPHistory{})
+	if includeUnattributed {
+		query = query.Where(
+			"((project_id = ? AND (session_id = ? OR session_id = '' OR session_id IS NULL)) OR ((project_id = '' OR project_id = 'default') AND (session_id = '' OR session_id IS NULL)))",
+			projectID, sessionID,
+		)
+	} else {
+		query = query.Where("project_id = ? AND session_id = ?", projectID, sessionID)
+	}
+	if source != "" && source != "all" {
+		query = query.Where("source = ?", source)
+	}
+	if len(targets) > 0 {
+		clauses := make([]string, 0, len(targets))
+		args := make([]interface{}, 0, len(targets)*3)
+		for _, raw := range targets {
+			target := strings.ToLower(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(raw), "*."), "."))
+			if target == "" {
+				continue
+			}
+			clauses = append(clauses, "(LOWER(host) = ? OR LOWER(host) LIKE ? OR LOWER(host) LIKE ?)")
+			args = append(args, target, "%."+target, target+":%")
+		}
+		if len(clauses) > 0 {
+			query = query.Where("("+strings.Join(clauses, " OR ")+")", args...)
+		}
+	}
+	var data []*HTTPHistory
+	if err := query.Order("created_at DESC").Limit(limit).Offset(offset).Find(&data).Error; err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func AddHistory(data *HTTPHistory) {
@@ -179,6 +221,29 @@ func GetHistory(host []string) []*HTTPHistory {
 	globalDBTmp.Find(&history)
 
 	return history
+}
+
+// GetHistoryByHost returns traffic for the current project and optional agent session.
+// GetHistory is kept for existing desktop callers that intentionally query the whole project.
+func GetHistoryByHost(projectID string, hosts []string, sessionID string) ([]*HTTPHistory, error) {
+	if GlobalDB == nil {
+		return nil, fmt.Errorf("数据库未初始化")
+	}
+	query := GlobalDB.Model(&HTTPHistory{})
+	if projectID != "" && projectID != "all" {
+		query = query.Where("project_id = ?", projectID)
+	}
+	if sessionID != "" {
+		query = query.Where("session_id = ?", sessionID)
+	}
+	if len(hosts) > 0 {
+		query = query.Where("host IN ?", hosts)
+	}
+	var history []*HTTPHistory
+	if err := query.Order("created_at DESC").Find(&history).Error; err != nil {
+		return nil, err
+	}
+	return history, nil
 }
 
 func GetHosts() []string {

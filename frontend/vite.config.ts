@@ -15,6 +15,12 @@ export default defineConfig({
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
   },
+  // 强制绑定 IPv4 (127.0.0.1)，否则 Node 18+ 会优先解析 localhost 为 IPv6 (::1)，
+  // 导致 Wails 后端的 ExternalAssetHandler 走 tcp4 拨号时 connection refused，
+  // 表现为窗口透明、看到桌面壁纸。
+  server: {
+    host: '127.0.0.1',
+  },
   build: {
     rollupOptions: {
       output: {

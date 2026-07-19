@@ -179,7 +179,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--row-color);
+  background-color: var(--row-color, transparent);
   opacity: 0.2; /* 提高不透明度，使其更明显 */
   pointer-events: none;
   z-index: -1; /* 将背景置于内容之下 */

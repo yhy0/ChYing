@@ -24,6 +24,9 @@ func getVulnerabilitiesTool() mcp.Tool {
 		mcp.WithString("session_id",
 			mcp.Description("Optional: filter by scan session ID"),
 		),
+		mcp.WithBoolean("include_unattributed",
+			mcp.Description("Include passive findings from this project database, restricted to the registered session targets"),
+		),
 	)
 }
 
@@ -32,6 +35,7 @@ func handleGetVulnerabilities(ctx context.Context, req mcp.CallToolRequest) (*mc
 	limit := req.GetInt("limit", 100)
 	offset := req.GetInt("offset", 0)
 	sessionID := req.GetString("session_id", "")
+	includeUnattributed := req.GetBool("include_unattributed", false)
 
 	if limit > 500 {
 		limit = 500
@@ -44,7 +48,21 @@ func handleGetVulnerabilities(ctx context.Context, req mcp.CallToolRequest) (*mc
 		source = ""
 	}
 
-	vulns, err := db.GetAllVulnerabilities(db.CurrentProjectName, source, limit, offset, sessionID)
+	var vulns []*db.Vulnerability
+	var err error
+	if includeUnattributed {
+		projectID, _, attributionErr := sessionAttribution(sessionID)
+		if attributionErr != nil || sessionID == "" {
+			return errorResult("include_unattributed requires an active session_id"), nil
+		}
+		session, ok := GetSession(sessionID)
+		if !ok {
+			return errorResult("session not found: %s", sessionID), nil
+		}
+		vulns, err = db.GetSessionVulnerabilities(projectID, source, sessionID, session.Targets, true, limit, offset)
+	} else {
+		vulns, err = db.GetAllVulnerabilities(db.CurrentProjectName, source, limit, offset, sessionID)
+	}
 	if err != nil {
 		return errorResult("failed to get vulnerabilities: %v", err), nil
 	}
@@ -66,6 +84,8 @@ func handleGetVulnerabilities(ctx context.Context, req mcp.CallToolRequest) (*mc
 		Request     string `json:"request"`
 		Response    string `json:"response"`
 		CreatedAt   string `json:"created_at"`
+		ProjectID   string `json:"project_id"`
+		SessionID   string `json:"session_id"`
 	}
 
 	items := make([]vulnItem, 0, len(vulns))
@@ -87,6 +107,8 @@ func handleGetVulnerabilities(ctx context.Context, req mcp.CallToolRequest) (*mc
 			Request:     v.Request,
 			Response:    v.Response,
 			CreatedAt:   v.CreatedAt.Format("2006-01-02 15:04:05"),
+			ProjectID:   v.ProjectID,
+			SessionID:   v.SessionID,
 		})
 	}
 

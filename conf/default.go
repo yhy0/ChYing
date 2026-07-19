@@ -46,7 +46,8 @@ proxy:
       enabled: true
 
 # MCP Server 端口配置
-mcp_port: 9245
+# 9090 与 chying-cli 的默认值保持一致；如被占用，启动时会自动尝试 9091..9099。
+mcp_port: 9090
 
 # 扫描配置
 scan:

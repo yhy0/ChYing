@@ -373,12 +373,32 @@ const closeContextMenu = () => {
   showContextMenu.value = false;
 };
 
+const ensureProxyItemBodyLoaded = async (item: ProxyHistoryItem) => {
+  if (item.request && item.request.trim()) {
+    return item;
+  }
+
+  const HTTPBody = await GetHistoryDump(Number(item.id));
+  if (HTTPBody) {
+    item.request = HTTPBody.request_raw || '';
+    item.response = HTTPBody.response_raw || '';
+  }
+  return item;
+};
+
 // 发送到Repeater
-const sendToRepeater = () => {
-  if (!selectedItem.value) return;
+const sendToRepeater = async (item?: ProxyHistoryItem) => {
+  const targetItem = item || selectedItem.value;
+  if (!targetItem) return;
+
+  try {
+    await ensureProxyItemBodyLoaded(targetItem);
+  } catch (err) {
+    console.error('Error getting history dump:', err);
+  }
 
   // 使用store发送到Repeater
-  store.sendToRepeater(selectedItem.value);
+  store.sendToRepeater(targetItem);
 
   // 显示成功通知
   showNotification(t('modules.proxy.notifications.sentToRepeater'));
@@ -387,11 +407,18 @@ const sendToRepeater = () => {
 };
 
 // 发送到Intruder
-const sendToIntruder = () => {
-  if (!selectedItem.value) return;
+const sendToIntruder = async (item?: ProxyHistoryItem) => {
+  const targetItem = item || selectedItem.value;
+  if (!targetItem) return;
+
+  try {
+    await ensureProxyItemBodyLoaded(targetItem);
+  } catch (err) {
+    console.error('Error getting history dump:', err);
+  }
 
   // 使用store发送到Intruder
-  store.sendToIntruder(selectedItem.value);
+  store.sendToIntruder(targetItem);
 
   // 显示成功通知
   showNotification(t('modules.proxy.notifications.sentToIntruder'));

@@ -369,6 +369,7 @@ func (a *App) StepInitializationComplete() Result {
 			progress.Success = false
 			progress.Error = fmt.Sprintf("初始化完成步骤失败: %v", r)
 			logging.Logger.Errorf("初始化完成 panic: %v", r)
+			a.markDesktopProjectFailed(db.CurrentProjectName, progress.Error)
 		}
 	}()
 
@@ -384,11 +385,12 @@ func (a *App) StepInitializationComplete() Result {
 	// 启动 MCP Server
 	mcpPort := conf.AppConf.MCPPort
 	if mcpPort <= 0 {
-		mcpPort = 9245
+		mcpPort = 9090
 	}
 	mcpAddr, mcpErr := mcpserver.StartHTTPServer(mcpPort)
 	if mcpErr != nil {
 		logging.Logger.Warnf("MCP Server 启动失败: %v", mcpErr)
+		a.markDesktopProjectFailed(db.CurrentProjectName, fmt.Sprintf("MCP 服务启动失败: %v", mcpErr))
 		if wailsApp != nil {
 			wailsApp.Event.Emit("MCPStarted", map[string]interface{}{
 				"success": false,
@@ -397,6 +399,7 @@ func (a *App) StepInitializationComplete() Result {
 		}
 	} else {
 		logging.Logger.Infof("MCP Server 已启动，监听地址: %s", mcpAddr)
+		a.markDesktopProjectReady(db.CurrentProjectName, fmt.Sprintf("http://%s/mcp", mcpAddr))
 		if wailsApp != nil {
 			wailsApp.Event.Emit("MCPStarted", map[string]interface{}{
 				"success": true,

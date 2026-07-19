@@ -9,6 +9,12 @@
   --color-bg-card: #ffffff;
   --color-bg-hover: #f9fafb;
   --color-bg-popup: #ffffff;
+  --color-bg-card-dark: var(--color-bg-card);
+  --color-bg-tertiary-dark: var(--color-bg-tertiary);
+  --color-bg-hover-dark: var(--color-bg-hover);
+  --row-color: transparent;
+  --bg-primary: var(--color-bg-primary);
+  --bg-hover: var(--color-primary-light);
   
   /* 文本颜色 */
   --color-text-primary: #1f2937;
@@ -16,11 +22,17 @@
   --color-text-secondary-rgb: 107, 114, 128;
   --color-text-tertiary: #9ca3af;
   --color-text-tertiary-rgb: 156, 163, 175;
+  --color-text-primary-dark: var(--color-text-primary);
+  --color-text-secondary-dark: var(--color-text-secondary);
+  --text-color-dark: var(--color-text-primary);
   
   /* 边框颜色 */
   --color-border: #e5e7eb;
   --color-border-light: #f3f4f6;
   --color-hover-border: #e5e7eb;
+  --border-color: var(--color-border);
+  --border-color-dark: var(--color-border);
+  --dark-border-color: var(--color-border);
   
   /* 阴影颜色 */
   --color-shadow: rgba(0, 0, 0, 0.05);
@@ -39,29 +51,61 @@
   --color-primary-dark: #4338ca;
   --color-primary-hover: #4338ca;
   --color-primary-rgb: 79, 70, 229;
+  --color-primary-bg: var(--color-primary-light);
 
   /* 品牌色别名 - 用于对话框等组件 */
   --color-brand: #3b82f6;
   --color-brand-dark: #2563eb;
   --color-brand-light: rgba(59, 130, 246, 0.1);
   --color-gray: #9ca3af;
+  --color-gray-800: #1f2937;
 
   /* 状态颜色 */
   --color-success: #10b981;
   --color-success-hover: #059669;
   --color-success-rgb: 16, 185, 129;
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-success-text: #047857;
+  --color-success-border: rgba(16, 185, 129, 0.28);
   --color-warning: #f59e0b;
   --color-warning-hover: #d97706;
   --color-warning-rgb: 245, 158, 11;
+  --color-warning-bg: rgba(245, 158, 11, 0.14);
+  --color-warning-text: #b45309;
+  --color-warning-border: rgba(245, 158, 11, 0.3);
   --color-error: #ef4444;
   --color-error-hover: #dc2626;
   --color-error-rgb: 239, 68, 68;
   --color-danger: #ef4444;
   --color-danger-hover: #dc2626;
   --color-danger-rgb: 239, 68, 68;
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-danger-text: #dc2626;
+  --color-danger-border: rgba(239, 68, 68, 0.28);
   --color-info: #3b82f6;
   --color-info-hover: #2563eb;
   --color-info-rgb: 59, 130, 246;
+  --color-info-bg: rgba(59, 130, 246, 0.12);
+  --color-info-text: #2563eb;
+  --color-info-border: rgba(59, 130, 246, 0.28);
+  --color-success-bg-dark: var(--color-success-bg);
+  --color-success-text-dark: var(--color-success-text);
+  --color-success-border-dark: var(--color-success-border);
+  --color-warning-bg-dark: var(--color-warning-bg);
+  --color-warning-text-dark: var(--color-warning-text);
+  --color-warning-border-dark: var(--color-warning-border);
+  --color-danger-bg-dark: var(--color-danger-bg);
+  --color-danger-text-dark: var(--color-danger-text);
+  --color-danger-border-dark: var(--color-danger-border);
+  --color-info-bg-dark: var(--color-info-bg);
+  --color-info-text-dark: var(--color-info-text);
+  --color-info-border-dark: var(--color-info-border);
+  --color-secondary-bg: #f8fafc;
+  --color-secondary-text: #64748b;
+  --color-secondary-border: #e2e8f0;
+  --color-secondary-bg-dark: rgba(148, 163, 184, 0.1);
+  --color-secondary-text-dark: #94a3b8;
+  --color-secondary-border-dark: rgba(148, 163, 184, 0.22);
   
   /* 漏洞等级颜色 */
   --color-vuln-critical: #dc2626;
@@ -79,19 +123,25 @@
   /* 颜色变量扩展 - 用于方法和状态标签 */
   --color-blue-400: #60a5fa;
   --color-blue-600: #2563eb;
+  --color-blue: var(--color-blue-600);
   --color-green-400: #34d399;
   --color-green-600: #059669;
+  --color-green: var(--color-green-600);
   --color-yellow-400: #fbbf24;
   --color-yellow-600: #d97706;
+  --color-yellow: var(--color-yellow-600);
   --color-red-400: #f87171;
   --color-red-600: #dc2626;
   --color-purple-400: #c084fc;
   --color-purple-600: #9333ea;
+  --color-purple: var(--color-purple-600);
+  --color-orange: #ea580c;
 
   /* 过渡时间 */
   --transition-fast: 0.15s;
   --transition-normal: 0.2s;
   --transition-slow: 0.3s;
+  --transition-duration: var(--transition-normal);
   
   /* 间距变量 */
   --spacing-xs: 0.25rem;
@@ -117,6 +167,7 @@
   --font-family-sans: 'Maple Mono NF CN', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-family-mono: 'Maple Mono NF CN', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-family-current: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
 
   /* 统一圆角系统 - 层次化设计 */
   --radius-xs: 0.25rem;    /* 4px - 最小元素 */
@@ -140,6 +191,9 @@
   --glass-bg-card: rgba(248, 250, 252, var(--glass-bg-alpha-strong));
   --glass-bg-popup: rgba(255, 255, 255, var(--glass-bg-alpha-intense));
   --glass-bg-hover: rgba(241, 245, 249, var(--glass-bg-alpha-strong));
+  --glass-bg-light: var(--glass-bg-secondary);
+  --glass-bg-medium: var(--glass-bg-primary);
+  --glass-bg-strong: var(--glass-bg-card);
 
   /* 玻璃态边框 - 白天模式优化：增强边界可见性 */
   --glass-border-alpha-light: 0.6;   /* 从 0.2 提升到 0.6 */
@@ -157,6 +211,9 @@
   --glass-blur-medium: blur(20px);
   --glass-blur-strong: blur(28px);
   --glass-blur-intense: blur(40px);
+  --glass-blur-sm: var(--glass-blur-subtle);
+  --glass-blur-md: var(--glass-blur-medium);
+  --glass-blur-lg: var(--glass-blur-strong);
 
   /* 统一使用新的圆角系统 */
   --glass-radius-xs: var(--radius-xs);
@@ -196,6 +253,16 @@
     0 8px 32px rgba(99, 102, 241, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 0 1px rgba(0, 0, 0, 0.08);
+  --glass-shadow-sm: var(--glass-shadow-subtle);
+  --glass-shadow-md: var(--glass-shadow-medium);
+  --glass-shadow-lg: var(--glass-shadow-strong);
+
+  /* 旧模块别名 - 逐步迁移到 --color-* 和 --glass-* */
+  --primary-color: var(--color-primary);
+  --primary-color-light: var(--color-primary-light);
+  --surface-color: var(--color-bg-card);
+  --surface-color-dark: var(--color-bg-card);
+  --color-bg-input: var(--color-bg-primary);
 
   /* 统一过渡动画系统 */
   --glass-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -223,6 +290,18 @@
   --btn-warning-bg: var(--color-warning);
   --btn-warning-text: var(--color-text-primary); /* 黄色背景配深色文字 */
   --btn-warning-hover-bg: #d97706;
+
+  --toggle-off-bg: #cbd5e1;
+  --toggle-off-border: #9ca3af;
+  --toggle-on-bg: var(--color-info);
+  --toggle-on-border: var(--color-info-hover);
+  --toggle-knob-bg: #ffffff;
+  --toggle-knob-border: #d1d5db;
+  --toggle-knob-border-active: #e5e7eb;
+  --toggle-off-bg-dark: #4b5563;
+  --toggle-off-border-dark: #6b7280;
+  --toggle-knob-bg-dark: #f9fafb;
+  --toggle-knob-border-dark: #d1d5db;
 
   /* 兼容性别名 - 逐步迁移 */
   --border-radius: var(--radius-md);
@@ -252,17 +331,29 @@
   --color-bg-card: #2a2a42;
   --color-bg-hover: #323248;
   --color-bg-popup-dark: #1f2937;
+  --color-bg-input: var(--color-bg-tertiary);
+  --color-bg-card-dark: var(--color-bg-card);
+  --color-bg-tertiary-dark: var(--color-bg-tertiary);
+  --color-bg-hover-dark: var(--color-bg-hover);
+  --bg-primary: var(--color-bg-primary);
+  --bg-hover: var(--color-primary-light);
   
   /* 文本颜色 */
   --color-text-primary: #f3f4f6;
   --color-text-secondary: #9ca3af;
   --color-text-tertiary: #6b7280;
+  --color-text-primary-dark: var(--color-text-primary);
+  --color-text-secondary-dark: var(--color-text-secondary);
+  --text-color-dark: var(--color-text-primary);
   
   /* 边框颜色 */
   --color-border: #4b5563;
   --color-border-light: #374151;
   --color-border-dark: #374151;
   --color-hover-border-dark: #374151;
+  --border-color: var(--color-border);
+  --border-color-dark: var(--color-border-dark);
+  --dark-border-color: var(--color-border-dark);
   
   /* 阴影颜色 */
   --color-shadow: rgba(0, 0, 0, 0.2);
@@ -282,6 +373,7 @@
   --color-primary-hover: #4f46e5;
   --color-primary-rgb: 99, 102, 241;
   --color-primary-light-dark: #a5b4fc;
+  --color-primary-bg: var(--color-primary-light);
 
   /* 品牌色别名 - 深色模式 */
   --color-brand: #60a5fa;
@@ -291,10 +383,40 @@
 
   /* 状态颜色悬停状态 - 深色模式 */
   --color-success-hover: #059669;
+  --color-success-bg: rgba(16, 185, 129, 0.16);
+  --color-success-text: #6ee7b7;
+  --color-success-border: rgba(16, 185, 129, 0.32);
   --color-warning-hover: #d97706;
+  --color-warning-bg: rgba(245, 158, 11, 0.16);
+  --color-warning-text: #fcd34d;
+  --color-warning-border: rgba(245, 158, 11, 0.32);
   --color-error-hover: #dc2626;
   --color-danger-hover: #dc2626;
+  --color-danger-bg: rgba(239, 68, 68, 0.16);
+  --color-danger-text: #f87171;
+  --color-danger-border: rgba(239, 68, 68, 0.32);
   --color-info-hover: #2563eb;
+  --color-info-bg: rgba(59, 130, 246, 0.16);
+  --color-info-text: #93c5fd;
+  --color-info-border: rgba(59, 130, 246, 0.32);
+  --color-success-bg-dark: var(--color-success-bg);
+  --color-success-text-dark: var(--color-success-text);
+  --color-success-border-dark: var(--color-success-border);
+  --color-warning-bg-dark: var(--color-warning-bg);
+  --color-warning-text-dark: var(--color-warning-text);
+  --color-warning-border-dark: var(--color-warning-border);
+  --color-danger-bg-dark: var(--color-danger-bg);
+  --color-danger-text-dark: var(--color-danger-text);
+  --color-danger-border-dark: var(--color-danger-border);
+  --color-info-bg-dark: var(--color-info-bg);
+  --color-info-text-dark: var(--color-info-text);
+  --color-info-border-dark: var(--color-info-border);
+  --color-secondary-bg: rgba(148, 163, 184, 0.1);
+  --color-secondary-text: #94a3b8;
+  --color-secondary-border: rgba(148, 163, 184, 0.22);
+  --color-secondary-bg-dark: var(--color-secondary-bg);
+  --color-secondary-text-dark: var(--color-secondary-text);
+  --color-secondary-border-dark: var(--color-secondary-border);
   
   /* 漏洞等级颜色 - 暗色主题调整 */
   --color-vuln-critical: #ef4444;
@@ -324,6 +446,9 @@
   --glass-bg-card: rgba(255, 255, 255, var(--glass-bg-alpha-strong));
   --glass-bg-popup: rgba(15, 23, 42, 0.85);
   --glass-bg-hover: rgba(255, 255, 255, var(--glass-bg-alpha-strong));
+  --glass-bg-light: var(--glass-bg-secondary);
+  --glass-bg-medium: var(--glass-bg-primary);
+  --glass-bg-strong: var(--glass-bg-card);
 
   /* 暗色主题玻璃态边框 */
   --glass-border-alpha-light: 0.08;
@@ -340,6 +465,13 @@
   --glass-shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.5), 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --glass-shadow-strong: 0 12px 32px rgba(0, 0, 0, 0.6), 0 24px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   --glass-shadow-focus: 0 0 0 4px rgba(129, 140, 248, 0.25), 0 8px 32px rgba(129, 140, 248, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --glass-shadow-sm: var(--glass-shadow-subtle);
+  --glass-shadow-md: var(--glass-shadow-medium);
+  --glass-shadow-lg: var(--glass-shadow-strong);
+
+  --surface-color: var(--color-bg-card);
+  --surface-color-dark: var(--color-bg-card);
+  --color-bg-input: var(--color-bg-tertiary);
 
   /* 按钮颜色系统 - 深色模式 */
   --btn-primary-bg: var(--color-primary);
@@ -361,6 +493,18 @@
   --btn-warning-bg: var(--color-warning);
   --btn-warning-text: white; /* 深色模式下可以配白色文字 */
   --btn-warning-hover-bg: #d97706;
+
+  --toggle-off-bg: #4b5563;
+  --toggle-off-border: #6b7280;
+  --toggle-on-bg: var(--color-info);
+  --toggle-on-border: var(--color-info-hover);
+  --toggle-knob-bg: #ffffff;
+  --toggle-knob-border: #d1d5db;
+  --toggle-knob-border-active: #e5e7eb;
+  --toggle-off-bg-dark: var(--toggle-off-bg);
+  --toggle-off-border-dark: var(--toggle-off-border);
+  --toggle-knob-bg-dark: #f9fafb;
+  --toggle-knob-border-dark: #d1d5db;
 }
 
 /* 浏览器兼容性支持 */

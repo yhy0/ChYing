@@ -50,7 +50,7 @@
 /* 按钮增强的悬停效果 - 使用颜色/阴影变化避免布局偏移 */
 .btn:hover {
   background: var(--glass-bg-primary);
-  color: var(--color-text-primary) !important;
+  color: var(--color-text-primary);
   /* 增强的多层边界悬停效果 - 无位移，纯视觉变化 */
   box-shadow:
     /* 增强的外层轮廓 */
@@ -62,6 +62,13 @@
     0 8px 24px rgba(0, 0, 0, 0.1),
     /* 外发光效果 */
     0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow:
+    var(--glass-shadow-focus),
+    inset 0 0 0 1px var(--glass-border-strong);
 }
 
 /* 按钮悬停时的径向渐变效果 */
@@ -162,6 +169,22 @@
   box-shadow:
     0 0 0 4px rgba(148, 163, 184, 0.25),
     var(--glass-shadow-medium);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  box-shadow: none;
+  border: 1px solid transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.btn-ghost:hover {
+  background: var(--glass-bg-light);
+  color: var(--color-text-primary);
+  border-color: var(--glass-border-light);
+  box-shadow: var(--glass-shadow-sm);
 }
 
 /* 危险按钮 - 变量驱动的主题适应设计 */
@@ -272,6 +295,26 @@
   border: 1px solid transparent;
 }
 
+.btn-icon-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0;
+  border-radius: var(--glass-radius-sm);
+  font-size: 0.8125rem;
+}
+
+.btn-icon-xs {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  padding: 0;
+  border-radius: var(--glass-radius-sm);
+  font-size: 0.75rem;
+}
+
 .btn-icon:hover {
   background: var(--glass-bg-secondary);
   color: var(--color-text-primary);
@@ -298,6 +341,14 @@
 }
 
 /* 小尺寸按钮 */
+.btn-xs {
+  font-size: 0.6875rem;
+  padding: 0.1875rem 0.4375rem;
+  min-height: 1.5rem;
+  border-radius: var(--glass-radius-sm);
+  gap: 0.25rem;
+}
+
 .btn-sm {
   font-size: 0.675rem;
   padding: 0.25rem 0.5rem;

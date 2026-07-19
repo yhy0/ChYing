@@ -188,11 +188,33 @@ export const useModulesStore = defineStore('modules', () => {
   }
   
   // REVISED Actions (to be called by event listeners)
+  function buildRawRequestFromProxyItem(sourceItem: ProxyHistoryItem): string {
+    if (sourceItem.request && sourceItem.request.trim()) {
+      return sourceItem.request;
+    }
+
+    const method = sourceItem.method || 'GET';
+    let host = sourceItem.host || '';
+    let path = sourceItem.path || '/';
+
+    if (sourceItem.url) {
+      try {
+        const urlObj = new URL(sourceItem.url);
+        host = urlObj.host || host;
+        path = `${urlObj.pathname || '/'}${urlObj.search || ''}`;
+      } catch {
+        // Keep the table metadata fallback.
+      }
+    }
+
+    return `${method} ${path || '/'} HTTP/1.1\nHost: ${host}\n\n`;
+  }
+
   function addRepeaterTabFromEventPayload(
     payload: { sourceItem: ProxyHistoryItem } 
   ): string { 
     const { sourceItem } = payload;
-    const requestContent = sourceItem.request;
+    const requestContent = buildRawRequestFromProxyItem(sourceItem);
     const baseName = `# ${sourceItem.id})`; 
     const initialColor = '#4f46e5';
 

@@ -78,6 +78,17 @@ const handleMCPStarted = (event: any) => {
   }
 };
 
+const handleDesktopProjectOpened = async () => {
+  if (router.currentRoute.value.path !== '/app/project') {
+    await router.push('/app/project');
+  }
+};
+
+const handleDesktopProjectOpenFailed = (event: any) => {
+  const data = event?.data;
+  showGlobalNotification(data?.error || '项目打开失败', 'error');
+};
+
 // 处理版本更新事件
 const handleUpdateAvailable = (event: any) => {
   const data = event.data;
@@ -117,6 +128,8 @@ onMounted(async () => {
   // 注册 Wails 后端事件监听器
   Events.On("ProxyStarted", handleProxyStarted);
   Events.On("MCPStarted", handleMCPStarted);
+  Events.On("DesktopProjectOpened", handleDesktopProjectOpened);
+  Events.On("DesktopProjectOpenFailed", handleDesktopProjectOpenFailed);
   Events.On("UpdateAvailable", handleUpdateAvailable);
 
   // 注册 eventBus 事件监听器
@@ -160,6 +173,8 @@ onUnmounted(() => {
   // 取消注册 Wails 后端事件监听器
   Events.Off("ProxyStarted");
   Events.Off("MCPStarted");
+  Events.Off("DesktopProjectOpened");
+  Events.Off("DesktopProjectOpenFailed");
   Events.Off("UpdateAvailable");
 
   // 取消注册 eventBus 事件监听器

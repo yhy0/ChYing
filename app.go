@@ -11,6 +11,7 @@ import (
 	"github.com/yhy0/ChYing/conf"
 	"github.com/yhy0/ChYing/conf/file"
 	JieConf "github.com/yhy0/ChYing/pkg/Jie/conf"
+	"github.com/yhy0/ChYing/pkg/desktop"
 	"github.com/yhy0/logging"
 )
 
@@ -39,6 +40,19 @@ import (
 // App 应用主结构体
 type App struct {
 	apiManager *api.APIManager // API管理器
+
+	desktopRuntimeOnce    sync.Once
+	desktopControllerOnce sync.Once
+	desktopRequests       chan []string
+	projectOpenMu         sync.Mutex
+	runtimeMu             sync.RWMutex
+	runtimeState          desktop.RuntimeState
+}
+
+func NewApp() *App {
+	app := &App{}
+	app.ensureDesktopRuntime()
+	return app
 }
 
 // Result 统一返回结果结构体
@@ -190,4 +204,3 @@ func init() {
 		})
 	}
 }
-

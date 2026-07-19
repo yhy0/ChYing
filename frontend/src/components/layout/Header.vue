@@ -202,22 +202,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-900 shadow-sm">
-    <div class="flex items-center">
-      <h1 class="text-base font-medium text-gray-800 dark:text-gray-100">{{ moduleInfo.title }}</h1>
-      <div class="h-3.5 mx-2 border-r border-gray-200 dark:border-gray-700"></div>
-      <p class="text-xs text-gray-500 dark:text-gray-400">{{ moduleInfo.description }}</p>
+  <header class="app-header">
+    <div class="header-title-group">
+      <h1 class="header-title">{{ moduleInfo.title }}</h1>
+      <div class="header-divider"></div>
+      <p class="header-description">{{ moduleInfo.description }}</p>
     </div>
-    <div class="flex items-center space-x-2">
+    <div class="header-actions">
 
       <!-- Claude AI Agent 按钮 -->
       <div class="tooltip-container">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          class="btn btn-icon btn-icon-sm"
           @click="openClaudeAgent"
           :aria-label="t('common.ui.claudeAgent')"
         >
-          <i class="bx bx-bot text-base flex items-center justify-center w-5 h-5"></i>
+          <i class="bx bx-bot"></i>
         </button>
         <span class="tooltip-text tooltip-bottom">{{ t('common.ui.claudeAgent') }}</span>
       </div>
@@ -225,11 +225,11 @@ onMounted(() => {
       <!-- 新增启动Chrome浏览器按钮 -->
       <div class="tooltip-container">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          class="btn btn-icon btn-icon-sm"
           @click="openChromeModal"
           :aria-label="t('common.ui.launchChrome')"
         >
-          <i class="bx bx-globe text-base flex items-center justify-center w-5 h-5"></i>
+          <i class="bx bx-globe"></i>
         </button>
         <span class="tooltip-text tooltip-bottom">{{ t('common.ui.launchChrome') }}</span>
       </div>
@@ -237,11 +237,11 @@ onMounted(() => {
       <!-- 打开配置目录按钮 -->
       <div class="tooltip-container">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          class="btn btn-icon btn-icon-sm"
           @click="openConfigDirectory"
           :aria-label="t('common.ui.openConfigDir')"
         >
-          <i class="bx bx-folder-open text-base flex items-center justify-center w-5 h-5"></i>
+          <i class="bx bx-folder-open"></i>
         </button>
         <span class="tooltip-text tooltip-bottom">{{ t('common.ui.openConfigDir') }}</span>
       </div>
@@ -249,15 +249,15 @@ onMounted(() => {
       <!-- 通知按钮 -->
       <div class="tooltip-container overflow-visible">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 relative notification-btn"
+          class="btn btn-icon btn-icon-sm notification-btn"
           @click="toggleNotifications"
           :aria-label="t('common.ui.notifications')"
         >
-          <i class="bx bx-bell text-base flex items-center justify-center w-5 h-5"></i>
+          <i class="bx bx-bell"></i>
           <!-- 未读消息数量 -->
           <span
             v-if="unreadCount > 0"
-            class="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-medium flex items-center justify-center pointer-events-none"
+            class="notification-count"
           >
             {{ unreadCount > 9 ? '9+' : unreadCount }}
           </span>
@@ -268,11 +268,11 @@ onMounted(() => {
       <!-- Language Toggle -->
       <div class="tooltip-container">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          class="btn btn-icon btn-icon-sm"
           @click="toggleLanguage"
           :aria-label="language === 'en' ? t('common.language.switch_to_zh') : t('common.language.switch_to_en')"
         >
-          <span class="bx text-base flex items-center justify-center w-5 h-5">{{ language === 'en' ? '🇺🇸' : '🇨🇳' }}</span>
+          <span class="language-glyph">{{ language === 'en' ? '🇺🇸' : '🇨🇳' }}</span>
         </button>
         <span class="tooltip-text tooltip-bottom">{{ language === 'en' ? t('common.language.switch_to_zh') : t('common.language.switch_to_en') }}</span>
       </div>
@@ -280,76 +280,147 @@ onMounted(() => {
       <!-- Theme Toggle -->
       <div class="tooltip-container">
         <button
-          class="btn p-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+          class="btn btn-icon btn-icon-sm"
           @click="toggleTheme"
           :aria-label="getThemeButtonTitle()"
         >
-          <i class="bx text-base flex items-center justify-center w-5 h-5" :class="getThemeIcon()"></i>
+          <i class="bx" :class="getThemeIcon()"></i>
         </button>
         <span class="tooltip-text tooltip-bottom">{{ getThemeButtonTitle() }}</span>
       </div>
     </div>
   </header>
 
-      <!-- Chrome浏览器配置弹窗 -->
-      <div v-if="showChromeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-          <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('layout.header.chrome_dialog_title') }}</h3>
-            <button 
-              @click="showChromeModal = false" 
-              class="btn btn-icon text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 w-6 h-6"
-              :disabled="isLaunchingBrowser"
-            >
-              <i class="bx bx-x"></i>
-            </button>
-          </div>
-          <div class="p-5">
-            <div class="mb-5">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                代理地址
-              </label>
-              <input 
-                v-model="proxyUrl" 
-                type="text" 
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-gray-100"
-                placeholder="http://127.0.0.1:9080"
-                spellcheck="false"
-              />
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Chrome将使用此代理地址并添加 --ignore-certificate-errors 参数启动
-              </p>
-            </div>
-            
-            <div class="flex justify-end space-x-3">
-              <button 
-                @click="showChromeModal = false" 
-                class="btn btn-secondary px-4 py-2 text-sm"
-                :disabled="isLaunchingBrowser"
-              >
-                取消
-              </button>
-              <button 
-                @click="launchChrome" 
-                class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm"
-                :disabled="isLaunchingBrowser"
-              >
-                <i class="bx bx-loader bx-spin mr-1" v-if="isLaunchingBrowser"></i>
-                {{ isLaunchingBrowser ? t('layout.header.launching') : t('layout.header.launch_chrome') }}
-              </button>
-            </div>
-          </div>
+  <!-- Chrome浏览器配置弹窗 -->
+  <div
+    v-if="showChromeModal"
+    class="dialog-overlay"
+    role="dialog"
+    aria-modal="true"
+    :aria-label="t('layout.header.chrome_dialog_title')"
+    @keydown.esc="showChromeModal = false"
+  >
+    <div class="dialog-container dialog-sm" @click.stop>
+      <div class="dialog-header">
+        <h3 class="dialog-title">{{ t('layout.header.chrome_dialog_title') }}</h3>
+        <button
+          @click="showChromeModal = false"
+          class="btn btn-icon btn-icon-xs"
+          :disabled="isLaunchingBrowser"
+          :aria-label="t('common.actions.close')"
+        >
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+      <div class="dialog-content">
+        <div class="form-field">
+          <label class="form-label" for="chrome-proxy-url">代理地址</label>
+          <input
+            id="chrome-proxy-url"
+            v-model="proxyUrl"
+            type="text"
+            class="form-input"
+            placeholder="http://127.0.0.1:9080"
+            spellcheck="false"
+          />
+          <p class="field-hint">Chrome将使用此代理地址并添加 --ignore-certificate-errors 参数启动</p>
         </div>
       </div>
+      <div class="dialog-footer">
+        <button
+          @click="showChromeModal = false"
+          class="btn btn-secondary btn-sm"
+          :disabled="isLaunchingBrowser"
+        >
+          取消
+        </button>
+        <button
+          @click="launchChrome"
+          class="btn btn-primary btn-sm"
+          :disabled="isLaunchingBrowser"
+        >
+          <i class="bx bx-loader bx-spin" v-if="isLaunchingBrowser"></i>
+          {{ isLaunchingBrowser ? t('layout.header.launching') : t('layout.header.launch_chrome') }}
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+.app-header {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-title-group {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.header-divider {
+  width: 1px;
+  height: 0.875rem;
+  background: var(--color-border);
+}
+
+.header-description {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .notification-btn {
+  position: relative;
   overflow: visible !important;
+}
+
+.notification-count {
+  position: absolute;
+  top: -0.375rem;
+  right: -0.375rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: var(--color-primary-text);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1rem;
+  pointer-events: none;
+}
+
+.language-glyph {
+  font-size: 0.875rem;
+  line-height: 1;
 }
 </style> 

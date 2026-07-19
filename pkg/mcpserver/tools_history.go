@@ -22,6 +22,8 @@ type historyItem struct {
 	Extension string `json:"extension"`
 	Title     string `json:"title"`
 	IP        string `json:"ip"`
+	ProjectID string `json:"project_id"`
+	SessionID string `json:"session_id"`
 }
 
 func convertHistory(h *db.HTTPHistory) historyItem {
@@ -38,6 +40,8 @@ func convertHistory(h *db.HTTPHistory) historyItem {
 		Extension: h.Extension,
 		Title:     h.Title,
 		IP:        h.IP,
+		ProjectID: h.ProjectID,
+		SessionID: h.SessionID,
 	}
 }
 
@@ -58,6 +62,9 @@ func getHttpHistoryTool() mcp.Tool {
 		mcp.WithString("session_id",
 			mcp.Description("Optional: filter by scan session ID"),
 		),
+		mcp.WithBoolean("include_unattributed",
+			mcp.Description("Include rows from this project database that have no session attribution, restricted to the registered session targets; no HTTP header is injected"),
+		),
 	)
 }
 
@@ -66,6 +73,7 @@ func handleGetHttpHistory(ctx context.Context, req mcp.CallToolRequest) (*mcp.Ca
 	limit := req.GetInt("limit", 50)
 	offset := req.GetInt("offset", 0)
 	sessionID := req.GetString("session_id", "")
+	includeUnattributed := req.GetBool("include_unattributed", false)
 
 	if limit > 500 {
 		limit = 500
@@ -78,7 +86,21 @@ func handleGetHttpHistory(ctx context.Context, req mcp.CallToolRequest) (*mcp.Ca
 		source = ""
 	}
 
-	histories, err := db.GetAllHistory(db.CurrentProjectName, source, limit, offset, sessionID)
+	var histories []*db.HTTPHistory
+	var err error
+	if includeUnattributed {
+		projectID, _, attributionErr := sessionAttribution(sessionID)
+		if attributionErr != nil || sessionID == "" {
+			return errorResult("include_unattributed requires an active session_id"), nil
+		}
+		session, ok := GetSession(sessionID)
+		if !ok {
+			return errorResult("session not found: %s", sessionID), nil
+		}
+		histories, err = db.GetSessionHistory(projectID, source, sessionID, session.Targets, true, limit, offset)
+	} else {
+		histories, err = db.GetAllHistory(db.CurrentProjectName, source, limit, offset, sessionID)
+	}
 	if err != nil {
 		return errorResult("failed to get history: %v", err), nil
 	}
@@ -120,11 +142,11 @@ func handleGetTrafficByHost(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 		return errorResult("host is required"), nil
 	}
 
-	// TODO: db.GetHistory does not support session_id filtering yet.
-	// Once supported, pass sessionID to filter results at the DB level.
-	_ = req.GetString("session_id", "")
-
-	histories := db.GetHistory([]string{host})
+	sessionID := req.GetString("session_id", "")
+	histories, queryErr := db.GetHistoryByHost(db.CurrentProjectName, []string{host}, sessionID)
+	if queryErr != nil {
+		return errorResult("failed to get traffic by host: %v", queryErr), nil
+	}
 
 	// 构建排除扩展名集合
 	excludeExts := make(map[string]bool)

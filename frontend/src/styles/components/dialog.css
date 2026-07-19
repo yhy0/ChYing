@@ -31,6 +31,8 @@
   max-height: 90vh;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   transition: var(--glass-transition-normal);
   animation: dialog-slide-up 0.3s ease-out;
 }
@@ -54,11 +56,23 @@
 
 /* 对话框头部 */
 .dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--glass-border);
   background: var(--glass-bg-secondary);
   backdrop-filter: var(--glass-blur-light);
   -webkit-backdrop-filter: var(--glass-blur-light);
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
 }
 
 /* 对话框内容 */
@@ -78,6 +92,66 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.modal-overlay,
+.form-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+
+.modal-content,
+.form-content {
+  width: min(90vw, 42rem);
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--glass-radius-lg);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.modal-header,
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--glass-bg-secondary);
+  border-color: var(--glass-border);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--glass-border);
+  justify-content: flex-end;
+}
+
+.modal-body,
+.form-body {
+  padding: 1.25rem;
+  overflow-y: auto;
 }
 
 /* 对话框动画 */

@@ -20,7 +20,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.8.0
 	github.com/iancoleman/orderedmap v0.3.0
-	github.com/imroc/req/v3 v3.57.0
+	github.com/imroc/req/v3 v3.59.0
 	github.com/ipinfo/go/v2 v2.10.0
 	github.com/klauspost/compress v1.18.4
 	github.com/logrusorgru/aurora v2.0.3+incompatible
@@ -215,7 +215,7 @@ require (
 	github.com/projectdiscovery/roundrobin v0.0.6 // indirect
 	github.com/projectdiscovery/tinydns v0.0.106 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/quic-go/quic-go v0.59.0 // indirect
+	github.com/quic-go/quic-go v0.60.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
 	github.com/refraction-networking/utls v1.8.2 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
@@ -293,9 +293,6 @@ replace github.com/projectdiscovery/wappalyzergo v0.1.23 => github.com/yhy0/wapp
 
 // 解决 zcrypto 版本冲突 - projectdiscovery/utils@v0.8.0 需要旧版 zcrypto
 replace github.com/zmap/zcrypto => github.com/zmap/zcrypto v0.0.0-20230422215203-9a665e1e9968
-
-// 解决 quic-go 版本冲突 - imroc/req/v3@v3.57.0 需要 quic-go v0.57.1
-replace github.com/quic-go/quic-go => github.com/quic-go/quic-go v0.57.1
 
 // 解决 fetchup 版本冲突 - go-rod/rod 需要旧版 fetchup
 replace github.com/ysmood/fetchup => github.com/ysmood/fetchup v0.2.3

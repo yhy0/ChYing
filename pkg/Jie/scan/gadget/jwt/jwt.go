@@ -8,7 +8,7 @@ import (
     "encoding/base64"
     "encoding/hex"
     "errors"
-    "github.com/golang-jwt/jwt"
+    "github.com/golang-jwt/jwt/v5"
     "github.com/yhy0/ChYing/pkg/Jie/pkg/util"
     "github.com/yhy0/sizedwaitgroup"
     "strings"
@@ -47,7 +47,7 @@ type Jwt struct {
 
 // Claims defines the struct containing the token claims.
 type Claims struct {
-    jwt.StandardClaims
+    jwt.RegisteredClaims
 }
 
 var Twj *Jwt

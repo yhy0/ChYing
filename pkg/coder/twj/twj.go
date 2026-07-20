@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/yhy0/ChYing/conf/file"
 	"github.com/yhy0/logging"
 )
@@ -25,7 +25,7 @@ import (
 
 // Claims defines the struct containing the token claims.
 type Claims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 var Percentage chan float64

@@ -387,6 +387,13 @@ func (a *App) StepInitializationComplete() Result {
 	if mcpPort <= 0 {
 		mcpPort = 9090
 	}
+	// 注入事件桥接：MCP 工具（pin_to_repeater 等）通过它把事件抛给 Wails 前端。
+	// pkg/mcpserver 无法访问 main 包的 wailsApp，故在此注入闭包。
+	mcpserver.EmitEvent = func(event string, data any) {
+		if wailsApp != nil {
+			wailsApp.Event.Emit(event, data)
+		}
+	}
 	mcpAddr, mcpErr := mcpserver.StartHTTPServer(mcpPort)
 	if mcpErr != nil {
 		logging.Logger.Warnf("MCP Server 启动失败: %v", mcpErr)

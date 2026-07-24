@@ -22,12 +22,14 @@ const props = defineProps<{
   hideEmptyResponse?: boolean; // 是否隐藏空响应
   uuid?: string; // 请求/响应的唯一标识符
   serverDurationMs: number;
+  notes?: string; // 笔记内容，父组件传入则走持久化路径
 }>();
 
 // 定义组件事件
 const emit = defineEmits<{
   (e: 'update:requestData', data: string): void;
   (e: 'update:responseData', data: string): void;
+  (e: 'update:notes', value: string): void;
 }>();
 
 // 编辑器引用
@@ -252,18 +254,23 @@ const stopPanelResize = () => {
   document.body.classList.remove('cursor-ew-resize');
 };
 
-// 笔记内容 - 根据UUID存储不同请求的笔记
+// 笔记内容 - 父组件通过 notes prop 接管时走持久化路径（emit 上抛由父组件落库）；
+// 否则回退到本地按 uuid 缓存，保持对未接 notes 的消费者（如 Proxy）不回归。
 const notesContent = ref<Record<string, string>>({});
 
 // 获取当前请求的笔记内容
 const currentNotes = computed({
   get: () => {
+    if (props.notes !== undefined) {
+      return props.notes;
+    }
     const requestId = props.uuid || 'default';
     return notesContent.value[requestId] || '';
   },
   set: (value: string) => {
     const requestId = props.uuid || 'default';
     notesContent.value[requestId] = value;
+    emit('update:notes', value);
   }
 });
 
@@ -271,6 +278,9 @@ const currentNotes = computed({
 const updateNotes = (value: string) => {
   currentNotes.value = value;
 };
+
+// 当前请求是否有笔记内容（驱动 Notes 按钮高亮，让用户一眼看出哪个 tab 有 note）
+const hasNotes = computed(() => (currentNotes.value || '').trim().length > 0);
 
 // 使用Inspector面板状态管理 - 根据UUID存储不同请求的展开状态
 const expandedSectionsStore = ref<Record<string, Record<string, boolean>>>({});
@@ -509,8 +519,9 @@ const toggleResponseWordWrap = () => {
     </div>
 
     <!-- 功能模块栏 -->
-    <FunctionModulesBar 
+    <FunctionModulesBar
       :active-module="activeModule"
+      :has-notes="hasNotes"
       @toggle-module="toggleModule"
     />
 

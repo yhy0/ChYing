@@ -8,6 +8,7 @@ export interface RepeaterTab {
   groupId: string | null;
   request: string;
   response: string | null;
+  note?: string;
   isActive: boolean;
   isRunning: boolean;
   modified: boolean;

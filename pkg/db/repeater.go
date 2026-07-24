@@ -15,6 +15,7 @@ type RepeaterTab struct {
 	GroupID          string `json:"group_id"`
 	Request          string `json:"request"`
 	Response         string `json:"response"`
+	Note             string `json:"note"`
 	Method           string `json:"method"`
 	URL              string `json:"url"`
 	SortOrder        int    `json:"sort_order"`

@@ -113,6 +113,20 @@ const handleSendToRepeater = (payload: { sourceItem: import('./types').ProxyHist
   }
 };
 
+// MCP pin_to_repeater 工具经 Wails 事件抛来的钉选请求：直接建带标题/note 的 Repeater 标签页
+// Wails v3 事件回调接收 WailsEvent 对象，实际数据在 event.data 中
+const handleRepeaterTabPinned = (event: any) => {
+  const payload = event?.data;
+  if (!payload || !payload.name || !payload.request) {
+    console.warn('RepeaterTabPinned event received with invalid data', payload);
+    return;
+  }
+  const newTabId = store.addRepeaterTabFromPin(payload);
+  if (newTabId) {
+    router.push('/app/repeater');
+  }
+};
+
 const handleSendToIntruder = (payload: { sourceItem: import('./types').ProxyHistoryItem | import('./types').RepeaterTab }) => {
   const newTabId = store.addIntruderTabFromEventPayload(payload);
   if (newTabId) {
@@ -128,6 +142,7 @@ onMounted(async () => {
   // 注册 Wails 后端事件监听器
   Events.On("ProxyStarted", handleProxyStarted);
   Events.On("MCPStarted", handleMCPStarted);
+  Events.On("RepeaterTabPinned", handleRepeaterTabPinned);
   Events.On("DesktopProjectOpened", handleDesktopProjectOpened);
   Events.On("DesktopProjectOpenFailed", handleDesktopProjectOpenFailed);
   Events.On("UpdateAvailable", handleUpdateAvailable);
@@ -173,6 +188,7 @@ onUnmounted(() => {
   // 取消注册 Wails 后端事件监听器
   Events.Off("ProxyStarted");
   Events.Off("MCPStarted");
+  Events.Off("RepeaterTabPinned");
   Events.Off("DesktopProjectOpened");
   Events.Off("DesktopProjectOpenFailed");
   Events.Off("UpdateAvailable");

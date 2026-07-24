@@ -32,6 +32,7 @@ func NewChYingMCPServer() *server.MCPServer {
 
 	// 主动测试类工具
 	s.AddTool(sendRequestTool(), handleSendRequest)
+	s.AddTool(pinToRepeaterTool(), handlePinToRepeater)
 	s.AddTool(runIntruderTool(), handleRunIntruder)
 
 	// 工具类

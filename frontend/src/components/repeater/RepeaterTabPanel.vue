@@ -26,6 +26,7 @@ interface RepeaterTab {
   groupId: string | null;
   request: string;
   response: string | null;
+  note?: string;
   isActive: boolean;
   modified: boolean;
   serverDurationMs: number;
@@ -41,6 +42,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update-request', data: string): void;
   (e: 'update-response', data: string | null): void;
+  (e: 'update-note', note: string): void;
   (e: 'update-history', history: RequestHistory[]): void; // 添加更新历史的事件
   (e: 'update-server-duration', duration: number): void; // 新增事件
   (e: 'update-url', url: string): void; // 新增更新 URL 的事件
@@ -484,8 +486,10 @@ onMounted(async () => {
         :serverDurationMs="tab.serverDurationMs || 0"
         :hideEmptyResponse="!tab.response"
         :uuid="tab.id"
+        :notes="tab.note || ''"
         @update:requestData="updateRequest"
         @update:responseData="updateResponse"
+        @update:notes="(v: string) => emit('update-note', v)"
         :responseReadOnly="true"
       />
     </div>

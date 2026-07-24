@@ -32,7 +32,10 @@ export const useModulesStore = defineStore('modules', () => {
   // Repeater模块状态
   const repeaterTabs = ref<RepeaterTab[]>([]);
   const repeaterTabCounter = ref(1);
-  
+  // 标记本会话是否已从 DB 加载过 Repeater tabs。首次挂载前若 pin 事件先往 store 塞了 tab，
+  // 挂载时必须先加载 DB 并合并，否则全量替换 save 会把 DB 里的旧 tab 删光。
+  const repeaterLoadedFromDb = ref(false);
+
   // Repeater分组状态（初始为空，用户可自行创建分组）
   const repeaterGroups = ref<RepeaterGroup[]>([]);
   
@@ -253,6 +256,61 @@ export const useModulesStore = defineStore('modules', () => {
     );
   }
 
+  // addRepeaterTabFromPin: 由 MCP pin_to_repeater 工具经 Wails 事件触发，
+  // 用 agent 提供的标题/note/请求/响应直接建一个 Repeater 标签页（不走 # counter 命名）。
+  // confirmed 的漏洞带红色 + 「Confirmed」分组（find-or-create）。
+  function addRepeaterTabFromPin(payload: {
+    name: string;
+    note?: string;
+    request: string;
+    response?: string;
+    method?: string;
+    url: string;
+    color: string;
+    group?: string;
+    confirmed?: boolean;
+  }): string {
+    // 解析 base URL，与 addRepeaterTabFromEventPayload 保持一致
+    let baseUrl = payload.url;
+    try {
+      const urlObj = new URL(payload.url);
+      baseUrl = `${urlObj.protocol}//${urlObj.host}`;
+    } catch {
+      // 解析失败保留原值
+    }
+
+    // find-or-create 分组
+    let groupId: string | null = null;
+    if (payload.group) {
+      const existing = repeaterGroups.value.find(g => g.name === payload.group);
+      if (existing) {
+        groupId = existing.id;
+      } else {
+        groupId = _createGroup<RepeaterGroup>(repeaterGroups, payload.group, payload.color);
+      }
+    }
+
+    return _createGenericTab<RepeaterTab>(
+      repeaterTabs,
+      repeaterTabCounter,
+      '', // 空前缀，name 由 factory 用 payload.name 覆盖
+      (id, _generatedName, isActive) => ({
+        id,
+        name: payload.name,
+        color: payload.color,
+        groupId,
+        request: payload.request,
+        response: payload.response || null,
+        note: payload.note || '',
+        isActive,
+        modified: false,
+        serverDurationMs: 0,
+        method: payload.method || 'GET',
+        url: baseUrl,
+      } as RepeaterTab)
+    );
+  }
+
   function addIntruderTabFromEventPayload(
     payload: { sourceItem: ProxyHistoryItem | RepeaterTab } 
   ): string { 
@@ -440,6 +498,7 @@ export const useModulesStore = defineStore('modules', () => {
     proxyInterceptEnabled,
     repeaterTabs,
     repeaterTabCounter,
+    repeaterLoadedFromDb,
     repeaterGroups,
     intruderTabs,
     intruderTabCounter,
@@ -476,6 +535,7 @@ export const useModulesStore = defineStore('modules', () => {
     markAllNotificationsAsRead,
     // 新增 actions
     addRepeaterTabFromEventPayload,
+    addRepeaterTabFromPin,
     addIntruderTabFromEventPayload,
   };
 });

@@ -96,6 +96,7 @@ const createTab = () => {
     groupId: null,
     request: defaultRequest,
     response: null,
+    note: '',
     isActive: true,
     isRunning: false,
     modified: false,
@@ -184,6 +185,14 @@ const updateResponseData = (tabId: string, data: string | null) => {
   }
 };
 
+// Update note in a tab
+const updateNoteData = (tabId: string, note: string) => {
+  const tab = tabs.value.find(tab => tab.id === tabId);
+  if (tab) {
+    tab.note = note;
+  }
+};
+
 // Send request to Intruder
 const sendToIntruder = () => {
   if (!activeTab.value) return;
@@ -221,6 +230,7 @@ const cloneTab = () => {
     groupId: originalGroupId,
     request: originalRequest,
     response: null, // Reset response
+    note: originalTab.note || '',
     isActive: true,
     isRunning: false,
     modified: false,
@@ -254,6 +264,7 @@ const debouncedSaveState = () => {
       group_id: tab.groupId || '',
       request: tab.request || '',
       response: tab.response || '',
+      note: tab.note || '',
       method: tab.method || 'GET',
       url: tab.url || '',
       sort_order: index,
@@ -318,20 +329,21 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 // Initialize a default tab if none exists
 onMounted(async () => {
-  // 仅在 store 中没有 tabs 时才从数据库加载（首次启动）
-  // 如果 store 已有 tabs，说明是页面切换回来或 addRepeaterTabFromEventPayload 刚添加了新 tab，
-  // 此时不能从数据库覆盖，否则会丢失未持久化的新 tab
-  if (store.repeaterTabs.length === 0) {
+  // 首次挂载必须从 DB 加载（每会话只一次）。若 pin 事件已往 store 塞了 tab，合并而非覆盖，
+  // 否则全量替换 save 会把 DB 里 store 还不知道的旧 tab 删光。
+  if (!store.repeaterLoadedFromDb) {
     try {
       const result = await LoadRepeaterState();
       if (result && !result.error && result.data) {
         const data = result.data as { tabs: any[]; groups: any[] };
+        // 合并分组：DB 有但 store 没有的补进来
         if (data.groups && data.groups.length > 0) {
-          store.repeaterGroups.splice(0, store.repeaterGroups.length, ...data.groups.map((g: any) => ({
-            id: g.id,
-            name: g.name,
-            color: g.color,
-          })));
+          const groupIds = new Set(store.repeaterGroups.map(g => g.id));
+          for (const g of data.groups) {
+            if (!groupIds.has(g.id)) {
+              store.repeaterGroups.push({ id: g.id, name: g.name, color: g.color });
+            }
+          }
         }
         if (data.tabs && data.tabs.length > 0) {
           // 找到最大的 tab 计数器（从 name 中解析 # 后面的数字）
@@ -349,6 +361,7 @@ onMounted(async () => {
               groupId: t.group_id || null,
               request: t.request || defaultRequest,
               response: t.response || null,
+              note: t.note || '',
               isActive: t.is_active || false,
               isRunning: false,
               modified: false,
@@ -359,12 +372,22 @@ onMounted(async () => {
             };
           });
 
-          // 确保至少有一个 tab 是激活的
-          if (!restoredTabs.some(tab => tab.isActive) && restoredTabs.length > 0) {
-            restoredTabs[0].isActive = true;
+          // 合并：DB 里 store 还没有的 tab 补到最前；store 已有的（pin 事件刚加的）保留 in-memory 版本
+          const inMemoryIds = new Set(store.repeaterTabs.map(t => t.id));
+          const hasActiveInMemory = store.repeaterTabs.some(tab => tab.isActive);
+          const dbTabsNotInMemory = restoredTabs.filter(t => !inMemoryIds.has(t.id));
+          if (hasActiveInMemory) {
+            // store 已有激活 tab（如刚 pin 的），合并进来的 DB tab 强制不激活，避免多 tab 同时激活
+            dbTabsNotInMemory.forEach(t => { t.isActive = false; });
+          }
+          if (dbTabsNotInMemory.length > 0) {
+            store.repeaterTabs.unshift(...dbTabsNotInMemory);
           }
 
-          store.repeaterTabs.splice(0, store.repeaterTabs.length, ...restoredTabs);
+          // 确保至少有一个 tab 是激活的
+          if (!store.repeaterTabs.some(tab => tab.isActive) && store.repeaterTabs.length > 0) {
+            store.repeaterTabs[0].isActive = true;
+          }
           if (maxCounter >= store.repeaterTabCounter) {
             store.repeaterTabCounter = maxCounter + 1;
           }
@@ -373,6 +396,7 @@ onMounted(async () => {
     } catch {
       // 加载失败时忽略，使用默认状态
     }
+    store.repeaterLoadedFromDb = true;
   }
 
   if (tabs.value.length === 0) {
@@ -380,11 +404,14 @@ onMounted(async () => {
   }
 
   loaded.value = true;
+  // 视图未挂载期间由事件（如 MCP pin_to_repeater、proxy send-to-repeater）加入 store 的 tab，
+  // 此刻 watch 尚未首次触发，补一次落库避免丢 tab。
+  debouncedSaveState();
   window.addEventListener('keydown', handleKeyDown);
 });
 
 // 监听 tabs 和 groups 变化，自动保存到数据库
-watch(() => [...tabs.value.map(t => ({ id: t.id, name: t.name, color: t.color, groupId: t.groupId, request: t.request, response: t.response, isActive: t.isActive, method: t.method, url: t.url, serverDurationMs: t.serverDurationMs }))], () => {
+watch(() => [...tabs.value.map(t => ({ id: t.id, name: t.name, color: t.color, groupId: t.groupId, request: t.request, response: t.response, note: t.note, isActive: t.isActive, method: t.method, url: t.url, serverDurationMs: t.serverDurationMs }))], () => {
   if (loaded.value) debouncedSaveState();
 }, { deep: true });
 
@@ -502,11 +529,12 @@ const closeCreateGroupModal = () => {
     
     <!-- Tab Content -->
     <div v-if="activeTab" class="flex-1 overflow-hidden">
-      <RepeaterTabPanel 
+      <RepeaterTabPanel
         :key="activeTab.id"
         :tab="activeTab"
         @update-request="updateRequestData(activeTab.id, $event)"
         @update-response="updateResponseData(activeTab.id, $event)"
+        @update-note="updateNoteData(activeTab.id, $event)"
         @update-history="updateHistory(activeTab.id, $event)"
         @update-server-duration="(duration) => activeTab && handleServerDurationUpdate(duration, activeTab.id)"
         @update-url="updateTabUrl(activeTab.id, $event)"

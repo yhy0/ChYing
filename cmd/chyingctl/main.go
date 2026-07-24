@@ -88,7 +88,7 @@ func parseOpenOptions(args []string, output io.Writer) (openOptions, error) {
 	flags := flag.NewFlagSet("open", flag.ContinueOnError)
 	flags.SetOutput(output)
 	options := openOptions{pollRate: 150 * time.Millisecond}
-	flags.StringVar(&options.project, "project", "", "要打开的本地项目名称")
+	flags.StringVar(&options.project, "project", "", "要打开的本地项目名称；省略时依附当前已就绪的项目")
 	flags.BoolVar(&options.waitMCP, "wait-mcp", true, "等待 MCP 服务就绪")
 	flags.DurationVar(&options.timeout, "timeout", defaultTimeout, "等待超时")
 	flags.BoolVar(&options.json, "json", false, "以 JSON 输出")
@@ -100,11 +100,15 @@ func parseOpenOptions(args []string, output io.Writer) (openOptions, error) {
 	if options.project == "" && flags.NArg() == 1 {
 		options.project = flags.Arg(0)
 	}
-	project, err := desktop.NormalizeProjectName(options.project)
-	if err != nil {
-		return openOptions{}, err
+	if strings.TrimSpace(options.project) != "" {
+		project, err := desktop.NormalizeProjectName(options.project)
+		if err != nil {
+			return openOptions{}, err
+		}
+		options.project = project
+	} else {
+		options.project = ""
 	}
-	options.project = project
 	if options.timeout <= 0 {
 		return openOptions{}, errors.New("--timeout 必须大于 0")
 	}
@@ -112,6 +116,9 @@ func parseOpenOptions(args []string, output io.Writer) (openOptions, error) {
 }
 
 func openProject(options openOptions) (desktop.RuntimeState, error) {
+	if options.project == "" {
+		return attachReadyProject(options.runtime)
+	}
 	appPath, err := resolveAppPath(options.appPath)
 	if err != nil {
 		return desktop.RuntimeState{}, err
@@ -127,6 +134,25 @@ func openProject(options openOptions) (desktop.RuntimeState, error) {
 		}, nil
 	}
 	return waitForProject(options.runtime, options.project, requestedAt, options.timeout, options.pollRate)
+}
+
+// attachReadyProject 依附人手动（或先前）已打开且 MCP 就绪的项目，不启动、不切换。
+func attachReadyProject(runtimePath string) (desktop.RuntimeState, error) {
+	state, err := desktop.ReadRuntimeState(runtimePath)
+	if err != nil {
+		return desktop.RuntimeState{}, errors.New("ChYing 尚未就绪：请先在桌面选择项目并点「开始」，或使用 open --project <名称>")
+	}
+	if !desktop.ProcessIsRunning(state.PID) {
+		return desktop.RuntimeState{}, errors.New("ChYing 尚未就绪：请先在桌面选择项目并点「开始」，或使用 open --project <名称>")
+	}
+	if state.Status != desktop.StatusReady || state.Project == "" || state.MCPURL == "" {
+		detail := state.Status
+		if detail == "" {
+			detail = "unknown"
+		}
+		return state, fmt.Errorf("ChYing 当前状态为 %s，无法依附；请先在桌面选择项目并点「开始」，或使用 open --project <名称>", detail)
+	}
+	return state, nil
 }
 
 func waitForProject(runtimePath string, project string, requestedAt time.Time, timeout time.Duration, pollRate time.Duration) (desktop.RuntimeState, error) {
@@ -290,5 +316,6 @@ func hasJSONFlag(args []string) bool {
 func printUsage(output io.Writer) {
 	fmt.Fprintln(output, "用法:")
 	fmt.Fprintln(output, "  chyingctl open --project <名称> --wait-mcp --json")
+	fmt.Fprintln(output, "  chyingctl open --wait-mcp --json          # 依附当前已就绪项目")
 	fmt.Fprintln(output, "  chyingctl status --json")
 }

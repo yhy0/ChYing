@@ -19,6 +19,49 @@ func TestParseOpenOptions(t *testing.T) {
 	}
 }
 
+func TestParseOpenOptionsAllowsMissingProject(t *testing.T) {
+	options, err := parseOpenOptions([]string{"--wait-mcp", "--json"}, os.Stderr)
+	if err != nil {
+		t.Fatalf("parseOpenOptions failed: %v", err)
+	}
+	if options.project != "" {
+		t.Fatalf("expected empty project, got %#v", options.project)
+	}
+}
+
+func TestAttachReadyProject(t *testing.T) {
+	runtimePath := filepath.Join(t.TempDir(), "runtime.json")
+	now := time.Now().UTC()
+	if err := desktop.WriteRuntimeState(runtimePath, desktop.RuntimeState{
+		Version: 1, Status: desktop.StatusReady, Project: "src-auto",
+		MCPURL: "http://127.0.0.1:9090/mcp", PID: os.Getpid(),
+		StartedAt: now, UpdatedAt: now,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	state, err := attachReadyProject(runtimePath)
+	if err != nil {
+		t.Fatalf("attachReadyProject failed: %v", err)
+	}
+	if state.Project != "src-auto" || state.MCPURL != "http://127.0.0.1:9090/mcp" {
+		t.Fatalf("unexpected state: %#v", state)
+	}
+}
+
+func TestAttachReadyProjectRejectsUnready(t *testing.T) {
+	runtimePath := filepath.Join(t.TempDir(), "runtime.json")
+	now := time.Now().UTC()
+	if err := desktop.WriteRuntimeState(runtimePath, desktop.RuntimeState{
+		Version: 1, Status: desktop.StatusSelecting, PID: os.Getpid(),
+		StartedAt: now, UpdatedAt: now,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := attachReadyProject(runtimePath); err == nil {
+		t.Fatal("expected attach to fail when not ready")
+	}
+}
+
 func TestWaitForProject(t *testing.T) {
 	runtimePath := filepath.Join(t.TempDir(), "runtime.json")
 	requestedAt := time.Now().UTC()

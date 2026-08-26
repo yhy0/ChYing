@@ -23,16 +23,20 @@ const (
 // RuntimeState is the local desktop readiness contract consumed by chyingctl.
 // It intentionally contains no credentials or captured traffic.
 type RuntimeState struct {
-	Version   int       `json:"version"`
-	Status    string    `json:"status"`
-	Project   string    `json:"project,omitempty"`
-	MCPURL    string    `json:"mcp_url,omitempty"`
-	PID       int       `json:"pid"`
-	Progress  int       `json:"progress,omitempty"`
-	Message   string    `json:"message,omitempty"`
-	Error     string    `json:"error,omitempty"`
-	StartedAt time.Time `json:"started_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Version     int       `json:"version"`
+	Status      string    `json:"status"`
+	Project     string    `json:"project,omitempty"`
+	MCPURL      string    `json:"mcp_url,omitempty"`
+	ProxyAddr   string    `json:"proxy_addr,omitempty"`
+	CaCert      string    `json:"ca_cert,omitempty"`
+	CaInstalled bool      `json:"ca_installed,omitempty"`
+	CaMessage   string    `json:"ca_message,omitempty"`
+	PID         int       `json:"pid"`
+	Progress    int       `json:"progress,omitempty"`
+	Message     string    `json:"message,omitempty"`
+	Error       string    `json:"error,omitempty"`
+	StartedAt   time.Time `json:"started_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func RuntimeFilePath() string {

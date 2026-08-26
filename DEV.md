@@ -21,6 +21,64 @@ go install
 如果执行 wails3 失败，则需要看 go 的 bin 目录是否已经加入到环境变量 GOPATH
 还需要 npm 环境
 
+Go 1.25+，编译必须 `CGO_ENABLED=1`（`go-sqlite3`）。关掉 CGO 能编过，跑起来会崩。
+
+## Linux 编译
+
+Linux 有两条产物，不要混：
+
+| 产物 | 干什么 | 无桌面（无 DISPLAY）能不能用 |
+|------|--------|------------------------------|
+| `ChYing` 本体 | Wails GUI | 不能。还要 node/pnpm、wails3、gtk/webkit |
+| `chying-cli` | 代理 + 被动扫描 + MCP，写 `runtime.json` | **用这个** |
+
+`go.mod` 的 `replace github.com/wailsapp/wails/v3 => ../wails/v3` 对 CLI 也生效，**wails 源码必须和 ChYing 同级**，即使 CLI 不链 GUI。
+
+### 无桌面：只编 chying-cli
+
+依赖：Go 1.25+、`gcc`、`libc6-dev`（Ubuntu: `sudo apt-get install -y build-essential`）。不需要 node / wails3 / webkit。
+
+```bash
+# Go 若不在 PATH（例如装在 /usr/local/go）
+export PATH=/usr/local/go/bin:$PATH
+
+cd /path/to/ChYing
+mkdir -p bin
+CGO_ENABLED=1 go build -trimpath -buildvcs=false -ldflags="-w -s" \
+  -o bin/chying-cli ./cmd/chying-cli
+
+# 给 TaiE / PATH 用
+sudo install -m 0755 bin/chying-cli /usr/local/bin/chying-cli
+chying-cli version
+```
+
+启动（项目名按实际改；MCP 默认 `127.0.0.1:9090/mcp`，代理默认 `9080`）：
+
+```bash
+chying-cli serve --project src --bind 127.0.0.1 --quiet
+```
+
+就绪后写入 `~/.config/ChYing/runtime.json`（`status=ready`、`mcp_url`、`pid`）。Ctrl+C 会写成 `stopped`。
+
+`chying_send_request` 走 MCP，不走 9080。9080 是给浏览器 / `curl -x` 做被动扫描的。HTTPS 被动扫描需要本机信任 MITM CA：
+
+```bash
+sudo apt-get install -y libnss3-tools   # certutil，装进用户 NSS 库
+chying-cli cert install                 # 或 serve 默认 --install-ca
+# CA 文件：~/.config/ChYing/proxify_data/cacert.pem
+```
+
+不要在无桌面机器上跑 `wails3 task linux:build` / `linux:package`，缺前端和 webkit，编的也是 GUI。
+
+### 有桌面：编 GUI
+
+```bash
+wails3 task linux:build      # 开发构建，产出 bin/ChYing 和 bin/chying-cli
+wails3 task linux:package    # 再生产 AppImage / deb / rpm
+```
+
+`linux:build` 会先编前端再 `go build` 两个二进制，需要 pnpm 和 wails3。
+
 ## Windows 本地开发环境要求
 
 本项目依赖 CGO（go-sqlite3、tree-sitter-javascript 等），Windows 本地开发需要安装 MinGW：

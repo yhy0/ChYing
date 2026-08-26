@@ -19,6 +19,8 @@ release: "1"
 contents:
   - src: "./bin/chying"
     dst: "/usr/local/bin/chying"
+  - src: "./bin/chying-cli"
+    dst: "/usr/local/bin/chying-cli"
   - src: "./build/appicon.png"
     dst: "/usr/share/icons/hicolor/128x128/apps/chying.png"
   - src: "./build/linux/chying.desktop"

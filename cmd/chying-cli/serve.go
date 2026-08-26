@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -16,7 +17,9 @@ import (
 	JieConf "github.com/yhy0/ChYing/pkg/Jie/conf"
 	"github.com/yhy0/ChYing/pkg/Jie/pkg/mode"
 	"github.com/yhy0/ChYing/pkg/Jie/pkg/output"
+	"github.com/yhy0/ChYing/pkg/Jie/pkg/protocols/httpx"
 	"github.com/yhy0/ChYing/pkg/db"
+	"github.com/yhy0/ChYing/pkg/desktop"
 	"github.com/yhy0/ChYing/pkg/mcpserver"
 	"github.com/yhy0/logging"
 )
@@ -27,6 +30,7 @@ var (
 	bindAddr  string
 	project   string
 	quiet     bool
+	installCA bool
 )
 
 var serveCmd = &cobra.Command{
@@ -42,9 +46,20 @@ func init() {
 	serveCmd.Flags().StringVar(&bindAddr, "bind", "127.0.0.1", "监听地址 (Docker 场景用 0.0.0.0)")
 	serveCmd.Flags().StringVar(&project, "project", "default", "项目名称")
 	serveCmd.Flags().BoolVar(&quiet, "quiet", false, "静默模式，不输出流量和漏洞到终端")
+	serveCmd.Flags().BoolVar(&installCA, "install-ca", true, "启动后尝试把 MITM CA 写入本机用户/系统信任库")
 }
 
 func runServe(cmd *cobra.Command, args []string) error {
+	normalized, err := desktop.NormalizeProjectName(project)
+	if err != nil {
+		return err
+	}
+	project = normalized
+	if err := desktop.AssertCanServeProject(project); err != nil {
+		return err
+	}
+	desktop.WriteOpeningState(project)
+
 	// 1. 日志初始化
 	logging.Logger = logging.New(true, file.ChyingDir, "ChYing-CLI", true)
 	logging.Logger.Infoln("Starting ChYing CLI...")
@@ -94,16 +109,34 @@ func runServe(cmd *cobra.Command, args []string) error {
 
 	printStatus("Proxy listening on %s:%d", bindAddr, proxyPort)
 
+	caPath := filepath.Join(file.ChyingDir, "proxify_data", "cacert.pem")
+	waitForFile(caPath, 8*time.Second)
+	ca := desktop.CAInstallResult{Message: "未尝试安装 CA"}
+	if installCA {
+		ca = desktop.InstallCACertificate(caPath)
+		printStatus("CA %s", ca.Message)
+	}
+
 	// 10. 启动 MCP Server
 	mcpAddr, mcpErr := mcpserver.StartHTTPServer(mcpPort, bindAddr)
 	if mcpErr != nil {
+		desktop.WriteFailedState(project, mcpErr.Error())
 		return fmt.Errorf("MCP server 启动失败: %w", mcpErr)
 	}
-	printStatus("MCP server on %s/mcp", mcpAddr)
+	mcpURL := desktop.LocalhostServiceURL(mcpAddr) + "/mcp"
+	proxyAddr := fmt.Sprintf("%s:%d", bindAddr, proxyPort)
+	if bindAddr == "0.0.0.0" || bindAddr == "::" {
+		proxyAddr = fmt.Sprintf("127.0.0.1:%d", proxyPort)
+	}
+	if err := desktop.WriteReadyState(project, mcpURL, proxyAddr, caPath, ca); err != nil {
+		return fmt.Errorf("写入 runtime.json 失败: %w", err)
+	}
+	printStatus("MCP server on %s", mcpURL)
 
 	// 11. 事件循环
 	go cliEventNotification(pool)
 	go cliVulnLoop()
+	go drainRequestScanMsgs()
 
 	printStatus("ChYing CLI ready. Press Ctrl+C to stop.")
 
@@ -113,7 +146,25 @@ func runServe(cmd *cobra.Command, args []string) error {
 	<-sigChan
 
 	printStatus("Shutting down...")
+	desktop.WriteStoppedState()
 	return nil
+}
+
+// drainRequestScanMsgs CLI 没有 Wails 前端消费 RequestScanMsgChannel。
+// 桌面版由 EventNotification 转发；这里丢掉即可，避免缓冲写满后 Repeater 再丢消息。
+func drainRequestScanMsgs() {
+	for range httpx.RequestScanMsgChannel {
+	}
+}
+
+func waitForFile(path string, timeout time.Duration) {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		if info, err := os.Stat(path); err == nil && info.Size() > 0 {
+			return
+		}
+		time.Sleep(150 * time.Millisecond)
+	}
 }
 
 // cliEventNotification 消费代理事件，入库

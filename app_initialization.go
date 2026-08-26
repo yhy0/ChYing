@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	JieConf "github.com/yhy0/ChYing/pkg/Jie/conf"
 	"github.com/yhy0/ChYing/pkg/Jie/pkg/mode"
 	"github.com/yhy0/ChYing/pkg/db"
+	"github.com/yhy0/ChYing/pkg/desktop"
 	"github.com/yhy0/ChYing/pkg/mcpserver"
 	"github.com/yhy0/ChYing/pkg/qqwry"
 	"github.com/yhy0/ChYing/pkg/utils"
@@ -406,7 +408,13 @@ func (a *App) StepInitializationComplete() Result {
 		}
 	} else {
 		logging.Logger.Infof("MCP Server 已启动，监听地址: %s", mcpAddr)
-		a.markDesktopProjectReady(db.CurrentProjectName, fmt.Sprintf("http://%s/mcp", mcpAddr))
+		mcpURL := desktop.LocalhostServiceURL(mcpAddr) + "/mcp"
+		caPath := filepath.Join(file.ChyingDir, "proxify_data", "cacert.pem")
+		a.markDesktopProjectReady(db.CurrentProjectName, mcpURL)
+		state := a.currentDesktopState()
+		state.ProxyAddr = fmt.Sprintf("%s:%d", conf.ProxyHost, conf.ProxyPort)
+		state.CaCert = caPath
+		a.setAndPublishDesktopState(state)
 		if wailsApp != nil {
 			wailsApp.Event.Emit("MCPStarted", map[string]interface{}{
 				"success": true,

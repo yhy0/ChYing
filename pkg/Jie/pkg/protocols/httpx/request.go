@@ -31,8 +31,10 @@ import (
 **/
 
 var (
-	HTTPBodyMap           sync.Map
-	RequestScanMsgChannel = make(chan RequestScanMsg)
+	HTTPBodyMap sync.Map
+	// 带缓冲：桌面 EventNotification 会消费；chying-cli serve 没有前端订阅方。
+	// 无缓冲时 CLI 的 send_request 会在第一次 recordRequestScanMsg 永久卡住。
+	RequestScanMsgChannel = make(chan RequestScanMsg, 1024)
 
 	HistoryItemIDGenerator atomic.Int64
 )
@@ -113,10 +115,14 @@ func (c *Client) Basic(target string, method string, body string, header map[str
 	return c.Request(target, method, body, header, moduleName)
 }
 
-// recordRequestScanMsg 记录请求扫描消息，发送到通道供前端监控
+// recordRequestScanMsg 记录请求扫描消息，发送到通道供前端监控。
+// 必须非阻塞：CLI / 无前端订阅时不能让 Repeater、MCP send_request 卡死。
 func recordRequestScanMsg(httpMsg RequestScanMsg) {
-	// 非阻塞发送，防止通道满时阻塞请求处理
-	RequestScanMsgChannel <- httpMsg
+	select {
+	case RequestScanMsgChannel <- httpMsg:
+	default:
+		logging.Logger.Warnf("RequestScanMsgChannel full, dropping scan msg: %s", httpMsg.Target)
+	}
 	logging.Logger.Debugf("RequestScanMsg recorded: %s [%s] from module: %s", httpMsg.Target, httpMsg.Method, httpMsg.ModuleName)
 }
 

@@ -25,6 +25,7 @@ var versionCmd = &cobra.Command{
 func main() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(serveCmd)
+	rootCmd.AddCommand(certCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)

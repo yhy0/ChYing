@@ -8,10 +8,9 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## 开发环境要求
 
-- Go 1.25+，CGO_ENABLED=1（go-sqlite3 依赖 CGO）
-- Node.js + npm
-- wails3 CLI（v3 代码已并入 master 分支，从 master 安装：`cd wails/v3/cmd/wails3 && go install`）
-- wails 源码需与 ChYing 目录同级（go.mod 中 `replace github.com/wailsapp/wails/v3 => ../wails/v3`）
+- Go 1.26+，CGO_ENABLED=1（go-sqlite3 依赖 CGO）
+- Node.js + pnpm
+- wails3 CLI：`go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.16`（无需克隆 wails 源码）
 - Windows 需要 MinGW（CGO 编译依赖）
 
 ## 常用命令
@@ -119,7 +118,6 @@ Vue 3 + TypeScript + UnoCSS，Glassmorphism（液态玻璃）UI 风格。
 ### go.mod replace 指令
 
 修改依赖时需注意以下 replace 指令：
-- `wails/v3 => ../wails/v3` — 本地 wails 源码
 - `proxify => ./lib/proxify` — 本地修改版
 - `wappalyzergo` → 自定义 fork `yhy0/wappalyzergo`
 - `zcrypto`、`quic-go`、`fetchup` — 版本冲突修复

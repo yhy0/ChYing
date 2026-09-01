@@ -1,27 +1,17 @@
 ## 安装 wails3
 
-注意 wails 应该和 ChYing 目录在一级，也就是 ls
-...
-ChYing
-wails
-...
-
-go.mod 中是这样写的
-replace github.com/wailsapp/wails/v3 => ../wails/v3
-
-
-```azure
-git clone https://github.com/wailsapp/wails.git
-cd wails
-git checkout master
-cd v3/cmd/wails3
-go install
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.16
 ```
 
-如果执行 wails3 失败，则需要看 go 的 bin 目录是否已经加入到环境变量 GOPATH
-还需要 npm 环境
+go.mod 已固定依赖 `github.com/wailsapp/wails/v3 v3.0.0-beta.16`（从 Go proxy 拉取），
+**不再需要**把 wails 源码克隆到同级目录，go.mod 中也没有 wails 的 replace 指令。
+升级 wails 版本时：更新 go.mod 的 require 版本，并同步修改本节安装命令的版本号。
 
-Go 1.25+，编译必须 `CGO_ENABLED=1`（`go-sqlite3`）。关掉 CGO 能编过，跑起来会崩。
+如果执行 wails3 失败，则需要看 go 的 bin 目录是否已经加入到环境变量 GOPATH
+还需要 pnpm 环境
+
+Go 1.26+，编译必须 `CGO_ENABLED=1`（`go-sqlite3`）。关掉 CGO 能编过，跑起来会崩。
 
 ## Linux 编译
 
@@ -32,11 +22,11 @@ Linux 有两条产物，不要混：
 | `ChYing` 本体 | Wails GUI | 不能。还要 node/pnpm、wails3、gtk/webkit |
 | `chying-cli` | 代理 + 被动扫描 + MCP，写 `runtime.json` | **用这个** |
 
-`go.mod` 的 `replace github.com/wailsapp/wails/v3 => ../wails/v3` 对 CLI 也生效，**wails 源码必须和 ChYing 同级**，即使 CLI 不链 GUI。
+`chying-cli` 完全不依赖 wails（go.mod 已移除 wails 的 replace），无需 wails 源码即可编译。
 
 ### 无桌面：只编 chying-cli
 
-依赖：Go 1.25+、`gcc`、`libc6-dev`（Ubuntu: `sudo apt-get install -y build-essential`）。不需要 node / wails3 / webkit。
+依赖：Go 1.26+、`gcc`、`libc6-dev`（Ubuntu: `sudo apt-get install -y build-essential`）。不需要 node / wails3 / webkit。
 
 ```bash
 # Go 若不在 PATH（例如装在 /usr/local/go）

@@ -76,14 +76,15 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.27'
           cache: true
 
       - name: Install Linux Dependencies
         if: matrix.goos == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev build-essential pkg-config
+          # wails v3 beta 起 Linux 默认使用 GTK4 + webkitgtk-6.0
+          sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev build-essential pkg-config
 
       - name: Setup MinGW for Windows
         if: matrix.goos == 'windows'
@@ -100,15 +101,8 @@ jobs:
 
       - name: Install Wails
         shell: bash
-        run: |
-          # 回到 GITHUB_WORKSPACE 的父目录
-          cd ..
-          # wails 仓库与项目目录同级（v3 已并入 master 分支，v3-alpha 已删除）
-          git clone https://github.com/wailsapp/wails.git
-          cd wails
-          git checkout master
-          cd v3/cmd/wails3
-          go install
+        # wails v3 已发布到 Go proxy，直接安装固定版本，无需再克隆 wails 仓库
+        run: go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.16
 
       - name: Build
         working-directory: ${{ github.workspace }}

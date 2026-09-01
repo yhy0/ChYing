@@ -1,6 +1,6 @@
 module github.com/yhy0/ChYing
 
-go 1.25.12
+go 1.26
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
@@ -51,7 +51,7 @@ require (
 	github.com/thoas/go-funk v0.9.3
 	github.com/tree-sitter/go-tree-sitter v0.25.0
 	github.com/tree-sitter/tree-sitter-javascript v0.25.0
-	github.com/wailsapp/wails/v3 v3.0.0-alpha.59
+	github.com/wailsapp/wails/v3 v3.0.0-beta.16
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/weppos/publicsuffix-go v0.50.3-0.20260108123922-15eaa75052c0
 	github.com/yhy0/claude-agent-sdk-go v0.0.0-20260125133125-c9f120a6c28e
@@ -125,7 +125,7 @@ require (
 	github.com/go-dedup/megophone v0.0.0-20170830025436-f01be21026f5 // indirect
 	github.com/go-dedup/simhash v0.0.0-20170904020510-9ecaca7b509c // indirect
 	github.com/go-dedup/text v0.0.0-20170907015346-8bb1b95e3cb7 // indirect
-	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
+	github.com/go-json-experiment/json v0.0.0-20260820222146-c27c302e5fc3 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/goburrow/cache v0.1.4 // indirect
@@ -286,8 +286,6 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/corvus-ch/zbase32.v1 v1.0.0 // indirect
 )
-
-replace github.com/wailsapp/wails/v3 => ../wails/v3
 
 replace github.com/projectdiscovery/wappalyzergo v0.1.23 => github.com/yhy0/wappalyzergo v0.0.0-20241031145433-decbd2ce5c91
 

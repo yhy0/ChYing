@@ -39,8 +39,9 @@ jobs:
             artifact_name: ChYing-linux-arm64
             build_task: linux:build
             cli_name: ChYing-cli-linux-arm64
-          # macOS AMD64 (Intel)
-          - os: macos-15
+          # macOS AMD64 (Intel) — GitHub 的 macOS runner 均为 ARM64（macos-15 实为 arm64 镜像），
+          # 在 ARM64 上通过 ARCH 变量交叉编译出真正的 x86_64 产物
+          - os: macos-latest
             goos: darwin
             goarch: amd64
             artifact_name: ChYing-macos-amd64
@@ -114,7 +115,9 @@ jobs:
           CC: ${{ matrix.goos == 'windows' && 'gcc' || '' }}
           PRODUCTION: "true"
         run: |
-          wails3 task ${{ matrix.build_task }}
+          # 通过 ARCH 变量显式指定目标架构（Taskfile 的 env 会覆盖 GOARCH 环境变量，
+          # 之前 macOS "amd64" job 实际构建出的是宿主机 arm64 架构）
+          wails3 task ${{ matrix.build_task }} ARCH=${{ matrix.goarch }}
 
       - name: Install create-dmg
         if: matrix.goos == 'darwin'

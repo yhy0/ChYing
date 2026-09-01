@@ -103,10 +103,10 @@ jobs:
         run: |
           # 回到 GITHUB_WORKSPACE 的父目录
           cd ..
-          # wails 仓库与项目目录同级
+          # wails 仓库与项目目录同级（v3 已并入 master 分支，v3-alpha 已删除）
           git clone https://github.com/wailsapp/wails.git
           cd wails
-          git checkout v3-alpha
+          git checkout master
           cd v3/cmd/wails3
           go install
 

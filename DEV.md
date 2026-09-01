@@ -13,7 +13,7 @@ replace github.com/wailsapp/wails/v3 => ../wails/v3
 ```azure
 git clone https://github.com/wailsapp/wails.git
 cd wails
-git checkout v3-alpha
+git checkout master
 cd v3/cmd/wails3
 go install
 ```

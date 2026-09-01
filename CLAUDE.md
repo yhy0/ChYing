@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Go 1.25+，CGO_ENABLED=1（go-sqlite3 依赖 CGO）
 - Node.js + npm
-- wails3 CLI（从 wails 仓库 v3-alpha 分支安装：`cd wails/v3/cmd/wails3 && go install`）
+- wails3 CLI（v3 代码已并入 master 分支，从 master 安装：`cd wails/v3/cmd/wails3 && go install`）
 - wails 源码需与 ChYing 目录同级（go.mod 中 `replace github.com/wailsapp/wails/v3 => ../wails/v3`）
 - Windows 需要 MinGW（CGO 编译依赖）
 

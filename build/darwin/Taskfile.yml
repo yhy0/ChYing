@@ -40,6 +40,7 @@ tasks:
     cmds:
       - go build {{.BUILD_FLAGS}} -o "{{.OUTPUT}}"
       - go build {{.BUILD_FLAGS}} -o "{{.OUTPUT}}.chyingctl" ./cmd/chyingctl
+      - go build {{.BUILD_FLAGS}} -o "{{.OUTPUT}}.chying-cli" ./cmd/chying-cli
     vars:
       BUILD_FLAGS: '{{if eq .DEV "true"}}-buildvcs=false -gcflags=all="-l"{{else}}-tags production -trimpath -buildvcs=false -ldflags="-w -s"{{end}}'
       DEFAULT_OUTPUT: '{{.BIN_DIR}}/{{.APP_NAME}}'
@@ -115,8 +116,10 @@ tasks:
     cmds:
       - lipo -create -output "{{.BIN_DIR}}/{{.APP_NAME}}" "{{.BIN_DIR}}/{{.APP_NAME}}-amd64" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64"
       - lipo -create -output "{{.BIN_DIR}}/{{.APP_NAME}}.chyingctl" "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chyingctl" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chyingctl"
+      - lipo -create -output "{{.BIN_DIR}}/{{.APP_NAME}}.chying-cli" "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chying-cli" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chying-cli"
       - rm "{{.BIN_DIR}}/{{.APP_NAME}}-amd64" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64"
       - rm "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chyingctl" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chyingctl"
+      - rm "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chying-cli" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chying-cli"
 
   build:universal:lipo:go:
     summary: Creates universal binary using wails3 tool lipo (Linux/Windows)
@@ -124,8 +127,10 @@ tasks:
     cmds:
       - wails3 tool lipo -output "{{.BIN_DIR}}/{{.APP_NAME}}" -input "{{.BIN_DIR}}/{{.APP_NAME}}-amd64" -input "{{.BIN_DIR}}/{{.APP_NAME}}-arm64"
       - wails3 tool lipo -output "{{.BIN_DIR}}/{{.APP_NAME}}.chyingctl" -input "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chyingctl" -input "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chyingctl"
+      - wails3 tool lipo -output "{{.BIN_DIR}}/{{.APP_NAME}}.chying-cli" -input "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chying-cli" -input "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chying-cli"
       - rm -f "{{.BIN_DIR}}/{{.APP_NAME}}-amd64" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64"
       - rm -f "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chyingctl" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chyingctl"
+      - rm -f "{{.BIN_DIR}}/{{.APP_NAME}}-amd64.chying-cli" "{{.BIN_DIR}}/{{.APP_NAME}}-arm64.chying-cli"
 
   package:
     summary: Packages the application into a `.app` bundle

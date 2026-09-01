@@ -24,30 +24,35 @@ jobs:
             goarch: amd64
             artifact_name: ChYing-windows-amd64.exe
             build_task: windows:build
+            cli_name: ChYing-cli-windows-amd64.exe
           # Linux AMD64
           - os: ubuntu-latest
             goos: linux
             goarch: amd64
             artifact_name: ChYing-linux-amd64
             build_task: linux:build
+            cli_name: ChYing-cli-linux-amd64
           # Linux ARM64
           - os: ubuntu-24.04-arm
             goos: linux
             goarch: arm64
             artifact_name: ChYing-linux-arm64
             build_task: linux:build
+            cli_name: ChYing-cli-linux-arm64
           # macOS AMD64 (Intel)
           - os: macos-15
             goos: darwin
             goarch: amd64
             artifact_name: ChYing-macos-amd64
             build_task: darwin:package
+            cli_name: ChYing-cli-macos-amd64
           # macOS ARM64 (Apple Silicon)
           - os: macos-latest
             goos: darwin
             goarch: arm64
             artifact_name: ChYing-macos-arm64
             build_task: darwin:package
+            cli_name: ChYing-cli-macos-arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -149,12 +154,15 @@ jobs:
         run: |
           mkdir -p release
           if [ "${{ matrix.goos }}" = "windows" ]; then
-            cp bin/*.exe "release/${{ matrix.artifact_name }}"
+            cp bin/ChYing.exe "release/${{ matrix.artifact_name }}"
+            cp bin/chying-cli.exe "release/${{ matrix.cli_name }}"
           elif [ "${{ matrix.goos }}" = "darwin" ]; then
             cp "bin/${{ matrix.artifact_name }}.dmg" release/
             cp "bin/${{ matrix.artifact_name }}.zip" release/
+            cp bin/ChYing.chying-cli "release/${{ matrix.cli_name }}"
           else
-            cp bin/* "release/${{ matrix.artifact_name }}"
+            cp bin/ChYing "release/${{ matrix.artifact_name }}"
+            cp bin/chying-cli "release/${{ matrix.cli_name }}"
           fi
 
       - name: Upload Artifact

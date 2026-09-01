@@ -22,6 +22,8 @@ tasks:
         platforms: [windows]
       - cmd: rm -f *.syso
         platforms: [linux, darwin]
+      # syso 清理后再构建 CLI，避免 GUI 的 manifest/图标被链接进 CLI
+      - go build {{.BUILD_FLAGS}} -o {{.BIN_DIR}}/chying-cli.exe ./cmd/chying-cli
     vars:
       BUILD_FLAGS: '{{if eq .PRODUCTION "true"}}-tags production -trimpath -buildvcs=false -ldflags="-w -s"{{else}}-buildvcs=false -gcflags=all="-l"{{end}}'
     env:
